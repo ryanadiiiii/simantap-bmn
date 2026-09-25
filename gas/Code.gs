@@ -1092,21 +1092,13 @@ function pastikanKolomPemeliharaanTambahan_() {
 }
 
 function pastikanHeaderMinimal_(sheet, headers) {
-  const numCols = Math.max(sheet.getLastColumn(), headers.length);
-  const currentHeaderRow = sheet.getRange(1, 1, 1, numCols).getDisplayValues()[0];
-  let changed = false;
-  const newHeaderRow = [...currentHeaderRow];
-
+  const currentLastCol = Math.max(sheet.getLastColumn(), 1);
+  const header = sheet.getRange(1, 1, 1, currentLastCol).getDisplayValues()[0];
   headers.forEach(function (h, idx) {
-    if (normalisasiTeks_(currentHeaderRow[idx]) !== normalisasiTeks_(h)) {
-      newHeaderRow[idx] = h;
-      changed = true;
+    if (normalisasiTeks_(header[idx]) !== normalisasiTeks_(h)) {
+      sheet.getRange(1, idx + 1).setValue(h);
     }
   });
-
-  if (changed) {
-    sheet.getRange(1, 1, 1, newHeaderRow.length).setValues([newHeaderRow]);
-  }
 }
 
 function pastikanKolomIdPertama_(sheet, headerId, prefix) {
