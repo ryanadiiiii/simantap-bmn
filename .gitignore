@@ -1,0 +1,11 @@
+node_modules/
+.wrangler/
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
+.clasp.json
+.clasprc.json
+.env
+.env.*
+.DS_Store
+Thumbs.db

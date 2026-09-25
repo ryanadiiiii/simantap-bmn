@@ -1,0 +1,20 @@
+{
+  "name": "simantap-bmn",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SIMANTAP BMN - Cloudflare Workers frontend + Google Apps Script backend",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "cf:login": "wrangler login",
+    "gas:login": "clasp login",
+    "gas:push": "clasp push",
+    "gas:watch": "clasp push --watch",
+    "gas:status": "clasp show-file-status"
+  },
+  "devDependencies": {
+    "@google/clasp": "latest",
+    "wrangler": "latest"
+  },
+  "type": "module"
+}

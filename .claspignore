@@ -1,0 +1,4 @@
+# rootDir sudah dibatasi ke folder gas oleh .clasp.json
+# File dot/config lokal tidak perlu dipush.
+**/.DS_Store
+**/Thumbs.db

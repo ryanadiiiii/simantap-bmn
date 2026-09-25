@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * { box-sizing: border-box; }
+    :root {
+      --primary:#003366;
+      --primary-2:#0b5ed7;
+      --accent:#ffcb05;
+      --bg:#eef3f9;
+      --card:#ffffff;
+      --text:#172033;
+      --muted:#667085;
+      --line:#e6eaf0;
+      --success:#198754;
+      --danger:#dc3545;
+      --orange:#fd7e14;
+      --shadow: 0 18px 45px rgba(16, 24, 40, .10);
+    }
+    body { font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif; margin: 0; background: radial-gradient(circle at top left, #ffffff 0, #eef5ff 32%, var(--bg) 100%); color: var(--text); }
+    .app-shell { max-width: 1240px; margin: 0 auto; padding: 22px 18px 34px; }
+    .topbar { background: linear-gradient(135deg, var(--primary), #0657a6); color: #fff; padding: 18px 20px; border-radius: 24px; box-shadow: var(--shadow); display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-mark { width: 46px; height: 46px; border-radius: 16px; background: rgba(255,255,255,.16); display: grid; place-items: center; font-size: 25px; border: 1px solid rgba(255,255,255,.22); }
+    .brand h1 { margin: 0; font-size: 22px; letter-spacing: .2px; }
+    .brand p { margin: 3px 0 0; opacity: .83; font-size: 13px; }
+    .container { background: rgba(255,255,255,.86); backdrop-filter: blur(10px); padding: 24px; border-radius: 24px; box-shadow: var(--shadow); border: 1px solid rgba(255,255,255,.74); }
+    .hidden { display: none !important; }
+    .hero { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(280px, .8fr); gap: 18px; align-items: stretch; }
+    .hero-main { background: linear-gradient(135deg, #003366, #0d6efd); color: white; padding: 30px; border-radius: 26px; min-height: 250px; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; position: relative; }
+    .hero-main:after { content:''; position:absolute; width:260px; height:260px; right:-80px; top:-80px; border-radius:50%; background: rgba(255,203,5,.24); }
+    .hero-main h2 { margin: 0 0 10px; font-size: 32px; line-height: 1.12; position: relative; z-index: 1; }
+    .hero-main p { max-width: 680px; margin: 0; line-height: 1.65; opacity: .92; position: relative; z-index: 1; }
+    .hero-badge { display:inline-flex; width:max-content; align-items:center; gap:8px; padding:8px 12px; background: rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.18); border-radius:999px; font-weight:700; font-size:13px; margin-bottom:18px; position: relative; z-index: 1; }
+    .hero-side { display: grid; gap: 14px; }
+    .quick-stat { background: #fff; border: 1px solid var(--line); border-radius: 22px; padding: 18px; box-shadow: 0 10px 26px rgba(16,24,40,.06); }
+    .quick-stat strong { display:block; font-size: 24px; color: var(--primary); }
+    .quick-stat span { color: var(--muted); font-size: 13px; }
+    .feature-grid, .module-grid, .admin-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 18px; }
+    .feature-card, .module-card, .admin-card { text-align: left; background: #fff; border: 1px solid var(--line); border-radius: 22px; padding: 22px; cursor: pointer; transition: .22s ease; box-shadow: 0 9px 24px rgba(16,24,40,.05); width: 100%; color: var(--text); }
+    .feature-card:hover, .module-card:hover, .admin-card:hover, .module-card.active { transform: translateY(-4px); box-shadow: var(--shadow); border-color: #b7d7ff; }
+    .feature-icon, .module-icon { width: 52px; height: 52px; display: grid; place-items: center; border-radius: 18px; background: #eff6ff; font-size: 26px; margin-bottom: 14px; }
+    .feature-card h3, .module-card h3, .admin-card h3 { margin: 0 0 8px; font-size: 18px; }
+    .feature-card p, .module-card p, .admin-card p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.55; }
+    .toolbar { display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 18px; flex-wrap: wrap; }
+    .toolbar h2 { margin: 0 0 4px; font-size: 26px; }
+    .muted { color: var(--muted); font-size: 14px; }
+    .card { background: #fff; border: 1px solid var(--line); border-radius: 22px; padding: 20px; margin-bottom: 18px; box-shadow: 0 8px 22px rgba(16,24,40,.05); }
+    .panel-card { border: 1px solid #d8e9ff; background: linear-gradient(180deg, #fff, #fbfdff); border-radius: 24px; padding: 18px; margin-top: 18px; box-shadow: var(--shadow); }
+    .panel-header { display:flex; justify-content:space-between; align-items:flex-start; gap:14px; margin-bottom: 14px; flex-wrap:wrap; }
+    .panel-header h3 { margin: 0 0 4px; font-size: 21px; }
+    button { padding: 12px 18px; border: 0; border-radius: 12px; cursor: pointer; font-weight: 800; transition: .22s; font-size: 14px; }
+    button:disabled { opacity: .65; cursor: not-allowed; }
+    .btn-main { background: var(--primary-2); color: #fff; }
+    .btn-main:hover { background: #074db2; }
+    .btn-green { background: var(--success); color: #fff; }
+    .btn-green:hover { background: #146c43; }
+    .btn-orange { background: var(--orange); color: #fff; }
+    .btn-orange:hover { background: #d8660f; }
+    .btn-dark { background: #111827; color: #fff; }
+    .btn-dark:hover { background: #020617; }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-danger:hover { background: #bb2d3b; }
+    .btn-light { background: #eef2f7; color: #1f2937; }
+    .btn-light:hover { background: #e1e7ef; }
+    .btn-small { padding: 7px 10px; font-size: 12px; border-radius: 9px; margin: 2px; width: auto; }
+    .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .form-grid .full { grid-column: 1 / -1; }
+    label { display: block; font-size: 13px; font-weight: 800; margin-bottom: 7px; color: #263244; }
+    input, select, textarea { width: 100%; padding: 12px 13px; border: 1px solid #cfd7e3; border-radius: 12px; font-size: 14px; background: #fff; outline: none; transition: .18s; }
+    input:focus, select:focus, textarea:focus { border-color: #72a7ff; box-shadow: 0 0 0 4px rgba(13,110,253,.10); }
+    textarea { min-height: 90px; resize: vertical; }
+    .small-note { display: block; margin-top: 6px; color: var(--muted); font-size: 12px; }
+    .alert { padding: 12px 14px; border-radius: 14px; margin: 12px 0; display: none; }
+    .alert.show { display: block; }
+    .alert-info { background: #e8f7ff; color: #055160; border:1px solid #b6effb; }
+    .alert-success { background: #eaf7ef; color: #0f5132; border:1px solid #badbcc; }
+    .alert-error { background: #fff1f2; color: #842029; border:1px solid #f5c2c7; }
+    .checkbox-panel { background: #fff; border: 1px solid #cfd7e3; border-radius: 14px; padding: 10px; min-height: 48px; max-height: 240px; overflow-y: auto; }
+    .checkbox-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 8px; border-bottom: 1px solid #eef1f4; font-weight: 600; cursor: pointer; }
+    .checkbox-item:last-child { border-bottom: 0; }
+    .checkbox-item input { width: auto; margin-top: 4px; }
+    .checkbox-item span { display: block; font-size: 12px; color: var(--muted); font-weight: 400; margin-top: 2px; }
+    .table-wrap { overflow-x: auto; border-radius: 16px; border: 1px solid var(--line); }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; background: #fff; }
+    th, td { border-bottom: 1px solid var(--line); padding: 12px; text-align: left; vertical-align: top; }
+    th { background: #f8fafc; color:#344054; font-size:13px; position: sticky; top: 0; z-index: 1; }
+    tr:last-child td { border-bottom: 0; }
+    .status { display: inline-block; padding: 6px 10px; border-radius: 999px; font-size: 12px; font-weight: 900; white-space: nowrap; }
+    .status-pending { background: #fff3cd; color: #856404; }
+    .status-acc, .status-disetujui { background: #d1e7dd; color: #0f5132; }
+    .status-tolak, .status-ditolak { background: #f8d7da; color: #842029; }
+    .status-dikembalikan { background: #cff4fc; color: #055160; }
+    .status-dipakai { background: #e0cffc; color: #3d0a91; }
+    .status-terlambat { background: #f8d7da; color: #842029; }
+    .status-default { background: #e2e3e5; color: #41464b; }
+    .action-group { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+    .action-group button:disabled { opacity: .65; cursor: not-allowed; }
+    .admin-note-cell { min-width: 240px; }
+    .admin-note-input { min-height: 72px; font-size: 13px; padding: 10px; border-radius: 11px; }
+    .admin-note-view { display:block; min-width: 180px; max-width: 280px; white-space: pre-wrap; line-height: 1.45; color: #344054; }
+    .filter-row { display: flex; gap: 10px; align-items: center; margin: 12px 0 14px; flex-wrap: wrap; }
+    .filter-row input { min-width: min(420px, 100%); flex: 1; }
+    .filter-row select { max-width: 220px; }
+    .summary-pill { display: inline-block; padding: 7px 11px; background: #eef2ff; color: #1e3a8a; border-radius: 999px; font-size: 13px; font-weight: 800; margin-top: 7px; }
+    .return-warning { border-left: 5px solid var(--danger); }
+    .empty-guide { background: #f8fbff; border: 1px dashed #bad7ff; border-radius: 22px; padding: 22px; color: var(--muted); text-align: center; margin-top: 18px; }
+    .stack { display: grid; gap: 16px; }
+
+    .home-clean { min-height: calc(100vh - 180px); display: grid; place-items: center; padding: 18px 0 8px; }
+    .home-panel { width: 100%; max-width: 980px; text-align: center; }
+    .home-logo-wrap { width: 132px; height: 146px; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; background: transparent; border: 0; box-shadow: none; overflow: visible; }
+    .home-logo-wrap img { width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: contain; object-position: center; display: block; }
+    .home-title { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.06; color: var(--primary); letter-spacing: -.5px; }
+    .home-subtitle { margin: 10px auto 0; color: var(--muted); font-size: 15px; max-width: 540px; line-height: 1.55; }
+    .home-feature-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-top: 26px; }
+    .home-feature-card { min-height: 150px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 1px solid var(--line); border-radius: 26px; background: rgba(255,255,255,.96); box-shadow: 0 12px 30px rgba(16,24,40,.07); cursor: pointer; transition: .22s ease; color: var(--text); padding: 22px 16px; }
+    .home-feature-card:hover { transform: translateY(-5px); box-shadow: var(--shadow); border-color: rgba(255,203,5,.8); }
+    .home-feature-icon { width: 58px; height: 58px; border-radius: 20px; display: grid; place-items: center; font-size: 29px; background: linear-gradient(135deg, #eff6ff, #fff8cc); margin-bottom: 12px; }
+    .home-feature-card h3 { margin: 0; font-size: 18px; color: var(--primary); }
+    .home-feature-card span { display: block; margin-top: 6px; font-size: 13px; color: var(--muted); font-weight: 600; }
+    .inventory-room-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 14px 0 18px; }
+    .inventory-room-card { text-align:left; border:1px solid var(--line); background:#fff; border-radius:20px; padding:16px; cursor:pointer; transition:.2s ease; box-shadow:0 8px 18px rgba(16,24,40,.05); }
+    .inventory-room-card:hover, .inventory-room-card.active { transform:translateY(-3px); border-color:#9cc5ff; box-shadow:var(--shadow); }
+    .inventory-room-card h3 { margin:0 0 6px; color:var(--primary); font-size:17px; }
+    .inventory-room-card .count { font-size:28px; font-weight:900; color:#0b5ed7; margin:8px 0 4px; }
+    .inventory-meta { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+    .inventory-meta span { display:inline-flex; padding:5px 8px; border-radius:999px; background:#f1f5f9; color:#344054; font-size:12px; font-weight:800; }
+    .inventory-control { display:grid; grid-template-columns: minmax(220px, .7fr) minmax(260px, 1fr) auto; gap:10px; align-items:end; }
+    .compact-filter-row { justify-content: flex-end; }
+    .sort-row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:flex-end; margin:0 0 14px; }
+    .sort-label { font-size:12px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; }
+    .sort-chip { padding:9px 12px; border:1px solid #d7dfeb; background:#fff; color:#24364f; border-radius:999px; font-size:12px; font-weight:800; cursor:pointer; transition:.2s; }
+    .sort-chip:hover { border-color:#9db8dd; transform:translateY(-1px); }
+    .sort-chip.active { background:var(--primary); color:#fff; border-color:var(--primary); box-shadow:0 8px 18px rgba(0,51,102,.18); }
+
+    /* --- FOOTER RESMI SIMANTAP BMN: FIXED / FREEZE --- */
+    body { padding-bottom: 160px; }
+    .app-footer {
+      position: fixed;
+      left: 50%;
+      bottom: 12px;
+      transform: translateX(-50%);
+      z-index: 1200;
+      width: min(calc(100% - 36px), 1204px);
+      margin: 0;
+      border-radius: 22px;
+      overflow: hidden;
+      background: linear-gradient(135deg, #002b57 0%, #003d78 58%, #075ca8 100%);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,.14);
+      box-shadow: 0 18px 46px rgba(0,51,102,.24);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .footer-inner { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 24px; align-items: center; padding: 20px 22px 17px; }
+    .footer-brand { display: flex; align-items: center; gap: 14px; min-width: 0; }
+    .footer-logo-wrap { width: 54px; height: 60px; flex: 0 0 54px; display: flex; align-items: center; justify-content: center; }
+    .footer-logo { width: 100%; height: 100%; object-fit: contain; display: block; }
+    .footer-title { margin: 0; font-size: 17px; font-weight: 900; letter-spacing: .2px; }
+    .footer-subtitle { margin: 4px 0 0; font-size: 12.5px; line-height: 1.5; color: rgba(255,255,255,.78); }
+    .footer-office { margin: 2px 0 0; font-size: 12.5px; line-height: 1.5; color: rgba(255,255,255,.92); font-weight: 700; }
+    .footer-meta { text-align: right; min-width: 190px; }
+    .footer-badge { display: inline-flex; align-items: center; gap: 8px; padding: 7px 11px; border-radius: 999px; background: rgba(255,203,5,.14); border: 1px solid rgba(255,203,5,.36); color: #fff3ad; font-size: 12px; font-weight: 900; }
+    .footer-status-dot { width: 8px; height: 8px; border-radius: 999px; background: var(--accent); box-shadow: 0 0 0 4px rgba(255,203,5,.12); }
+    .footer-meta small { display: block; margin-top: 8px; color: rgba(255,255,255,.68); font-size: 11.5px; }
+    .footer-bottom { display: flex; justify-content: space-between; gap: 14px; flex-wrap: wrap; padding: 10px 22px; border-top: 1px solid rgba(255,255,255,.12); background: rgba(0,0,0,.08); color: rgba(255,255,255,.70); font-size: 11.5px; }
+    .footer-bottom strong { color: rgba(255,255,255,.92); }
+
+    @media (max-width: 900px) { .hero, .feature-grid, .module-grid, .admin-grid, .home-feature-grid, .inventory-room-grid, .inventory-control { grid-template-columns: 1fr; } .topbar { border-radius: 0 0 24px 24px; margin: -22px -18px 18px; } .home-clean { min-height: auto; padding: 6px 0; } .home-logo-wrap { width: 108px; height: 120px; } }
+    @media (max-width: 760px) {
+      body { padding-bottom: 215px; }
+      .container { padding: 16px; }
+      .form-grid { grid-template-columns: 1fr; }
+      button { width: 100%; }
+      .btn-small { width: auto; }
+      .hero-main { padding: 22px; }
+      .hero-main h2 { font-size: 25px; }
+      .app-footer { width: calc(100% - 20px); bottom: 8px; border-radius: 18px; }
+      .footer-inner { grid-template-columns: 1fr; gap: 10px; padding: 14px 16px 12px; }
+      .footer-brand { gap: 10px; }
+      .footer-meta { text-align: left; min-width: 0; }
+      .footer-meta small { display: none; }
+      .footer-bottom { flex-direction: column; gap: 3px; padding: 8px 16px; }
+      .footer-logo-wrap { width: 42px; height: 48px; flex-basis: 42px; }
+      .footer-title { font-size: 15px; }
+      .footer-subtitle, .footer-office { font-size: 11.5px; }
+    }
+  </style>
+</head>
+<body>
+<div class="app-shell">
+  <div class="topbar hidden" id="appTopbar">
+    <div class="brand">
+      <div class="brand-mark">📦</div>
+      <div>
+        <h1>SIMANTAP BMN</h1>
+        <p>Sistem Monitoring Terpadu Penatausahaan Barang Milik Negara</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <datalist id="listPegawai"></datalist>
+    <datalist id="listBMN"></datalist>
+
+    <section id="dashboardUtama">
+      <div class="home-clean">
+        <div class="home-panel">
+          <div class="home-logo-wrap">
+            <img src="data:image/webp;base64,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" alt="Logo Pengayoman">
+          </div>
+          <h2 class="home-title">SIMANTAP BMN</h2>
+          <p class="home-subtitle">Sistem Monitoring Terpadu Penatausahaan Barang Milik Negara</p>
+          <p class="home-subtitle" style="margin-top:6px;">Pilih layanan yang dibutuhkan.</p>
+
+          <div class="home-feature-grid">
+            <button class="home-feature-card" onclick="bukaDashboard('dashboardPinjamPakaiBMN')">
+              <div class="home-feature-icon">📦</div>
+              <h3>Pinjam Pakai BMN</h3>
+              <span>Ruangan, kendaraan, sarpras</span>
+            </button>
+            <button class="home-feature-card" onclick="bukaDashboard('dashboardPemeliharaan')">
+              <div class="home-feature-icon">🛠️</div>
+              <h3>Pemeliharaan BMN</h3>
+              <span>Laporan dan riwayat</span>
+            </button>
+            <button class="home-feature-card" onclick="bukaDashboard('dashboardInventarisRuangan')">
+              <div class="home-feature-icon">🏢</div>
+              <h3>Inventaris Ruangan</h3>
+              <span>Lihat BMN per ruangan</span>
+            </button>
+            <button class="home-feature-card" onclick="bukaLoginAdmin()">
+              <div class="home-feature-icon">🔐</div>
+              <h3>Login Administrator</h3>
+              <span>Kelola data dan persetujuan</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="dashboardInventarisRuangan" class="hidden">
+      <div class="toolbar">
+        <div>
+          <h2>Daftar Inventaris BMN Per Ruangan</h2>
+          <p class="muted">Pilih ruangan untuk melihat daftar BMN yang tercatat pada lokasi tersebut.</p>
+        </div>
+        <button class="btn-light" onclick="kembaliKeUtama()">← Kembali</button>
+      </div>
+
+      <div class="card">
+        <div class="inventory-control">
+          <div>
+            <label for="selectInventarisLokasi">Pilih Ruangan/Lokasi</label>
+            <select id="selectInventarisLokasi" onchange="pilihLokasiInventarisSelect()">
+              <option value="">Memuat lokasi...</option>
+            </select>
+          </div>
+          <div>
+            <label for="searchInventarisRuangan">Cari BMN di ruangan terpilih</label>
+            <input id="searchInventarisRuangan" placeholder="Cari kode barang, NUP, nama BMN, merk, kondisi, atau PJ..." oninput="renderInventarisRuangan(false)">
+          </div>
+          <div>
+            <button class="btn-light" onclick="resetInventarisRuangan()">Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="inventarisRoomGrid" class="inventory-room-grid"></div>
+
+      <div class="card">
+        <div class="panel-header">
+          <div>
+            <h3 id="judulInventarisRuangan">Inventaris Ruangan</h3>
+            <p id="ringkasanInventarisRuangan" class="muted">Pilih salah satu ruangan untuk menampilkan data.</p>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>No</th><th>Kode Barang</th><th>NUP</th><th>Nama BMN</th><th>Merk</th><th>Tahun</th><th>Kondisi</th><th>Penanggung Jawab/Pemilik</th></tr>
+            </thead>
+            <tbody id="tabelInventarisRuangan"><tr><td colspan="8">Memuat data inventaris...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="dashboardPinjamPakaiBMN" class="hidden">
+      <div class="toolbar">
+        <div>
+          <h2>Pinjam Pakai BMN</h2>
+          <p class="muted">Pilih jenis peminjaman. Form dan riwayat akan muncul sesuai pilihan agar tidak perlu scroll terlalu panjang.</p>
+        </div>
+        <button class="btn-light" onclick="kembaliKeUtama()">← Kembali</button>
+      </div>
+      <div id="alertPinjam" class="alert"></div>
+
+      <div class="module-grid">
+        <button class="module-card" data-panel="ruangan" onclick="bukaPanelPinjam('ruangan')"><div class="module-icon">🏛️</div><h3>Pinjam Ruangan</h3><p>Ruang Aula, Zona Integritas, dan Transit lengkap dengan jadwal dan checklist BMN.</p></button>
+        <button class="module-card" data-panel="kendaraan" onclick="bukaPanelPinjam('kendaraan')"><div class="module-icon">🚗</div><h3>Pinjam Kendaraan</h3><p>Ajukan kendaraan dinas dengan kegiatan, tujuan, lama pakai, dan batas kembali.</p></button>
+        <button class="module-card" data-panel="sarpras" onclick="bukaPanelPinjam('sarpras')"><div class="module-icon">🎛️</div><h3>Pinjam Sarpras</h3><p>Ajukan sarpras kegiatan seperti laptop, proyektor, sound system, atau barang lainnya.</p></button>
+      </div>
+      <div id="guidePinjam" class="empty-guide">Pilih salah satu jenis pinjam pakai di atas untuk membuka form dan riwayatnya.</div>
+
+      <div id="panelPinjamRuangan" class="panel-card hidden">
+        <div class="panel-header"><div><h3>Pinjam Ruangan</h3><p class="muted">Isi detail kegiatan sebagai bahan pertimbangan administrator.</p></div></div>
+        <div class="card">
+          <h3>Form Pinjam Ruangan</h3>
+          <form id="formBooking" onsubmit="submitBooking(event)">
+            <div class="form-grid">
+              <div><label for="tanggalBooking">Tanggal</label><input type="date" id="tanggalBooking" required onchange="validasiBookingRealtime()"></div>
+              <div><label for="ruanganBooking">Ruangan</label><select id="ruanganBooking" required onchange="renderChecklistBMNPinjam(); validasiBookingRealtime();"><option value="">Pilih ruangan</option><option value="Ruang Aula">Ruang Aula</option><option value="Ruang Zona Integritas">Ruang Zona Integritas</option><option value="Ruang Transit">Ruang Transit</option></select></div>
+              <div><label for="jamMulaiBooking">Jam Mulai</label><input type="time" id="jamMulaiBooking" required onchange="validasiBookingRealtime()"></div>
+              <div><label for="jamSelesaiBooking">Jam Selesai</label><input type="time" id="jamSelesaiBooking" required onchange="validasiBookingRealtime()"></div>
+              <div><label for="namaPeminjamRuangan">Nama Peminjam</label><input type="text" id="namaPeminjamRuangan" list="listPegawai" placeholder="Ketik nama pegawai..." required></div>
+              <div><label for="namaKegiatanRuangan">Nama Kegiatan</label><input type="text" id="namaKegiatanRuangan" placeholder="Contoh: Rapat koordinasi" required></div>
+              <div><label for="jumlahPesertaRuangan">Jumlah Peserta</label><input type="number" id="jumlahPesertaRuangan" min="1" placeholder="Contoh: 50" required></div>
+              <div><label for="pesertaJabatanRuangan">Peserta / Jabatan</label><input type="text" id="pesertaJabatanRuangan" placeholder="Contoh: Pejabat struktural, JF, pegawai, tamu eksternal" required></div>
+              <div class="full"><label>BMN Dipinjam</label><div id="bmnChecklistContainer" class="checkbox-panel"><div class="muted">Pilih ruangan terlebih dahulu untuk menampilkan BMN yang ada di ruangan tersebut.</div></div><input type="hidden" id="bmnDipinjam" value="-"><small class="small-note">Daftar BMN mengikuti kolom Lokasi pada sheet Data_BMN. Identitas barang memakai Kode Barang + NUP.</small></div>
+            </div>
+            <div style="margin-top:16px;"><button id="btnSubmitBooking" class="btn-green" type="submit">Kirim Pengajuan Pinjam Ruangan</button></div>
+          </form>
+        </div>
+        <div class="card"><div class="panel-header"><div><h3>Jadwal Ruangan Hari Ini</h3><p class="muted">Hanya jadwal pada hari ini yang ditampilkan pada halaman pengguna. <span id="labelTanggalJadwalHariIni"></span></p></div><button class="btn-light" onclick="muatJadwal()">Refresh</button></div><div class="table-wrap"><table><thead><tr><th>Tanggal</th><th>Ruangan</th><th>Waktu</th><th>Peminjam</th><th>Kegiatan</th><th>Peserta</th><th>BMN</th><th>Status</th></tr></thead><tbody id="tabelJadwalPinjam"><tr><td colspan="8">Klik modul Pinjam Ruangan untuk memuat jadwal hari ini.</td></tr></tbody></table></div></div>
+      </div>
+
+      <div id="panelPinjamKendaraan" class="panel-card hidden">
+        <div class="panel-header"><div><h3>Pinjam Kendaraan</h3><p class="muted">Ajukan kendaraan dan tentukan batas kembali agar mudah dipantau.</p></div></div>
+        <div class="card"><h3>Form Pinjam Kendaraan</h3><form id="formPinjamKendaraan" onsubmit="submitPinjamKendaraan(event)"><div class="form-grid"><div><label for="namaPeminjamKendaraan">Nama Peminjam</label><input id="namaPeminjamKendaraan" list="listPegawai" placeholder="Ketik nama pegawai..." required></div><div><label for="kegiatanKendaraan">Kegiatan Apa</label><input id="kegiatanKendaraan" placeholder="Contoh: Koordinasi ke Pemda" required></div><div><label for="tujuanKendaraan">Tujuan</label><input id="tujuanKendaraan" placeholder="Contoh: Kantor Bupati Lombok Barat" required></div><div><label for="lamaKendaraan">Berapa Lama</label><input id="lamaKendaraan" placeholder="Contoh: 1 hari / 08.00-16.00" required></div><div class="full"><label for="batasKembaliKendaraan">Batas Kembali</label><input type="datetime-local" id="batasKembaliKendaraan" required><small class="small-note">Ini dipakai untuk mengontrol agar kendaraan dikembalikan tepat waktu.</small></div></div><div style="margin-top:16px;"><button id="btnSubmitKendaraan" class="btn-green" type="submit">Kirim Pengajuan Pinjam Kendaraan</button></div></form></div>
+        <div class="card"><div class="panel-header"><div><h3>Riwayat Pinjam Kendaraan</h3><p class="muted">Status akan berubah menjadi Terlambat jika melewati batas kembali. Keterangan admin hanya dapat diisi oleh admin.</p></div><button class="btn-light" onclick="muatPinjamKendaraan()">Refresh</button></div><div class="table-wrap"><table><thead><tr><th>ID</th><th>Peminjam</th><th>Kegiatan</th><th>Tujuan</th><th>Lama</th><th>Batas Kembali</th><th>Status</th><th>Keterangan Admin</th></tr></thead><tbody id="tabelPinjamKendaraan"><tr><td colspan="8">Klik modul Pinjam Kendaraan untuk memuat data.</td></tr></tbody></table></div></div>
+      </div>
+
+      <div id="panelPinjamSarpras" class="panel-card hidden">
+        <div class="panel-header"><div><h3>Pinjam Sarpras</h3><p class="muted">Ajukan sarpras kegiatan dan tentukan batas kembali.</p></div></div>
+        <div class="card"><h3>Form Pinjam Sarpras</h3><form id="formPinjamSarpras" onsubmit="submitPinjamSarpras(event)"><div class="form-grid"><div><label for="namaPeminjamSarpras">Nama Peminjam</label><input id="namaPeminjamSarpras" list="listPegawai" placeholder="Ketik nama pegawai..." required></div><div><label for="kegiatanSarpras">Kegiatan Apa</label><input id="kegiatanSarpras" placeholder="Contoh: Sosialisasi layanan" required></div><div><label for="tempatSarpras">Tempat Kegiatan</label><input id="tempatSarpras" placeholder="Contoh: Aula Kanwil" required></div><div><label for="jenisBarangSarpras">Jenis Barang</label><input id="jenisBarangSarpras" placeholder="Contoh: Laptop, proyektor, sound system" required></div><div><label for="lamaSarpras">Berapa Lama</label><input id="lamaSarpras" placeholder="Contoh: 3 jam / 1 hari" required></div><div><label for="batasKembaliSarpras">Batas Kembali</label><input type="datetime-local" id="batasKembaliSarpras" required></div></div><div style="margin-top:16px;"><button id="btnSubmitSarpras" class="btn-green" type="submit">Kirim Pengajuan Pinjam Sarpras</button></div></form></div>
+        <div class="card"><div class="panel-header"><div><h3>Riwayat Pinjam Sarpras</h3><p class="muted">Status akan berubah menjadi Terlambat jika melewati batas kembali.</p></div><button class="btn-light" onclick="muatPinjamSarpras()">Refresh</button></div><div class="table-wrap"><table><thead><tr><th>ID</th><th>Peminjam</th><th>Kegiatan</th><th>Tempat</th><th>Jenis Barang</th><th>Lama</th><th>Batas Kembali</th><th>Status</th></tr></thead><tbody id="tabelPinjamSarpras"><tr><td colspan="8">Klik modul Pinjam Sarpras untuk memuat data.</td></tr></tbody></table></div></div>
+      </div>
+    </section>
+
+    <section id="dashboardPemeliharaan" class="hidden">
+      <div class="toolbar"><div><h2>Pemeliharaan BMN</h2><p class="muted">Riwayat pemeliharaan ditampilkan dulu. Form laporan baru dibuka hanya saat diperlukan.</p></div><button class="btn-light" onclick="kembaliKeUtama()">← Kembali</button></div>
+      <div id="alertPemeliharaan" class="alert"></div>
+      <div class="card"><div class="panel-header"><div><h3>Riwayat Pemeliharaan</h3><p class="muted">Pantau laporan yang sudah masuk beserta statusnya.</p></div><div style="display:flex; gap:10px; flex-wrap:wrap;"><button id="btnToggleFormPemeliharaanUser" class="btn-main" onclick="toggleFormPemeliharaanUser()">➕ Buat Laporan Pemeliharaan</button><button class="btn-light" onclick="muatPemeliharaan()">Refresh</button></div></div><div class="table-wrap"><table><thead><tr><th>Kode Barang</th><th>NUP</th><th>Nama BMN</th><th>Tanggal</th><th>Keterangan</th><th>Foto</th><th>Status</th></tr></thead><tbody id="tabelPemeliharaan"><tr><td colspan="7">Memuat data...</td></tr></tbody></table></div></div>
+      <div id="cardFormPemeliharaanUser" class="card hidden"><h3>Form Lapor Pemeliharaan</h3><form id="formPemeliharaan" onsubmit="submitPemeliharaan(event)"><div class="form-grid"><div class="full"><label for="bmnPemeliharaanInput">Pilih BMN</label><input id="bmnPemeliharaanInput" list="listBMN" placeholder="Ketik Kode Barang, NUP, nama BMN, merk, atau lokasi..." required></div><div><label for="tanggalPemeliharaan">Tanggal</label><input type="date" id="tanggalPemeliharaan" required></div><div><label for="fotoPemeliharaan">Upload Foto Kerusakan</label><input type="file" id="fotoPemeliharaan" accept="image/*"></div><div class="full"><label for="deskripsiPemeliharaan">Deskripsi / Keterangan</label><textarea id="deskripsiPemeliharaan" placeholder="Contoh: AC tidak dingin, kursi rusak, proyektor tidak menyala..." required></textarea></div></div><div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;"><button id="btnSubmitPemeliharaan" class="btn-green" type="submit">Kirim Laporan Pemeliharaan</button><button class="btn-light" type="button" onclick="toggleFormPemeliharaanUser()">Batal</button></div></form></div>
+    </section>
+
+    <section id="dashboardLoginAdmin" class="hidden">
+      <div class="toolbar"><div><h2>Login Administrator</h2><p class="muted">Masukkan PIN administrator untuk mengelola BMN.</p></div><button class="btn-light" onclick="kembaliKeUtama()">← Kembali</button></div>
+      <div id="alertLoginAdmin" class="alert"></div>
+      <div class="card"><form id="formLoginAdmin" onsubmit="submitLoginAdmin(event)"><div class="form-grid"><div><label for="pinAdmin">PIN Administrator</label><input type="password" id="pinAdmin" placeholder="Masukkan PIN" autocomplete="off" required></div></div><div style="margin-top:16px;"><button id="btnLoginAdmin" class="btn-dark" type="submit">Masuk Administrator</button></div></form></div>
+    </section>
+
+    <section id="dashboardAdmin" class="hidden">
+      <div class="toolbar"><div><h2>Dashboard Administrator</h2><p class="muted">Pilih modul administrasi yang ingin dikelola.</p></div><button class="btn-danger" onclick="logoutAdmin()">Logout</button></div>
+      <div class="admin-grid">
+        <button class="admin-card" onclick="bukaAdminFitur('adminDataBMN')"><div class="feature-icon">🗂️</div><h3>Data BMN</h3><p>Main data barang: Kode Barang, NUP, nama, merk, tahun, dan kondisi.</p></button>
+        <button class="admin-card" onclick="bukaAdminFitur('adminLokasiBMN')"><div class="feature-icon">📍</div><h3>Lokasi BMN</h3><p>Pelacakan posisi barang dan penanggung jawab/pemiliknya.</p></button>
+        <button class="admin-card" onclick="bukaAdminFitur('adminPemeliharaan')"><div class="feature-icon">🛠️</div><h3>Pemeliharaan</h3><p>ACC laporan user dan input pemeliharaan rutin dari administrator.</p></button>
+        <button class="admin-card" onclick="bukaAdminFitur('adminPinjamPakaiBMN')"><div class="feature-icon">📦</div><h3>Pinjam Pakai BMN</h3><p>Monitoring dan ACC pinjam ruangan, kendaraan, dan sarpras.</p></button>
+      </div>
+    </section>
+
+    <section id="adminDataBMN" class="hidden">
+      <div class="toolbar"><div><h2>Data BMN</h2><p class="muted">Tabel ini khusus main data barang agar berbeda dengan Lokasi BMN.</p><span id="jumlahAdminDataBMN" class="summary-pill">Memuat data...</span></div><div style="display:flex; gap:10px; flex-wrap:wrap;"><button class="btn-green" onclick="toggleFormInputBMN(true)">➕ Input Data BMN Baru</button><button class="btn-light" onclick="kembaliKeDashboardAdmin()">← Kembali ke Admin</button></div></div>
+      <div id="cardInputBMNBaru" class="card hidden"><h3>Input Data BMN Baru</h3><div id="alertInputBMN" class="alert"></div><form id="formInputBMNBaru" onsubmit="submitInputBMNBaru(event)"><div class="form-grid"><div><label for="inputKodeBarangBMN">Kode Barang</label><input id="inputKodeBarangBMN" placeholder="Contoh: 3.10.01.02.001" required></div><div><label for="inputNupBMN">NUP</label><input id="inputNupBMN" placeholder="Contoh: 1" required></div><div><label for="inputNamaBMN">Nama BMN</label><input id="inputNamaBMN" placeholder="Contoh: Proyektor Epson" required></div><div><label for="inputMerkBMN">Merk</label><input id="inputMerkBMN" placeholder="Contoh: Epson EB-X500"></div><div><label for="inputTahunBMN">Tahun Perolehan</label><input id="inputTahunBMN" type="number" min="1900" max="2100" placeholder="Contoh: 2024"></div><div><label for="inputKondisiBMN">Kondisi</label><select id="inputKondisiBMN" required><option value="Baik">Baik</option><option value="Rusak Ringan">Rusak Ringan</option><option value="Rusak Berat">Rusak Berat</option></select></div><div><label for="inputLokasiBMN">Lokasi</label><input id="inputLokasiBMN" list="daftarLokasiRuanganBMN" placeholder="Contoh: Ruang Aula"><datalist id="daftarLokasiRuanganBMN"><option value="Ruang Aula"></option><option value="Ruang Zona Integritas"></option><option value="Ruang Transit"></option></datalist><small class="small-note">Dipakai oleh fitur Lokasi BMN dan checklist pinjam ruangan.</small></div><div class="full"><label for="inputPjBMN">Penanggung Jawab / Pemilik</label><input id="inputPjBMN" placeholder="Contoh: Bagian Umum / Nama pegawai"></div></div><div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;"><button id="btnSimpanBMNBaru" class="btn-green" type="submit">Simpan Data BMN</button><button class="btn-light" type="button" onclick="toggleFormInputBMN(false)">Batal</button></div></form></div>
+      <div class="card">
+        <div class="filter-row compact-filter-row">
+          <input id="filterAdminDataBMN" placeholder="Cari cepat semua kolom..." oninput="renderAdminDataBMN()">
+          <button class="btn-light" onclick="resetAllAdminDataBMNSearch()">Reset Search</button>
+        </div>
+        <div class="sort-row">
+          <span class="sort-label">Urutkan:</span>
+          <button class="sort-chip" data-sort-group="data-bmn" data-sort-key="kodeBarang" onclick="setSortDataBMN('kodeBarang')">Kode Barang</button>
+          <button class="sort-chip" data-sort-group="data-bmn" data-sort-key="nup" onclick="setSortDataBMN('nup')">NUP</button>
+          <button class="sort-chip" data-sort-group="data-bmn" data-sort-key="nama" onclick="setSortDataBMN('nama')">Nama BMN</button>
+          <button class="sort-chip" data-sort-group="data-bmn" data-sort-key="merk" onclick="setSortDataBMN('merk')">Merk</button>
+          <button class="sort-chip" data-sort-group="data-bmn" data-sort-key="tahunPerolehan" onclick="setSortDataBMN('tahunPerolehan')">Tahun</button>
+          <button class="sort-chip" data-sort-group="data-bmn" data-sort-key="kondisi" onclick="setSortDataBMN('kondisi')">Kondisi</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>No</th><th>Kode Barang</th><th>NUP</th><th>Nama BMN</th><th>Merk</th><th>Tahun Perolehan</th><th>Kondisi</th></tr>
+            </thead>
+            <tbody id="tabelAdminDataBMN"><tr><td colspan="7">Memuat data...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="adminLokasiBMN" class="hidden">
+      <div class="toolbar"><div><h2>Lokasi BMN</h2><p class="muted">Tabel ini fokus pada posisi barang dan siapa penanggung jawabnya.</p><span id="jumlahAdminLokasiBMN" class="summary-pill">Memuat data...</span></div><button class="btn-light" onclick="kembaliKeDashboardAdmin()">← Kembali ke Admin</button></div>
+      <div class="card">
+        <div class="filter-row compact-filter-row">
+          <input id="filterAdminLokasiBMN" placeholder="Cari cepat semua kolom..." oninput="renderAdminLokasiBMN()">
+          <button class="btn-light" onclick="resetAllAdminLokasiBMNSearch()">Reset Search</button>
+        </div>
+        <div class="sort-row">
+          <span class="sort-label">Urutkan:</span>
+          <button class="sort-chip" data-sort-group="lokasi-bmn" data-sort-key="lokasi" onclick="setSortLokasiBMN('lokasi')">Lokasi</button>
+          <button class="sort-chip" data-sort-group="lokasi-bmn" data-sort-key="pj" onclick="setSortLokasiBMN('pj')">PJ/Pemilik</button>
+          <button class="sort-chip" data-sort-group="lokasi-bmn" data-sort-key="kodeBarang" onclick="setSortLokasiBMN('kodeBarang')">Kode Barang</button>
+          <button class="sort-chip" data-sort-group="lokasi-bmn" data-sort-key="nup" onclick="setSortLokasiBMN('nup')">NUP</button>
+          <button class="sort-chip" data-sort-group="lokasi-bmn" data-sort-key="nama" onclick="setSortLokasiBMN('nama')">Nama BMN</button>
+          <button class="sort-chip" data-sort-group="lokasi-bmn" data-sort-key="tahunPerolehan" onclick="setSortLokasiBMN('tahunPerolehan')">Tahun</button>
+          <button class="sort-chip" data-sort-group="lokasi-bmn" data-sort-key="kondisi" onclick="setSortLokasiBMN('kondisi')">Kondisi</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>No</th><th>Lokasi</th><th>Penanggung Jawab/Pemilik</th><th>Kode Barang</th><th>NUP</th><th>Nama BMN</th><th>Merk</th><th>Tahun</th><th>Kondisi</th></tr>
+            </thead>
+            <tbody id="tabelAdminLokasiBMN"><tr><td colspan="9">Memuat data...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="adminPemeliharaan" class="hidden">
+      <div class="toolbar"><div><h2>Pemeliharaan</h2><p class="muted">ACC laporan user dan input pemeliharaan rutin dari administrator.</p></div><button class="btn-light" onclick="kembaliKeDashboardAdmin()">← Kembali ke Admin</button></div>
+      <div id="alertAdminPemeliharaan" class="alert"></div>
+      <div class="card"><h3>Input Pemeliharaan Rutin oleh Admin</h3><form id="formAdminPemeliharaan" onsubmit="submitAdminPemeliharaan(event)"><div class="form-grid"><div class="full"><label for="bmnAdminPemeliharaanInput">Pilih BMN</label><input id="bmnAdminPemeliharaanInput" list="listBMN" placeholder="Ketik Kode Barang, NUP, nama BMN, merk, atau lokasi..." required></div><div><label for="tanggalAdminPemeliharaan">Tanggal Pemeliharaan</label><input type="date" id="tanggalAdminPemeliharaan" required></div><div><label for="fotoAdminPemeliharaan">Upload Foto / Bukti</label><input type="file" id="fotoAdminPemeliharaan" accept="image/*"></div><div class="full"><label for="deskripsiAdminPemeliharaan">Keterangan Pemeliharaan</label><textarea id="deskripsiAdminPemeliharaan" placeholder="Contoh: Pemeliharaan rutin meja, pengecekan AC, service proyektor..." required></textarea></div></div><div style="margin-top:16px;"><button id="btnSubmitAdminPemeliharaan" class="btn-green" type="submit">Simpan Pemeliharaan Rutin</button></div></form></div>
+      <div class="card"><div class="panel-header"><div><h3>Daftar Pemeliharaan</h3><p class="muted">Admin bisa ACC/Tolak laporan dari user.</p></div><button class="btn-light" onclick="muatPemeliharaanAdmin()">Refresh</button></div><div class="table-wrap"><table><thead><tr><th>ID Pengajuan</th><th>Kode Barang</th><th>NUP</th><th>Nama BMN</th><th>Tanggal</th><th>Keterangan</th><th>Foto</th><th>Sumber</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="tabelAdminPemeliharaan"><tr><td colspan="10">Memuat data...</td></tr></tbody></table></div></div>
+    </section>
+
+    <section id="adminPinjamPakaiBMN" class="hidden">
+      <div class="toolbar"><div><h2>ACC Pinjam Pakai BMN</h2><p class="muted">Pilih modul monitoring agar tabel tidak menumpuk dalam satu halaman.</p></div><button class="btn-light" onclick="kembaliKeDashboardAdmin()">← Kembali ke Admin</button></div>
+      <div id="alertAdminPinjam" class="alert"></div>
+      <div class="module-grid"><button class="module-card" data-admin-panel="ruangan" onclick="bukaPanelAdminPinjam('ruangan')"><div class="module-icon">🏛️</div><h3>Pinjam Ruangan</h3><p>Monitoring dan ACC permintaan penggunaan ruangan.</p></button><button class="module-card" data-admin-panel="kendaraan" onclick="bukaPanelAdminPinjam('kendaraan')"><div class="module-icon">🚗</div><h3>Pinjam Kendaraan</h3><p>Monitoring kendaraan, batas kembali, dan status terlambat.</p></button><button class="module-card" data-admin-panel="sarpras" onclick="bukaPanelAdminPinjam('sarpras')"><div class="module-icon">🎛️</div><h3>Pinjam Sarpras</h3><p>Monitoring sarpras kegiatan dan pengembaliannya.</p></button></div>
+      <div id="guideAdminPinjam" class="empty-guide">Pilih salah satu modul di atas untuk membuka data pengajuan.</div>
+      <div id="panelAdminRuangan" class="panel-card hidden"><div class="panel-header"><div><h3>Permintaan Pinjam Ruangan</h3><span id="summaryAdminJadwal" class="summary-pill">Belum dimuat</span></div><button class="btn-light" onclick="muatJadwalAdmin()">Refresh</button></div><div class="filter-row"><input id="filterAdminJadwal" placeholder="Cari ID, tanggal, ruangan, peminjam, kegiatan, atau BMN..." oninput="renderTabelJadwalAdmin(daftarJadwal)"><select id="filterStatusAdminJadwal" onchange="renderTabelJadwalAdmin(daftarJadwal)"><option value="Semua">Semua Status</option><option value="Pending">Pending</option><option value="ACC">ACC</option><option value="Ditolak">Ditolak</option></select></div><div class="table-wrap"><table><thead><tr><th>ID</th><th>Tanggal</th><th>Ruangan</th><th>Waktu</th><th>Peminjam</th><th>Kegiatan</th><th>Jumlah Peserta</th><th>Peserta/Jabatan</th><th>BMN</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="tabelAdminJadwal"><tr><td colspan="11">Klik modul Pinjam Ruangan untuk memuat data.</td></tr></tbody></table></div></div>
+      <div id="panelAdminKendaraan" class="panel-card hidden"><div class="panel-header"><div><h3>Permintaan Pinjam Kendaraan</h3><span id="summaryAdminKendaraan" class="summary-pill">Belum dimuat</span></div><button class="btn-light" onclick="muatPinjamKendaraanAdmin()">Refresh</button></div><div class="filter-row"><input id="filterAdminKendaraan" placeholder="Cari ID, peminjam, kegiatan, tujuan, lama, atau keterangan admin..." oninput="renderPinjamKendaraan('tabelAdminKendaraan', daftarKendaraan, true)"><select id="filterStatusAdminKendaraan" onchange="renderPinjamKendaraan('tabelAdminKendaraan', daftarKendaraan, true)"><option value="Semua">Semua Status</option><option value="Pending">Pending</option><option value="ACC">ACC</option><option value="Ditolak">Ditolak</option><option value="Dikembalikan">Dikembalikan</option><option value="Terlambat">Terlambat</option></select></div><div class="table-wrap"><table><thead><tr><th>ID</th><th>Pengajuan</th><th>Peminjam</th><th>Kegiatan</th><th>Tujuan</th><th>Lama</th><th>Batas Kembali</th><th>Status</th><th>Keterangan Admin</th><th>Aksi</th></tr></thead><tbody id="tabelAdminKendaraan"><tr><td colspan="10">Klik modul Pinjam Kendaraan untuk memuat data.</td></tr></tbody></table></div></div>
+      <div id="panelAdminSarpras" class="panel-card hidden"><div class="panel-header"><div><h3>Permintaan Pinjam Sarpras</h3><span id="summaryAdminSarpras" class="summary-pill">Belum dimuat</span></div><button class="btn-light" onclick="muatPinjamSarprasAdmin()">Refresh</button></div><div class="filter-row"><input id="filterAdminSarpras" placeholder="Cari ID, peminjam, kegiatan, tempat, atau barang..." oninput="renderPinjamSarpras('tabelAdminSarpras', daftarSarpras, true)"><select id="filterStatusAdminSarpras" onchange="renderPinjamSarpras('tabelAdminSarpras', daftarSarpras, true)"><option value="Semua">Semua Status</option><option value="Pending">Pending</option><option value="ACC">ACC</option><option value="Ditolak">Ditolak</option><option value="Dikembalikan">Dikembalikan</option><option value="Terlambat">Terlambat</option></select></div><div class="table-wrap"><table><thead><tr><th>ID</th><th>Pengajuan</th><th>Peminjam</th><th>Kegiatan</th><th>Tempat</th><th>Jenis Barang</th><th>Lama</th><th>Batas Kembali</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="tabelAdminSarpras"><tr><td colspan="10">Klik modul Pinjam Sarpras untuk memuat data.</td></tr></tbody></table></div></div>
+    </section>
+  </div>
+
+  <footer class="app-footer" aria-label="Footer SIMANTAP BMN">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div class="footer-logo-wrap">
+          <img id="footerLogo" class="footer-logo" alt="Logo Pengayoman">
+        </div>
+        <div>
+          <p class="footer-title">SIMANTAP BMN</p>
+          <p class="footer-subtitle">Sistem Monitoring Terpadu Penatausahaan Barang Milik Negara</p>
+          <p class="footer-office">Kantor Wilayah Kementerian Hukum Nusa Tenggara Barat</p>
+        </div>
+      </div>
+      <div class="footer-meta">
+        <span class="footer-badge"><span class="footer-status-dot"></span>Layanan Internal</span>
+        <small>Penatausahaan BMN yang tertib, terintegrasi, dan mudah dipantau.</small>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span id="footerYear"></span> <strong>Kanwil Kemenkum NTB</strong></span>
+      <span>SIMANTAP BMN · Dashboard Layanan BMN</span>
+    </div>
+  </footer>
+</div>
+
+<script>
+  let masterData = { pegawai: [], bmn: [] };
+  let daftarJadwal = [];
+  let daftarKendaraan = [];
+  let daftarSarpras = [];
+  let adminLogin = sessionStorage.getItem('adminLoginBMN') === '1';
+  let sortDataBMN = { key: 'kodeBarang', dir: 'asc' };
+  let sortLokasiBMN = { key: 'lokasi', dir: 'asc' };
+  let inventarisLokasiAktif = '';
+  let skipPushHistory = false;
+  let masterDataLoaded = false;
+  let masterDataLoading = false;
+  let masterDataCallbacks = [];
+  const LIMIT_USER = 50;
+  const LIMIT_ADMIN = 100;
+
+  document.addEventListener('DOMContentLoaded', function () {
+    initBrowserBackNavigation();
+    setTanggalHariIni();
+    setMinDateTimeLocal();
+    resetPanelPinjam();
+    inisialisasiFooter();
+    setLabelJadwalHariIni();
+  });
+
+  function inisialisasiFooter() {
+    const homeLogo = document.querySelector('.home-logo-wrap img');
+    const footerLogo = document.getElementById('footerLogo');
+    if (homeLogo && footerLogo) footerLogo.src = homeLogo.src;
+
+    const yearEl = document.getElementById('footerYear');
+    if (yearEl) yearEl.textContent = String(new Date().getFullYear());
+  }
+
+  function setLabelJadwalHariIni() {
+    const el = document.getElementById('labelTanggalJadwalHariIni');
+    if (!el) return;
+    try {
+      const teks = new Intl.DateTimeFormat('id-ID', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' }).format(new Date());
+      el.textContent = 'Tanggal: ' + teks + '.';
+    } catch (e) {
+      el.textContent = '';
+    }
+  }
+
+  function allSections() { return ['dashboardUtama','dashboardInventarisRuangan','dashboardPinjamPakaiBMN','dashboardPemeliharaan','dashboardLoginAdmin','dashboardAdmin','adminDataBMN','adminLokasiBMN','adminPemeliharaan','adminPinjamPakaiBMN']; }
+
+  function aturTopbar(sectionId) {
+    const topbar = document.getElementById('appTopbar');
+    if (!topbar) return;
+    if (sectionId === 'dashboardUtama') topbar.classList.add('hidden');
+    else topbar.classList.remove('hidden');
+  }
+
+  function currentVisibleSection() {
+    return allSections().find(id => {
+      const el = document.getElementById(id);
+      return el && !el.classList.contains('hidden');
+    }) || 'dashboardUtama';
+  }
+
+  function pushHistoryState(state) {
+    if (skipPushHistory) return;
+    const section = (state && state.section) || currentVisibleSection();
+    const finalState = Object.assign({ appBMN: true, section: section }, state || {});
+    history.pushState(finalState, '', '#' + encodeURIComponent(section));
+  }
+
+  function initBrowserBackNavigation() {
+    history.replaceState({ appBMN: true, section: 'dashboardUtama' }, '', '#dashboardUtama');
+    aturTopbar('dashboardUtama');
+    window.addEventListener('popstate', function(event) {
+      const state = event.state;
+      if (!state || !state.appBMN) return;
+      applyHistoryState(state);
+    });
+  }
+
+  function applyHistoryState(state) {
+    skipPushHistory = true;
+    const section = state.section || 'dashboardUtama';
+    tampilkanSection(section, false);
+
+    if (section === 'dashboardPemeliharaan') {
+      muatPemeliharaan();
+      tutupFormPemeliharaanUser();
+    }
+
+    if (section === 'dashboardPinjamPakaiBMN') {
+      resetPanelPinjam();
+      if (state.panelPinjam) bukaPanelPinjam(state.panelPinjam, false);
+    }
+
+    if (section === 'dashboardInventarisRuangan') {
+      if (state.inventarisLokasi) inventarisLokasiAktif = state.inventarisLokasi;
+      pastikanMasterData(function() { renderInventarisRuangan(!state.inventarisLokasi); });
+    }
+
+    if (section === 'dashboardLoginAdmin') {
+      setTimeout(() => { const pin = document.getElementById('pinAdmin'); if (pin) pin.focus(); }, 100);
+    }
+
+    if (section === 'adminDataBMN') pastikanMasterData(renderAdminDataBMN);
+    if (section === 'adminLokasiBMN') pastikanMasterData(renderAdminLokasiBMN);
+    if (section === 'adminPemeliharaan') muatPemeliharaanAdmin();
+    if (section === 'adminPinjamPakaiBMN') {
+      resetPanelAdminPinjam();
+      if (state.panelAdminPinjam) bukaPanelAdminPinjam(state.panelAdminPinjam, false);
+    }
+
+    skipPushHistory = false;
+  }
+
+  function tampilkanSection(id, pushHistory) {
+    allSections().forEach(s => {
+      const el = document.getElementById(s);
+      if (el) el.classList.add('hidden');
+    });
+    const target = document.getElementById(id);
+    if (target) target.classList.remove('hidden');
+    aturTopbar(id);
+    if (pushHistory !== false) pushHistoryState({ section: id });
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  function bukaDashboard(id, pushHistory) {
+    tampilkanSection(id, pushHistory);
+    if (id === 'dashboardPemeliharaan') {
+      muatPemeliharaan();
+      tutupFormPemeliharaanUser();
+    }
+    if (id === 'dashboardPinjamPakaiBMN') {
+      resetPanelPinjam();
+    }
+    if (id === 'dashboardInventarisRuangan') {
+      pastikanMasterData(function() { renderInventarisRuangan(true); });
+    }
+  }
+  function kembaliKeUtama() { tampilkanSection('dashboardUtama'); }
+  function bukaLoginAdmin() { tampilkanSection('dashboardLoginAdmin'); setTimeout(() => document.getElementById('pinAdmin').focus(), 100); }
+
+  function resetPanelPinjam() {
+    ['panelPinjamRuangan','panelPinjamKendaraan','panelPinjamSarpras'].forEach(id => { const el = document.getElementById(id); if (el) el.classList.add('hidden'); });
+    document.querySelectorAll('.module-card[data-panel]').forEach(el => el.classList.remove('active'));
+    const guide = document.getElementById('guidePinjam'); if (guide) guide.classList.remove('hidden');
+  }
+  function bukaPanelPinjam(tipe, pushHistory) {
+    resetPanelPinjam();
+    const map = { ruangan: 'panelPinjamRuangan', kendaraan: 'panelPinjamKendaraan', sarpras: 'panelPinjamSarpras' };
+    const panelId = map[tipe];
+    const panel = document.getElementById(panelId);
+    const guide = document.getElementById('guidePinjam'); if (guide) guide.classList.add('hidden');
+    if (panel) panel.classList.remove('hidden');
+    const btn = document.querySelector(`.module-card[data-panel="${tipe}"]`);
+    if (btn) btn.classList.add('active');
+    if (tipe === 'ruangan') {
+      pastikanMasterData(function() {
+        renderChecklistBMNPinjam();
+        muatJadwal();
+      });
+    }
+    if (tipe === 'kendaraan') muatPinjamKendaraan();
+    if (tipe === 'sarpras') muatPinjamSarpras();
+    setMinDateTimeLocal();
+    if (pushHistory !== false) pushHistoryState({ section: 'dashboardPinjamPakaiBMN', panelPinjam: tipe });
+    setTimeout(() => panel && panel.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+  }
+
+  function tutupFormPemeliharaanUser() {
+    const form = document.getElementById('cardFormPemeliharaanUser');
+    const btn = document.getElementById('btnToggleFormPemeliharaanUser');
+    if (form) form.classList.add('hidden');
+    if (btn) btn.textContent = '➕ Buat Laporan Pemeliharaan';
+  }
+  function toggleFormPemeliharaanUser() {
+    const form = document.getElementById('cardFormPemeliharaanUser');
+    const btn = document.getElementById('btnToggleFormPemeliharaanUser');
+    if (!form) return;
+    const akanBuka = form.classList.contains('hidden');
+    form.classList.toggle('hidden', !akanBuka);
+    if (btn) btn.textContent = akanBuka ? 'Tutup Form' : '➕ Buat Laporan Pemeliharaan';
+    if (akanBuka) {
+      pastikanMasterData();
+      setTimeout(() => form.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+    }
+  }
+
+  function resetPanelAdminPinjam() {
+    ['panelAdminRuangan','panelAdminKendaraan','panelAdminSarpras'].forEach(id => { const el = document.getElementById(id); if (el) el.classList.add('hidden'); });
+    document.querySelectorAll('.module-card[data-admin-panel]').forEach(el => el.classList.remove('active'));
+    const guide = document.getElementById('guideAdminPinjam'); if (guide) guide.classList.remove('hidden');
+  }
+  function bukaPanelAdminPinjam(tipe, pushHistory) {
+    if (!pastikanAdminLogin()) return;
+    resetPanelAdminPinjam();
+    const map = { ruangan: 'panelAdminRuangan', kendaraan: 'panelAdminKendaraan', sarpras: 'panelAdminSarpras' };
+    const panelId = map[tipe];
+    const panel = document.getElementById(panelId);
+    const guide = document.getElementById('guideAdminPinjam'); if (guide) guide.classList.add('hidden');
+    if (panel) panel.classList.remove('hidden');
+    const btn = document.querySelector(`.module-card[data-admin-panel="${tipe}"]`);
+    if (btn) btn.classList.add('active');
+    if (tipe === 'ruangan') muatJadwalAdmin();
+    if (tipe === 'kendaraan') muatPinjamKendaraanAdmin();
+    if (tipe === 'sarpras') muatPinjamSarprasAdmin();
+    if (pushHistory !== false) pushHistoryState({ section: 'adminPinjamPakaiBMN', panelAdminPinjam: tipe });
+    setTimeout(() => panel && panel.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+  }
+
+  function setTanggalHariIni() {
+    const today = formatDateInputLokal(new Date());
+    ['tanggalBooking','tanggalPemeliharaan','tanggalAdminPemeliharaan'].forEach(id => { const el = document.getElementById(id); if (el) { el.min = today; if (!el.value) el.value = today; } });
+  }
+  function setMinDateTimeLocal() {
+    const min = formatDateTimeLocal(new Date());
+    ['batasKembaliKendaraan','batasKembaliSarpras'].forEach(id => { const el = document.getElementById(id); if (el) el.min = min; });
+  }
+  function formatDateInputLokal(date) { return date.getFullYear() + '-' + String(date.getMonth()+1).padStart(2,'0') + '-' + String(date.getDate()).padStart(2,'0'); }
+  function formatDateTimeLocal(date) { return formatDateInputLokal(date) + 'T' + String(date.getHours()).padStart(2,'0') + ':' + String(date.getMinutes()).padStart(2,'0'); }
+
+  function muatMasterData(callback, forceRefresh) {
+    if (typeof callback === 'function') masterDataCallbacks.push(callback);
+
+    if (masterDataLoaded && !forceRefresh) {
+      jalankanMasterDataCallbacks();
+      return;
+    }
+
+    if (masterDataLoading) return;
+
+    masterDataLoading = true;
+    google.script.run.withSuccessHandler(function (data) {
+      masterDataLoading = false;
+      masterDataLoaded = true;
+      masterData = data || { pegawai: [], bmn: [] };
+      isiDatalistPegawai();
+      isiDatalistBMN();
+      renderChecklistBMNPinjam();
+      jalankanMasterDataCallbacks();
+    }).withFailureHandler(function (err) {
+      masterDataLoading = false;
+      console.error(err);
+      jalankanMasterDataCallbacks();
+    }).getMasterDataOptimized(!!forceRefresh);
+  }
+
+  function pastikanMasterData(callback, forceRefresh) {
+    if (masterDataLoaded && !forceRefresh) {
+      if (typeof callback === 'function') callback();
+      return;
+    }
+    muatMasterData(callback, forceRefresh);
+  }
+
+  function jalankanMasterDataCallbacks() {
+    const callbacks = masterDataCallbacks.splice(0, masterDataCallbacks.length);
+    callbacks.forEach(function (fn) {
+      try { if (typeof fn === 'function') fn(); } catch (e) { console.error(e); }
+    });
+  }
+
+  function isiDatalistPegawai() { const el = document.getElementById('listPegawai'); if (el) el.innerHTML = (masterData.pegawai || []).map(n => `<option value="${escapeHtml(n)}"></option>`).join(''); }
+  function labelBMN(item) { return [item.kodeBarang ? 'Kode: ' + item.kodeBarang : '', item.nup ? 'NUP: ' + item.nup : '', item.nama, item.merk, item.tahunPerolehan, item.lokasi].filter(Boolean).join(' | '); }
+  function isiDatalistBMN() { const el = document.getElementById('listBMN'); if (el) el.innerHTML = (masterData.bmn || []).map(item => `<option value="${escapeHtml(labelBMN(item))}"></option>`).join(''); }
+  function cariBMNDariInput(value) { const teks = normalizeText(value); return (masterData.bmn || []).find(item => normalizeText(labelBMN(item)) === teks) || null; }
+
+  function renderChecklistBMNPinjam() {
+    const container = document.getElementById('bmnChecklistContainer');
+    if (!container) return;
+    const ruangan = document.getElementById('ruanganBooking').value;
+    document.getElementById('bmnDipinjam').value = '-';
+    if (!ruangan) { container.innerHTML = '<div class="muted">Pilih ruangan terlebih dahulu untuk menampilkan BMN yang ada di ruangan tersebut.</div>'; return; }
+    const data = (masterData.bmn || []).filter(item => normalizeRoom(item.lokasi) === normalizeRoom(ruangan));
+    if (!data.length) { container.innerHTML = '<div class="muted">Belum ada BMN tercatat pada ' + escapeHtml(ruangan) + '.</div>'; return; }
+    container.innerHTML = data.map((item, i) => `<label class="checkbox-item"><input type="checkbox" class="cekBmnPinjam" value="${escapeHtml(labelBMN(item))}" onchange="updateBMNPinjamTerpilih()"><div>${escapeHtml(item.nama || '-')}<span>${escapeHtml([item.kodeBarang ? 'Kode: ' + item.kodeBarang : '', item.nup ? 'NUP: ' + item.nup : '', item.merk, item.kondisi].filter(Boolean).join(' · '))}</span></div></label>`).join('');
+  }
+  function updateBMNPinjamTerpilih() { const values = Array.from(document.querySelectorAll('.cekBmnPinjam:checked')).map(el => el.value); document.getElementById('bmnDipinjam').value = values.length ? values.join('; ') : '-'; }
+  function normalizeRoom(value) { return normalizeText(value).replace(/ruang /g,'').replace(/ruangan /g,''); }
+
+  function muatJadwal() {
+    ['tabelJadwalUtama','tabelJadwalPinjam'].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = '<tr><td colspan="8">Memuat data...</td></tr>'; });
+    google.script.run.withSuccessHandler(function (data) { daftarJadwal = data || []; renderTabelJadwal('tabelJadwalUtama', daftarJadwal, false); renderTabelJadwal('tabelJadwalPinjam', daftarJadwal, true); }).withFailureHandler(function (err) { renderError('tabelJadwalUtama', err.message, 7); }).getJadwalRingkas(LIMIT_USER);
+  }
+  function renderTabelJadwal(targetId, data, detail) {
+    const tbody = document.getElementById(targetId); if (!tbody) return;
+    const colspan = detail ? 8 : 7;
+    if (!data.length) { tbody.innerHTML = `<tr><td colspan="${colspan}">Belum ada jadwal ruangan hari ini.</td></tr>`; return; }
+    tbody.innerHTML = data.map(row => detail ? `<tr><td>${escapeHtml(row.tanggal)}</td><td>${escapeHtml(row.ruangan)}</td><td>${escapeHtml(row.mulai)} - ${escapeHtml(row.selesai)}</td><td>${escapeHtml(row.nama)}</td><td>${escapeHtml(row.namaKegiatan || '-')}</td><td>${escapeHtml(row.jumlahPeserta || '-')}<br><span class="muted">${escapeHtml(row.pesertaJabatan || '-')}</span></td><td>${escapeHtml(row.bmnPinjam || '-')}</td><td>${badgeStatus(row.status)}</td></tr>` : `<tr><td>${escapeHtml(row.tanggal)}</td><td>${escapeHtml(row.ruangan)}</td><td>${escapeHtml(row.mulai)} - ${escapeHtml(row.selesai)}</td><td>${escapeHtml(row.nama)}</td><td>${escapeHtml(row.namaKegiatan || '-')}</td><td>${escapeHtml(row.bmnPinjam || '-')}</td><td>${badgeStatus(row.status)}</td></tr>`).join('');
+  }
+
+  function validasiBookingRealtime() {
+    const pesan = pesanValidasiWaktuBooking(document.getElementById('tanggalBooking').value, document.getElementById('jamMulaiBooking').value, document.getElementById('jamSelesaiBooking').value);
+    if (pesan) tampilAlert('alertPinjam', pesan, 'error');
+  }
+  function pesanValidasiWaktuBooking(tanggal, mulai, selesai) {
+    if (!tanggal || !mulai || !selesai) return '';
+    const start = new Date(tanggal + 'T' + mulai); const end = new Date(tanggal + 'T' + selesai);
+    if (end <= start) return 'Jam selesai harus lebih besar dari jam mulai.';
+    if (start < new Date()) return 'Tanggal dan jam mulai tidak boleh berada di masa lalu.';
+    return '';
+  }
+  function cariJadwalBentrokClient(form) {
+    const start = new Date(form.tanggal + 'T' + form.jamMulai); const end = new Date(form.tanggal + 'T' + form.jamSelesai);
+    return (daftarJadwal || []).find(row => !normalizeText(row.status).includes('tolak') && normalizeRoom(row.ruangan) === normalizeRoom(form.ruangan) && new Date(row.tanggal + 'T' + row.mulai) < end && new Date(row.tanggal + 'T' + row.selesai) > start);
+  }
+
+  function submitBooking(event) {
+    event.preventDefault(); updateBMNPinjamTerpilih();
+    const form = { tanggal: val('tanggalBooking'), ruangan: val('ruanganBooking'), jamMulai: val('jamMulaiBooking'), jamSelesai: val('jamSelesaiBooking'), nama: val('namaPeminjamRuangan'), bmnDipinjam: val('bmnDipinjam') || '-', namaKegiatan: val('namaKegiatanRuangan'), jumlahPeserta: val('jumlahPesertaRuangan'), pesertaJabatan: val('pesertaJabatanRuangan') };
+    const pesanWaktu = pesanValidasiWaktuBooking(form.tanggal, form.jamMulai, form.jamSelesai); if (pesanWaktu) return tampilAlert('alertPinjam', pesanWaktu, 'error');
+    const bentrok = cariJadwalBentrokClient(form); if (bentrok) return tampilAlert('alertPinjam', 'Jadwal bentrok dengan ' + bentrok.ruangan + ' pukul ' + bentrok.mulai + ' - ' + bentrok.selesai + ' oleh ' + bentrok.nama + '.', 'error');
+    runSubmit('btnSubmitBooking', 'Mengirim...', 'Kirim Pengajuan Pinjam Ruangan', 'alertPinjam', function(runner) { runner.simpanBooking(form); }, function() { document.getElementById('formBooking').reset(); setTanggalHariIni(); renderChecklistBMNPinjam(); muatJadwal(); });
+  }
+
+  function submitPinjamKendaraan(event) {
+    event.preventDefault(); setMinDateTimeLocal();
+    const form = { nama: val('namaPeminjamKendaraan'), kegiatan: val('kegiatanKendaraan'), tujuan: val('tujuanKendaraan'), lama: val('lamaKendaraan'), batasKembali: val('batasKembaliKendaraan') };
+    if (new Date(form.batasKembali) < new Date()) return tampilAlert('alertPinjam', 'Batas kembali kendaraan tidak boleh berada di masa lalu.', 'error');
+    runSubmit('btnSubmitKendaraan', 'Mengirim...', 'Kirim Pengajuan Pinjam Kendaraan', 'alertPinjam', r => r.simpanPinjamKendaraan(form), function() { document.getElementById('formPinjamKendaraan').reset(); setMinDateTimeLocal(); muatPinjamKendaraan(); });
+  }
+  function submitPinjamSarpras(event) {
+    event.preventDefault(); setMinDateTimeLocal();
+    const form = { nama: val('namaPeminjamSarpras'), kegiatan: val('kegiatanSarpras'), tempat: val('tempatSarpras'), tujuan: val('tempatSarpras'), jenisBarang: val('jenisBarangSarpras'), lama: val('lamaSarpras'), batasKembali: val('batasKembaliSarpras') };
+    if (new Date(form.batasKembali) < new Date()) return tampilAlert('alertPinjam', 'Batas kembali sarpras tidak boleh berada di masa lalu.', 'error');
+    runSubmit('btnSubmitSarpras', 'Mengirim...', 'Kirim Pengajuan Pinjam Sarpras', 'alertPinjam', r => r.simpanPinjamSarpras(form), function() { document.getElementById('formPinjamSarpras').reset(); setMinDateTimeLocal(); muatPinjamSarpras(); });
+  }
+
+  function muatPinjamKendaraan() { google.script.run.withSuccessHandler(function(data) { daftarKendaraan = data || []; renderPinjamKendaraan('tabelPinjamKendaraan', daftarKendaraan, false); }).withFailureHandler(err => renderError('tabelPinjamKendaraan', err.message, 8)).getPinjamKendaraanRingkas(LIMIT_USER); }
+  function muatPinjamSarpras() { google.script.run.withSuccessHandler(function(data) { daftarSarpras = data || []; renderPinjamSarpras('tabelPinjamSarpras', daftarSarpras, false); }).withFailureHandler(err => renderError('tabelPinjamSarpras', err.message, 8)).getPinjamSarprasRingkas(LIMIT_USER); }
+  function renderPinjamKendaraan(id, data, admin) {
+    const tbody = document.getElementById(id); if (!tbody) return;
+    const colspan = admin ? 10 : 8;
+    let rows = data || [];
+    if (admin && id === 'tabelAdminKendaraan') {
+      rows = filterAdminPinjamRows(rows, 'filterAdminKendaraan', 'filterStatusAdminKendaraan', row => [row.idPinjam,row.tanggalPengajuan,row.nama,row.kegiatan,row.tujuan,row.lama,row.batasKembali,row.status,statusDenganTerlambat(row),row.keteranganAdmin].join(' '));
+      setTextIfExists('summaryAdminKendaraan', rows.length + ' dari ' + (data || []).length + ' pengajuan kendaraan');
+    }
+    if (!rows.length) { tbody.innerHTML = `<tr><td colspan="${colspan}">Data pinjam kendaraan tidak ditemukan.</td></tr>`; return; }
+    tbody.innerHTML = rows.map(row => {
+      const ket = row.keteranganAdmin || '';
+      const idEncoded = encodeURIComponent(row.idPinjam || '');
+      const noteId = buatDomId('ketKendaraan_' + (row.idPinjam || ''));
+      const noteCell = admin
+        ? `<td class="admin-note-cell"><textarea class="admin-note-input" id="${noteId}" maxlength="500" placeholder="Catatan untuk peminjam kendaraan, opsional...">${escapeHtml(ket)}</textarea><div style="margin-top:6px;"><button class="btn-light btn-small" onclick="simpanKeteranganKendaraan('${idEncoded}', '${noteId}', this)">Simpan Catatan</button></div></td>`
+        : `<td><span class="admin-note-view">${escapeHtml(ket || '-')}</span></td>`;
+      return `<tr class="${isOverdue(row) ? 'return-warning' : ''}"><td>${escapeHtml(row.idPinjam)}</td>${admin ? `<td>${escapeHtml(row.tanggalPengajuan || '-')}</td>` : ''}<td>${escapeHtml(row.nama)}</td><td>${escapeHtml(row.kegiatan)}</td><td>${escapeHtml(row.tujuan)}</td><td>${escapeHtml(row.lama)}</td><td>${escapeHtml(row.batasKembali)}</td><td>${badgeStatus(statusDenganTerlambat(row))}</td>${noteCell}${admin ? `<td>${tombolAksiStatus('kendaraan', row.idPinjam, row.status, statusDenganTerlambat(row))}</td>` : ''}</tr>`;
+    }).join('');
+  }
+  function renderPinjamSarpras(id, data, admin) {
+    const tbody = document.getElementById(id); if (!tbody) return;
+    const colspan = admin ? 10 : 8;
+    let rows = data || [];
+    if (admin && id === 'tabelAdminSarpras') {
+      rows = filterAdminPinjamRows(rows, 'filterAdminSarpras', 'filterStatusAdminSarpras', row => [row.idPinjam,row.tanggalPengajuan,row.nama,row.kegiatan,row.tempat,row.jenisBarang,row.lama,row.batasKembali,row.status,statusDenganTerlambat(row)].join(' '));
+      setTextIfExists('summaryAdminSarpras', rows.length + ' dari ' + (data || []).length + ' pengajuan sarpras');
+    }
+    if (!rows.length) { tbody.innerHTML = `<tr><td colspan="${colspan}">Data pinjam sarpras tidak ditemukan.</td></tr>`; return; }
+    tbody.innerHTML = rows.map(row => `<tr class="${isOverdue(row) ? 'return-warning' : ''}"><td>${escapeHtml(row.idPinjam)}</td>${admin ? `<td>${escapeHtml(row.tanggalPengajuan || '-')}</td>` : ''}<td>${escapeHtml(row.nama)}</td><td>${escapeHtml(row.kegiatan)}</td><td>${escapeHtml(row.tempat)}</td><td>${escapeHtml(row.jenisBarang)}</td><td>${escapeHtml(row.lama)}</td><td>${escapeHtml(row.batasKembali)}</td><td>${badgeStatus(statusDenganTerlambat(row))}</td>${admin ? `<td>${tombolAksiStatus('sarpras', row.idPinjam, row.status, statusDenganTerlambat(row))}</td>` : ''}</tr>`).join('');
+  }
+  function isOverdue(row) { const st = normalizeText(row.status); if (st.includes('dikembalikan') || st.includes('tolak')) return false; const t = row.batasKembali ? new Date(row.batasKembali) : null; return t && !isNaN(t.getTime()) && t < new Date(); }
+  function statusDenganTerlambat(row) { return isOverdue(row) ? 'Terlambat' : row.status; }
+
+  function submitPemeliharaan(event) { event.preventDefault(); const item = cariBMNDariInput(val('bmnPemeliharaanInput')); if (!item) return tampilAlert('alertPemeliharaan', 'Silakan pilih BMN dari daftar pencarian.', 'error'); const form = { kodeBarang: item.kodeBarang, nup: item.nup, namaBmn: item.nama, tanggal: val('tanggalPemeliharaan'), deskripsi: val('deskripsiPemeliharaan'), sumber: 'User' }; kirimPemeliharaanDenganFoto(form, 'fotoPemeliharaan', 'btnSubmitPemeliharaan', 'Kirim Laporan Pemeliharaan', 'alertPemeliharaan', function() { document.getElementById('formPemeliharaan').reset(); setTanggalHariIni(); tutupFormPemeliharaanUser(); muatPemeliharaan(); }); }
+  function submitAdminPemeliharaan(event) { event.preventDefault(); const item = cariBMNDariInput(val('bmnAdminPemeliharaanInput')); if (!item) return tampilAlert('alertAdminPemeliharaan', 'Silakan pilih BMN dari daftar pencarian.', 'error'); const form = { kodeBarang: item.kodeBarang, nup: item.nup, namaBmn: item.nama, tanggal: val('tanggalAdminPemeliharaan'), deskripsi: val('deskripsiAdminPemeliharaan'), sumber: 'Administrator' }; kirimPemeliharaanDenganFoto(form, 'fotoAdminPemeliharaan', 'btnSubmitAdminPemeliharaan', 'Simpan Pemeliharaan Rutin', 'alertAdminPemeliharaan', function() { document.getElementById('formAdminPemeliharaan').reset(); setTanggalHariIni(); muatPemeliharaanAdmin(); muatPemeliharaan(); }); }
+  function kirimPemeliharaanDenganFoto(form, fileInputId, btnId, defaultText, alertId, successCallback) { const file = document.getElementById(fileInputId).files[0]; if (!file) return kirimPemeliharaan(form, btnId, defaultText, alertId, successCallback); const reader = new FileReader(); reader.onload = e => { form.fotoBase64 = e.target.result; form.namaFile = file.name; kirimPemeliharaan(form, btnId, defaultText, alertId, successCallback); }; reader.onerror = () => tampilAlert(alertId, 'Gagal membaca file foto.', 'error'); reader.readAsDataURL(file); }
+  function kirimPemeliharaan(form, btnId, defaultText, alertId, successCallback) { runSubmit(btnId, 'Menyimpan...', defaultText, alertId, r => r.simpanPemeliharaan(form), successCallback); }
+  function muatPemeliharaan() { google.script.run.withSuccessHandler(data => renderTabelPemeliharaan(data || [])).withFailureHandler(err => renderError('tabelPemeliharaan', err.message, 7)).getPemeliharaanRingkas(LIMIT_USER); }
+  function renderTabelPemeliharaan(data) { const tbody = document.getElementById('tabelPemeliharaan'); if (!tbody) return; if (!data.length) { tbody.innerHTML = '<tr><td colspan="7">Belum ada laporan pemeliharaan.</td></tr>'; return; } tbody.innerHTML = data.map(row => `<tr><td>${escapeHtml(row.kodeBarang || '-')}</td><td>${escapeHtml(row.nup || '-')}</td><td>${escapeHtml(row.nama || '-')}</td><td>${escapeHtml(row.tgl || '-')}</td><td>${escapeHtml(row.ket || '-')}</td><td>${row.foto && row.foto !== '-' ? `<a href="${escapeHtml(row.foto)}" target="_blank">Lihat Foto</a>` : '-'}</td><td>${badgeStatus(row.status)}</td></tr>`).join(''); }
+
+
+  function lokasiUtamaInventaris() { return ['Ruang Aula', 'Ruang Zona Integritas', 'Ruang Transit']; }
+  function namaLokasiBMN(item) { return String((item && item.lokasi) || '').trim() || 'Tanpa Lokasi'; }
+  function daftarLokasiInventaris() {
+    const set = new Set((masterData.bmn || []).map(namaLokasiBMN));
+    const utama = lokasiUtamaInventaris().filter(l => set.has(l));
+    const lain = Array.from(set).filter(l => !lokasiUtamaInventaris().includes(l)).sort((a,b) => a.localeCompare(b, 'id', { numeric:true, sensitivity:'base' }));
+    return utama.concat(lain);
+  }
+  function dataInventarisLokasi(lokasi) {
+    return (masterData.bmn || []).filter(item => namaLokasiBMN(item) === lokasi);
+  }
+  function badgeKondisiRingkas(label, jumlah) { return `<span>${escapeHtml(label)}: ${jumlah}</span>`; }
+  function hitungKondisi(data) {
+    const ringkas = { baik:0, ringan:0, berat:0, lain:0 };
+    data.forEach(item => {
+      const kondisi = normalizeText(item.kondisi || '');
+      if (kondisi.includes('baik')) ringkas.baik++;
+      else if (kondisi.includes('ringan')) ringkas.ringan++;
+      else if (kondisi.includes('berat')) ringkas.berat++;
+      else ringkas.lain++;
+    });
+    return ringkas;
+  }
+  function renderSelectInventarisLokasi(lokasiList) {
+    const select = document.getElementById('selectInventarisLokasi');
+    if (!select) return;
+    select.innerHTML = lokasiList.map(lokasi => `<option value="${escapeHtml(lokasi)}" ${lokasi === inventarisLokasiAktif ? 'selected' : ''}>${escapeHtml(lokasi)}</option>`).join('');
+  }
+  function renderKartuInventarisLokasi(lokasiList) {
+    const grid = document.getElementById('inventarisRoomGrid');
+    if (!grid) return;
+    if (!lokasiList.length) {
+      grid.innerHTML = '<div class="empty-guide" style="grid-column:1/-1;">Belum ada data lokasi BMN. Isi kolom Lokasi pada sheet Data_BMN terlebih dahulu.</div>';
+      return;
+    }
+    grid.innerHTML = lokasiList.map(lokasi => {
+      const data = dataInventarisLokasi(lokasi);
+      const k = hitungKondisi(data);
+      const aktif = lokasi === inventarisLokasiAktif ? 'active' : '';
+      return `<button class="inventory-room-card ${aktif}" onclick="pilihLokasiInventaris('${encodeURIComponent(lokasi)}')">
+        <h3>${escapeHtml(lokasi)}</h3>
+        <div class="count">${data.length}</div>
+        <p class="muted">item BMN tercatat</p>
+        <div class="inventory-meta">${badgeKondisiRingkas('Baik', k.baik)}${badgeKondisiRingkas('RR', k.ringan)}${badgeKondisiRingkas('RB', k.berat)}${k.lain ? badgeKondisiRingkas('Lain', k.lain) : ''}</div>
+      </button>`;
+    }).join('');
+  }
+  function pilihLokasiInventaris(encodedLokasi) {
+    inventarisLokasiAktif = decodeURIComponent(encodedLokasi || '');
+    renderInventarisRuangan(false);
+    pushHistoryState({ section: 'dashboardInventarisRuangan', inventarisLokasi: inventarisLokasiAktif });
+  }
+  function pilihLokasiInventarisSelect() {
+    inventarisLokasiAktif = val('selectInventarisLokasi');
+    renderInventarisRuangan(false);
+    pushHistoryState({ section: 'dashboardInventarisRuangan', inventarisLokasi: inventarisLokasiAktif });
+  }
+  function resetInventarisRuangan() {
+    const search = document.getElementById('searchInventarisRuangan');
+    if (search) search.value = '';
+    renderInventarisRuangan(false);
+  }
+  function renderInventarisRuangan(resetLokasi) {
+    if (!masterDataLoaded) return pastikanMasterData(function() { renderInventarisRuangan(resetLokasi); });
+    const tbody = document.getElementById('tabelInventarisRuangan');
+    if (!tbody) return;
+    const lokasiList = daftarLokasiInventaris();
+    if (resetLokasi || !inventarisLokasiAktif || !lokasiList.includes(inventarisLokasiAktif)) {
+      inventarisLokasiAktif = lokasiList[0] || '';
+    }
+    renderSelectInventarisLokasi(lokasiList);
+    renderKartuInventarisLokasi(lokasiList);
+
+    const judul = document.getElementById('judulInventarisRuangan');
+    const ringkasan = document.getElementById('ringkasanInventarisRuangan');
+
+    if (!inventarisLokasiAktif) {
+      if (judul) judul.textContent = 'Inventaris Ruangan';
+      if (ringkasan) ringkasan.textContent = 'Belum ada data lokasi BMN.';
+      tbody.innerHTML = '<tr><td colspan="8">Belum ada data lokasi BMN.</td></tr>';
+      return;
+    }
+
+    const keyword = normalizeText(val('searchInventarisRuangan'));
+    const keys = keyword.split(' ').filter(Boolean);
+    const semuaDiLokasi = dataInventarisLokasi(inventarisLokasiAktif);
+    const data = semuaDiLokasi.filter(item => {
+      const txt = normalizeText([item.kodeBarang, item.nup, item.nama, item.merk, item.tahunPerolehan, item.kondisi, item.pj].join(' '));
+      return keys.every(k => txt.includes(k));
+    }).sort((a,b) => String(a.nama || '').localeCompare(String(b.nama || ''), 'id', { numeric:true, sensitivity:'base' }));
+
+    if (judul) judul.textContent = 'Inventaris ' + inventarisLokasiAktif;
+    if (ringkasan) ringkasan.textContent = data.length + ' dari ' + semuaDiLokasi.length + ' BMN ditampilkan' + (keyword ? ' berdasarkan pencarian.' : '.');
+
+    if (!data.length) {
+      tbody.innerHTML = '<tr><td colspan="8">Tidak ada BMN yang cocok pada ruangan ini.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = data.map((item, i) => `<tr><td>${i+1}</td><td>${escapeHtml(item.kodeBarang || '-')}</td><td>${escapeHtml(item.nup || '-')}</td><td>${escapeHtml(item.nama || '-')}</td><td>${escapeHtml(item.merk || '-')}</td><td>${escapeHtml(item.tahunPerolehan || '-')}</td><td>${escapeHtml(item.kondisi || '-')}</td><td>${escapeHtml(item.pj || '-')}</td></tr>`).join('');
+  }
+
+  function submitLoginAdmin(event) { event.preventDefault(); runSubmit('btnLoginAdmin', 'Memverifikasi...', 'Masuk Administrator', 'alertLoginAdmin', r => r.verifikasiPin(val('pinAdmin')), function(valid) { if (!valid) { tampilAlert('alertLoginAdmin', 'PIN salah. Silakan coba lagi.', 'error'); return false; } adminLogin = true; sessionStorage.setItem('adminLoginBMN','1'); document.getElementById('formLoginAdmin').reset(); tampilkanSection('dashboardAdmin'); }); }
+  function logoutAdmin() { adminLogin = false; sessionStorage.removeItem('adminLoginBMN'); kembaliKeUtama(); }
+  function pastikanAdminLogin() { if (adminLogin) return true; bukaLoginAdmin(); return false; }
+  function kembaliKeDashboardAdmin() { if (pastikanAdminLogin()) tampilkanSection('dashboardAdmin'); }
+  function bukaAdminFitur(id) {
+    if (!pastikanAdminLogin()) return;
+    tampilkanSection(id);
+    if (id === 'adminDataBMN') pastikanMasterData(renderAdminDataBMN);
+    if (id === 'adminLokasiBMN') pastikanMasterData(renderAdminLokasiBMN);
+    if (id === 'adminPemeliharaan') muatPemeliharaanAdmin();
+    if (id === 'adminPinjamPakaiBMN') resetPanelAdminPinjam();
+  }
+
+  function toggleFormInputBMN(show) { const card = document.getElementById('cardInputBMNBaru'); card.classList.toggle('hidden', !show); if (show) document.getElementById('inputKodeBarangBMN').focus(); }
+  function submitInputBMNBaru(event) { event.preventDefault(); const form = { kodeBarang: val('inputKodeBarangBMN'), nup: val('inputNupBMN'), namaBmn: val('inputNamaBMN'), merk: val('inputMerkBMN'), tahunPerolehan: val('inputTahunBMN'), kondisi: val('inputKondisiBMN'), lokasi: val('inputLokasiBMN'), pj: val('inputPjBMN') }; runSubmit('btnSimpanBMNBaru', 'Menyimpan...', 'Simpan Data BMN', 'alertInputBMN', r => r.simpanBMN(form), function() { document.getElementById('formInputBMNBaru').reset(); toggleFormInputBMN(false); muatMasterData(function() { renderAdminDataBMN(); renderAdminLokasiBMN(); }, true); }); }
+  function filterDataBMN(keyword) {
+    const keys = normalizeText(keyword).split(' ').filter(Boolean);
+    return (masterData.bmn || []).filter(item => {
+      const txt = normalizeText([item.kodeBarang,item.nup,item.id,item.nama,item.merk,item.tahunPerolehan,item.kondisi,item.lokasi,item.pj].join(' '));
+      return keys.every(k => txt.includes(k));
+    });
+  }
+  function nilaiSortBMN(item, key) {
+    const nilai = item && item[key] != null ? item[key] : '';
+    if (key === 'nup' || key === 'tahunPerolehan') {
+      const angka = Number(String(nilai).replace(/[^0-9.-]/g, ''));
+      return Number.isFinite(angka) ? angka : String(nilai || '').toLowerCase();
+    }
+    return normalizeText(nilai || '');
+  }
+  function sortRowsBMN(data, state) {
+    const hasil = [...(data || [])];
+    const key = state.key;
+    const dir = state.dir === 'desc' ? -1 : 1;
+    hasil.sort((a, b) => {
+      const va = nilaiSortBMN(a, key);
+      const vb = nilaiSortBMN(b, key);
+      if (typeof va === 'number' && typeof vb === 'number') return (va - vb) * dir;
+      return String(va).localeCompare(String(vb), 'id', { numeric: true, sensitivity: 'base' }) * dir;
+    });
+    return hasil;
+  }
+  function refreshSortChips(group, state) {
+    document.querySelectorAll(`[data-sort-group="${group}"]`).forEach(btn => {
+      const aktif = btn.dataset.sortKey === state.key;
+      btn.classList.toggle('active', aktif);
+      const labelAsli = btn.dataset.originalLabel || btn.textContent.replace(/\s*[↑↓]$/,'');
+      btn.dataset.originalLabel = labelAsli;
+      btn.textContent = aktif ? `${labelAsli} ${state.dir === 'asc' ? '↑' : '↓'}` : labelAsli;
+    });
+  }
+  function setSortDataBMN(key) {
+    if (sortDataBMN.key === key) sortDataBMN.dir = sortDataBMN.dir === 'asc' ? 'desc' : 'asc';
+    else sortDataBMN = { key, dir: 'asc' };
+    renderAdminDataBMN();
+  }
+  function setSortLokasiBMN(key) {
+    if (sortLokasiBMN.key === key) sortLokasiBMN.dir = sortLokasiBMN.dir === 'asc' ? 'desc' : 'asc';
+    else sortLokasiBMN = { key, dir: 'asc' };
+    renderAdminLokasiBMN();
+  }
+  function renderAdminDataBMN() {
+    if (!masterDataLoaded) return pastikanMasterData(renderAdminDataBMN);
+    const tbody = document.getElementById('tabelAdminDataBMN');
+    const semua = masterData.bmn || [];
+    const data = sortRowsBMN(filterDataBMN(val('filterAdminDataBMN')), sortDataBMN);
+    refreshSortChips('data-bmn', sortDataBMN);
+    document.getElementById('jumlahAdminDataBMN').textContent = data.length + ' dari ' + semua.length + ' data BMN';
+    if (!data.length) { tbody.innerHTML = '<tr><td colspan="7">Data BMN tidak ditemukan.</td></tr>'; return; }
+    tbody.innerHTML = data.map((item,i) => `<tr><td>${i+1}</td><td>${escapeHtml(item.kodeBarang || '-')}</td><td>${escapeHtml(item.nup || '-')}</td><td>${escapeHtml(item.nama || '-')}</td><td>${escapeHtml(item.merk || '-')}</td><td>${escapeHtml(item.tahunPerolehan || '-')}</td><td>${escapeHtml(item.kondisi || '-')}</td></tr>`).join('');
+  }
+  function renderAdminLokasiBMN() {
+    if (!masterDataLoaded) return pastikanMasterData(renderAdminLokasiBMN);
+    const tbody = document.getElementById('tabelAdminLokasiBMN');
+    const semua = masterData.bmn || [];
+    const data = sortRowsBMN(filterDataBMN(val('filterAdminLokasiBMN')), sortLokasiBMN);
+    refreshSortChips('lokasi-bmn', sortLokasiBMN);
+    const totalLokasi = new Set(semua.map(item => item.lokasi || 'Tanpa Lokasi')).size;
+    document.getElementById('jumlahAdminLokasiBMN').textContent = data.length + ' data BMN · ' + totalLokasi + ' lokasi terdeteksi';
+    if (!data.length) { tbody.innerHTML = '<tr><td colspan="9">Data lokasi BMN tidak ditemukan.</td></tr>'; return; }
+    tbody.innerHTML = data.map((item,i) => `<tr><td>${i+1}</td><td>${escapeHtml(item.lokasi || 'Tanpa Lokasi')}</td><td>${escapeHtml(item.pj || '-')}</td><td>${escapeHtml(item.kodeBarang || '-')}</td><td>${escapeHtml(item.nup || '-')}</td><td>${escapeHtml(item.nama || '-')}</td><td>${escapeHtml(item.merk || '-')}</td><td>${escapeHtml(item.tahunPerolehan || '-')}</td><td>${escapeHtml(item.kondisi || '-')}</td></tr>`).join('');
+  }
+  function kosongkanValue(ids) { ids.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; }); }
+  function resetAllAdminDataBMNSearch() { kosongkanValue(['filterAdminDataBMN']); renderAdminDataBMN(); }
+  function resetAllAdminLokasiBMNSearch() { kosongkanValue(['filterAdminLokasiBMN']); renderAdminLokasiBMN(); }
+  function resetFilterAdmin(inputId, callback) { const el = document.getElementById(inputId); if (el) el.value = ''; callback(); }
+
+  function muatPemeliharaanAdmin() { google.script.run.withSuccessHandler(data => renderTabelPemeliharaanAdmin(data || [])).withFailureHandler(err => renderError('tabelAdminPemeliharaan', err.message, 10)).getPemeliharaanAdminRingkas(LIMIT_ADMIN); }
+  function renderTabelPemeliharaanAdmin(data) { const tbody = document.getElementById('tabelAdminPemeliharaan'); if (!data.length) { tbody.innerHTML = '<tr><td colspan="10">Belum ada data pemeliharaan.</td></tr>'; return; } tbody.innerHTML = data.map(row => `<tr><td>${escapeHtml(row.idPemeliharaan || '-')}</td><td>${escapeHtml(row.kodeBarang || '-')}</td><td>${escapeHtml(row.nup || '-')}</td><td>${escapeHtml(row.nama || '-')}</td><td>${escapeHtml(row.tgl || '-')}</td><td>${escapeHtml(row.ket || '-')}</td><td>${row.foto && row.foto !== '-' ? `<a href="${escapeHtml(row.foto)}" target="_blank">Lihat Foto</a>` : '-'}</td><td>${escapeHtml(row.sumber || 'User')}</td><td>${badgeStatus(row.status)}</td><td>${tombolAksiStatus('pemeliharaan', row.idPemeliharaan, row.status)}</td></tr>`).join(''); }
+
+  function muatPinjamPakaiAdmin() { muatJadwalAdmin(); muatPinjamKendaraanAdmin(); muatPinjamSarprasAdmin(); }
+  function muatJadwalAdmin() { google.script.run.withSuccessHandler(data => { daftarJadwal = data || []; renderTabelJadwalAdmin(daftarJadwal); }).withFailureHandler(err => renderError('tabelAdminJadwal', err.message, 11)).getJadwalAdminRingkas(LIMIT_ADMIN); }
+  function muatPinjamKendaraanAdmin() { google.script.run.withSuccessHandler(data => { daftarKendaraan = data || []; renderPinjamKendaraan('tabelAdminKendaraan', daftarKendaraan, true); }).withFailureHandler(err => renderError('tabelAdminKendaraan', err.message, 10)).getPinjamKendaraanAdminRingkas(LIMIT_ADMIN); }
+  function muatPinjamSarprasAdmin() { google.script.run.withSuccessHandler(data => { daftarSarpras = data || []; renderPinjamSarpras('tabelAdminSarpras', daftarSarpras, true); }).withFailureHandler(err => renderError('tabelAdminSarpras', err.message, 10)).getPinjamSarprasAdminRingkas(LIMIT_ADMIN); }
+  function filterAdminPinjamRows(data, inputId, statusId, textFn) {
+    let hasil = data || [];
+    const keyword = normalizeText(val(inputId));
+    const status = normalizeText(val(statusId));
+    if (keyword) {
+      const keys = keyword.split(' ').filter(Boolean);
+      hasil = hasil.filter(row => { const teks = normalizeText(textFn(row)); return keys.every(k => teks.includes(k)); });
+    }
+    if (status && status !== 'semua') hasil = hasil.filter(row => normalizeText(statusDenganTerlambat(row)).includes(status) || normalizeText(row.status).includes(status));
+    return hasil;
+  }
+  function setTextIfExists(id, text) { const el = document.getElementById(id); if (el) el.textContent = text; }
+  function renderTabelJadwalAdmin(data) {
+    const tbody = document.getElementById('tabelAdminJadwal'); if (!tbody) return;
+    const filtered = filterAdminPinjamRows(data, 'filterAdminJadwal', 'filterStatusAdminJadwal', row => [row.idBooking,row.tanggal,row.ruangan,row.mulai,row.selesai,row.nama,row.namaKegiatan,row.jumlahPeserta,row.pesertaJabatan,row.bmnPinjam,row.status].join(' '));
+    setTextIfExists('summaryAdminJadwal', filtered.length + ' dari ' + (data || []).length + ' pengajuan ruangan');
+    if (!filtered.length) { tbody.innerHTML = '<tr><td colspan="11">Data pinjam ruangan tidak ditemukan.</td></tr>'; return; }
+    tbody.innerHTML = filtered.map(row => `<tr><td>${escapeHtml(row.idBooking || '-')}</td><td>${escapeHtml(row.tanggal)}</td><td>${escapeHtml(row.ruangan)}</td><td>${escapeHtml(row.mulai)} - ${escapeHtml(row.selesai)}</td><td>${escapeHtml(row.nama)}</td><td>${escapeHtml(row.namaKegiatan || '-')}</td><td>${escapeHtml(row.jumlahPeserta || '-')}</td><td>${escapeHtml(row.pesertaJabatan || '-')}</td><td>${escapeHtml(row.bmnPinjam || '-')}</td><td>${badgeStatus(row.status)}</td><td>${tombolAksiStatus('booking', row.idBooking, row.status)}</td></tr>`).join('');
+  }
+
+  function simpanKeteranganKendaraan(idEncoded, textareaId, tombol) {
+    if (!pastikanAdminLogin()) return;
+
+    const id = decodeURIComponent(idEncoded || '');
+    const textarea = document.getElementById(textareaId);
+    const keterangan = textarea ? String(textarea.value || '').trim() : '';
+
+    if (keterangan.length > 500) {
+      return tampilAlert('alertAdminPinjam', 'Keterangan admin maksimal 500 karakter.', 'error');
+    }
+
+    const teksAwal = tombol ? tombol.textContent : '';
+    if (tombol) {
+      tombol.disabled = true;
+      tombol.textContent = 'Menyimpan...';
+    }
+
+    google.script.run.withSuccessHandler(function(pesan) {
+      if (tombol) {
+        tombol.disabled = false;
+        tombol.textContent = teksAwal || 'Simpan Catatan';
+      }
+      tampilAlert('alertAdminPinjam', pesan, 'success');
+      muatPinjamKendaraanAdmin();
+      muatPinjamKendaraan();
+    }).withFailureHandler(function(err) {
+      if (tombol) {
+        tombol.disabled = false;
+        tombol.textContent = teksAwal || 'Simpan Catatan';
+      }
+      tampilAlert('alertAdminPinjam', 'Gagal menyimpan keterangan admin: ' + (err.message || err), 'error');
+    }).updateKeteranganKendaraan(id, keterangan);
+  }
+
+  function tombolAksiStatus(tipe, idData, statusSekarang, statusTampil) {
+    if (!idData) return '<span class="muted">ID belum tersedia</span>';
+
+    const statusRaw = normalizeText(statusSekarang);
+    const statusView = normalizeText(statusTampil || statusSekarang);
+    const id = encodeURIComponent(idData);
+    const isPending = !statusRaw || statusRaw.includes('pending');
+    const isDitolak = statusRaw.includes('tolak') || statusView.includes('tolak');
+    const isDikembalikan = statusRaw.includes('dikembalikan') || statusView.includes('dikembalikan');
+    const isDisetujui = statusRaw.includes('acc') || statusRaw.includes('setuju') || statusRaw.includes('dipakai') || statusView.includes('terlambat');
+
+    if (isPending) {
+      return `<div class="action-group"><button class="btn-green btn-small" onclick="ubahStatusAdmin('${tipe}','${id}','ACC', this)">ACC</button><button class="btn-danger btn-small" onclick="ubahStatusAdmin('${tipe}','${id}','Ditolak', this)">Tolak</button></div>`;
+    }
+
+    if ((tipe === 'kendaraan' || tipe === 'sarpras') && isDisetujui && !isDitolak && !isDikembalikan) {
+      return `<div class="action-group"><button class="btn-light btn-small" onclick="ubahStatusAdmin('${tipe}','${id}','Dikembalikan', this)">Dikembalikan</button></div>`;
+    }
+
+    return '<span class="muted">Tidak ada aksi</span>';
+  }
+  function ubahStatusAdmin(tipe, idEncoded, statusBaru, tombol) {
+    if (!pastikanAdminLogin()) return;
+    const id = decodeURIComponent(idEncoded || '');
+    if (!confirm('Ubah status data ' + id + ' menjadi ' + statusBaru + '?')) return;
+
+    const wrapperAksi = tombol ? tombol.closest('.action-group') : null;
+    if (wrapperAksi) {
+      wrapperAksi.querySelectorAll('button').forEach(btn => btn.disabled = true);
+      wrapperAksi.insertAdjacentHTML('beforeend', '<span class="muted"> Memproses...</span>');
+    }
+
+    const runner = google.script.run.withSuccessHandler(function(pesan) {
+      tampilAlert(tipe === 'pemeliharaan' ? 'alertAdminPemeliharaan' : 'alertAdminPinjam', pesan, 'success');
+      if (tipe === 'pemeliharaan') {
+        muatPemeliharaanAdmin();
+        if (isVisible('dashboardPemeliharaan')) muatPemeliharaan();
+      } else if (tipe === 'booking') {
+        muatJadwalAdmin();
+        if (isVisible('panelPinjamRuangan')) muatJadwal();
+      } else if (tipe === 'kendaraan') {
+        muatPinjamKendaraanAdmin();
+        if (isVisible('panelPinjamKendaraan')) muatPinjamKendaraan();
+      } else if (tipe === 'sarpras') {
+        muatPinjamSarprasAdmin();
+        if (isVisible('panelPinjamSarpras')) muatPinjamSarpras();
+      }
+    }).withFailureHandler(function(err) {
+      if (wrapperAksi) {
+        wrapperAksi.querySelectorAll('button').forEach(btn => btn.disabled = false);
+        const proses = wrapperAksi.querySelector('.muted');
+        if (proses) proses.remove();
+      }
+      tampilAlert(tipe === 'pemeliharaan' ? 'alertAdminPemeliharaan' : 'alertAdminPinjam', 'Gagal mengubah status: ' + (err.message || err), 'error');
+    });
+
+    if (tipe === 'pemeliharaan') return runner.ubahStatusPemeliharaan(id, statusBaru);
+    if (tipe === 'booking') return runner.ubahStatusBooking(id, statusBaru);
+    if (tipe === 'kendaraan') return runner.ubahStatusKendaraan(id, statusBaru);
+    if (tipe === 'sarpras') return runner.ubahStatusSarpras(id, statusBaru);
+  }
+
+  function buatDomId(value) { return String(value || '').replace(/[^a-zA-Z0-9_-]/g, '_'); }
+  function runSubmit(btnId, loadingText, defaultText, alertId, callFn, successCallback) { const btn = document.getElementById(btnId); btn.disabled = true; btn.textContent = loadingText; const runner = google.script.run.withSuccessHandler(function(result) { btn.disabled = false; btn.textContent = defaultText; if (successCallback) { const cont = successCallback(result); if (cont === false) return; } tampilAlert(alertId, typeof result === 'string' ? result : 'Berhasil.', 'success'); }).withFailureHandler(function(err) { btn.disabled = false; btn.textContent = defaultText; tampilAlert(alertId, err.message || 'Terjadi kesalahan.', 'error'); }); callFn(runner); }
+  function badgeStatus(status) { const n = normalizeText(status); let c = 'status-default'; if (n.includes('pending')) c = 'status-pending'; if (n.includes('acc') || n.includes('setuju')) c = 'status-acc'; if (n.includes('tolak')) c = 'status-ditolak'; if (n.includes('dikembalikan')) c = 'status-dikembalikan'; if (n.includes('dipakai')) c = 'status-dipakai'; if (n.includes('terlambat')) c = 'status-terlambat'; return `<span class="status ${c}">${escapeHtml(status || '-')}</span>`; }
+  function tampilAlert(id, pesan, tipe) { const el = document.getElementById(id); if (!el) return; el.className = 'alert show ' + (tipe === 'success' ? 'alert-success' : tipe === 'info' ? 'alert-info' : 'alert-error'); el.textContent = pesan; }
+  function renderError(id, pesan, colspan) { const el = document.getElementById(id); if (el) el.innerHTML = `<tr><td colspan="${colspan}">Gagal memuat data: ${escapeHtml(pesan || '')}</td></tr>`; }
+  function val(id) { const el = document.getElementById(id); return el ? String(el.value || '').trim() : ''; }
+  function normalizeText(value) { return String(value || '').toLowerCase().trim().replace(/\s+/g,' '); }
+  function isVisible(id) { const el = document.getElementById(id); return !!(el && !el.classList.contains('hidden')); }
+  function escapeHtml(value) { return String(value == null ? '' : value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); }
+</script>
+</body>
+</html>

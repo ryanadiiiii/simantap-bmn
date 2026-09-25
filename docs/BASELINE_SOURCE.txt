@@ -1,0 +1,4 @@
+Baseline migrasi:
+- Code_SIMANTAP_BMN_JadwalHariIni_Footer_FIXED.gs
+- Index_SIMANTAP_BMN_JadwalHariIni_Footer_FIXED.html
+Dibangun tanpa mengubah alur bisnis utama.
