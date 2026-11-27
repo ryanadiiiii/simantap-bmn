@@ -1,5 +1,9 @@
 let masterData = { pegawai: [], bmn: [] };
 let daftarJadwal = [];
+let daftarJadwalUser = [];
+let tanggalJadwalAktif = '';
+let bulanKalenderJadwal = '';
+let requestJadwalUserAktif = 0;
 let daftarKendaraan = [];
 let daftarSarpras = [];
 let adminLogin = sessionStorage.getItem('adminLoginBMN') === '1';
@@ -12,6 +16,13 @@ let masterDataLoading = false;
 let masterDataCallbacks = [];
 const LIMIT_USER = 50;
 const LIMIT_ADMIN = 100;
+let daftarKetersediaanKendaraan = [];
+let requestKetersediaanKendaraanAktif = 0;
+const identitasPeminjam = {
+  ruangan: { verifiedNip: '', whatsappTerdaftar: false, ubahWhatsapp: false, requestId: 0, timer: null },
+  kendaraan: { verifiedNip: '', whatsappTerdaftar: false, ubahWhatsapp: false, requestId: 0, timer: null },
+  sarpras: { verifiedNip: '', whatsappTerdaftar: false, ubahWhatsapp: false, requestId: 0, timer: null }
+};
 
 document.addEventListener('DOMContentLoaded', function () {
   initBrowserBackNavigation();
@@ -19,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function () {
   setMinDateTimeLocal();
   resetPanelPinjam();
   inisialisasiFooter();
-  setLabelJadwalHariIni();
+  inisialisasiJadwalRuangan();
 });
 
 function inisialisasiFooter() {
@@ -33,15 +44,192 @@ function inisialisasiFooter() {
   if (yearEl) yearEl.textContent = String(new Date().getFullYear());
 }
 
-function setLabelJadwalHariIni() {
-  const el = document.getElementById('labelTanggalJadwalHariIni');
-  if (!el) return;
+function inisialisasiJadwalRuangan() {
+  tanggalJadwalAktif = tanggalHariIniWita();
+  bulanKalenderJadwal = tanggalJadwalAktif.slice(0, 7) + '-01';
+  perbaruiLabelTanggalJadwal();
+  renderKalenderJadwal();
+
+  document.addEventListener('click', function(event) {
+    const picker = document.querySelector('.schedule-date-picker');
+    if (!picker || picker.contains(event.target)) return;
+    tutupKalenderJadwal();
+  });
+
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') tutupKalenderJadwal();
+  });
+}
+
+function tanggalHariIniWita() {
   try {
-    const teks = new Intl.DateTimeFormat('id-ID', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' }).format(new Date());
-    el.textContent = 'Tanggal: ' + teks + '.';
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'Asia/Makassar',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    }).formatToParts(new Date());
+    const map = {};
+    parts.forEach(part => { if (part.type !== 'literal') map[part.type] = part.value; });
+    if (map.year && map.month && map.day) return map.year + '-' + map.month + '-' + map.day;
   } catch (e) {
-    el.textContent = '';
+    console.warn('Timezone Asia/Makassar tidak tersedia, memakai tanggal lokal browser.', e);
   }
+  return formatDateInputLokal(new Date());
+}
+
+function parseYmdParts(value) {
+  const match = String(value || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return null;
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const probe = new Date(Date.UTC(year, month - 1, day));
+  if (probe.getUTCFullYear() !== year || probe.getUTCMonth() !== month - 1 || probe.getUTCDate() !== day) return null;
+  return { year, month, day };
+}
+
+function ymdDariUtc(date) {
+  return date.getUTCFullYear() + '-' + String(date.getUTCMonth() + 1).padStart(2, '0') + '-' + String(date.getUTCDate()).padStart(2, '0');
+}
+
+function geserYmd(value, jumlahHari) {
+  const parts = parseYmdParts(value);
+  if (!parts) return tanggalHariIniWita();
+  const date = new Date(Date.UTC(parts.year, parts.month - 1, parts.day));
+  date.setUTCDate(date.getUTCDate() + Number(jumlahHari || 0));
+  return ymdDariUtc(date);
+}
+
+function formatTanggalJadwal(value) {
+  const parts = parseYmdParts(value);
+  if (!parts) return String(value || '-');
+  const date = new Date(parts.year, parts.month - 1, parts.day, 12, 0, 0, 0);
+  try {
+    return new Intl.DateTimeFormat('id-ID', {
+      weekday: 'long',
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
+    }).format(date);
+  } catch (e) {
+    return String(parts.day).padStart(2, '0') + '/' + String(parts.month).padStart(2, '0') + '/' + parts.year;
+  }
+}
+
+function perbaruiLabelTanggalJadwal(jumlahJadwal) {
+  const label = document.getElementById('labelTanggalJadwal');
+  const ringkasan = document.getElementById('ringkasanTanggalJadwal');
+  const teksTanggal = formatTanggalJadwal(tanggalJadwalAktif);
+  const hariIni = tanggalJadwalAktif === tanggalHariIniWita();
+
+  if (label) label.textContent = teksTanggal;
+  if (ringkasan) {
+    const prefix = hariIni ? 'Hari ini' : 'Tanggal terpilih';
+    ringkasan.textContent = Number.isInteger(jumlahJadwal)
+      ? prefix + ' · ' + jumlahJadwal + ' jadwal'
+      : prefix + ' · ' + teksTanggal;
+  }
+}
+
+function toggleKalenderJadwal() {
+  const popover = document.getElementById('kalenderJadwal');
+  const trigger = document.getElementById('btnTanggalJadwal');
+  if (!popover || !trigger) return;
+
+  const akanBuka = popover.classList.contains('hidden');
+  if (akanBuka) {
+    bulanKalenderJadwal = tanggalJadwalAktif.slice(0, 7) + '-01';
+    renderKalenderJadwal();
+    popover.classList.remove('hidden');
+  } else {
+    popover.classList.add('hidden');
+  }
+  trigger.setAttribute('aria-expanded', akanBuka ? 'true' : 'false');
+}
+
+function tutupKalenderJadwal() {
+  const popover = document.getElementById('kalenderJadwal');
+  const trigger = document.getElementById('btnTanggalJadwal');
+  if (popover) popover.classList.add('hidden');
+  if (trigger) trigger.setAttribute('aria-expanded', 'false');
+}
+
+function gantiBulanKalenderJadwal(delta) {
+  const parts = parseYmdParts(bulanKalenderJadwal || tanggalJadwalAktif);
+  if (!parts) return;
+  const date = new Date(Date.UTC(parts.year, parts.month - 1 + Number(delta || 0), 1));
+  bulanKalenderJadwal = ymdDariUtc(date);
+  renderKalenderJadwal();
+}
+
+function renderKalenderJadwal() {
+  const grid = document.getElementById('gridKalenderJadwal');
+  const labelBulan = document.getElementById('labelBulanKalenderJadwal');
+  if (!grid || !labelBulan) return;
+
+  const parts = parseYmdParts(bulanKalenderJadwal || tanggalJadwalAktif || tanggalHariIniWita());
+  if (!parts) return;
+
+  const firstDay = new Date(Date.UTC(parts.year, parts.month - 1, 1));
+  const offsetSenin = (firstDay.getUTCDay() + 6) % 7;
+  const start = new Date(firstDay.getTime());
+  start.setUTCDate(start.getUTCDate() - offsetSenin);
+
+  try {
+    labelBulan.textContent = new Intl.DateTimeFormat('id-ID', { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(firstDay);
+  } catch (e) {
+    labelBulan.textContent = String(parts.month).padStart(2, '0') + '/' + parts.year;
+  }
+
+  const hariIni = tanggalHariIniWita();
+  const buttons = [];
+  for (let i = 0; i < 42; i++) {
+    const date = new Date(start.getTime());
+    date.setUTCDate(start.getUTCDate() + i);
+    const ymd = ymdDariUtc(date);
+    const isOutside = date.getUTCMonth() !== parts.month - 1;
+    const classes = ['schedule-calendar-day'];
+    if (isOutside) classes.push('is-outside');
+    if (ymd === hariIni) classes.push('is-today');
+    if (ymd === tanggalJadwalAktif) classes.push('is-selected');
+    const ariaCurrent = ymd === hariIni ? ' aria-current="date"' : '';
+    const ariaPressed = ymd === tanggalJadwalAktif ? 'true' : 'false';
+    buttons.push('<button type="button" class="' + classes.join(' ') + '" data-tanggal="' + ymd + '" aria-label="' + escapeHtml(formatTanggalJadwal(ymd)) + '" aria-pressed="' + ariaPressed + '"' + ariaCurrent + '>' + date.getUTCDate() + '</button>');
+  }
+  grid.innerHTML = buttons.join('');
+  grid.querySelectorAll('[data-tanggal]').forEach(function(button) {
+    button.addEventListener('click', function() { pilihTanggalJadwal(button.dataset.tanggal); });
+  });
+}
+
+function pilihTanggalJadwal(value) {
+  if (!parseYmdParts(value)) return;
+  tanggalJadwalAktif = value;
+  bulanKalenderJadwal = value.slice(0, 7) + '-01';
+  tutupKalenderJadwal();
+  perbaruiLabelTanggalJadwal();
+  renderKalenderJadwal();
+  muatJadwal();
+}
+
+function geserTanggalJadwal(delta) {
+  tanggalJadwalAktif = geserYmd(tanggalJadwalAktif || tanggalHariIniWita(), delta);
+  bulanKalenderJadwal = tanggalJadwalAktif.slice(0, 7) + '-01';
+  tutupKalenderJadwal();
+  perbaruiLabelTanggalJadwal();
+  renderKalenderJadwal();
+  muatJadwal();
+}
+
+function kembaliJadwalHariIni() {
+  const hariIni = tanggalHariIniWita();
+  tanggalJadwalAktif = hariIni;
+  bulanKalenderJadwal = hariIni.slice(0, 7) + '-01';
+  tutupKalenderJadwal();
+  perbaruiLabelTanggalJadwal();
+  renderKalenderJadwal();
+  muatJadwal();
 }
 
 function allSections() { return ['dashboardUtama','dashboardInventarisRuangan','dashboardPinjamPakaiBMN','dashboardPemeliharaan','dashboardLoginAdmin','dashboardAdmin','adminDataBMN','adminLokasiBMN','adminPemeliharaan','adminPinjamPakaiBMN']; }
@@ -160,7 +348,7 @@ function bukaPanelPinjam(tipe, pushHistory) {
       muatJadwal();
     });
   }
-  if (tipe === 'kendaraan') muatPinjamKendaraan();
+  if (tipe === 'kendaraan') { muatPinjamKendaraan(); muatKetersediaanKendaraan(); }
   if (tipe === 'sarpras') muatPinjamSarpras();
   setMinDateTimeLocal();
   if (pushHistory !== false) pushHistoryState({ section: 'dashboardPinjamPakaiBMN', panelPinjam: tipe });
@@ -214,10 +402,315 @@ function setTanggalHariIni() {
 }
 function setMinDateTimeLocal() {
   const min = formatDateTimeLocal(new Date());
-  ['batasKembaliKendaraan','batasKembaliSarpras'].forEach(id => { const el = document.getElementById(id); if (el) el.min = min; });
+  ['mulaiKendaraan','batasKembaliKendaraan','batasKembaliSarpras'].forEach(id => { const el = document.getElementById(id); if (el) el.min = min; });
 }
 function formatDateInputLokal(date) { return date.getFullYear() + '-' + String(date.getMonth()+1).padStart(2,'0') + '-' + String(date.getDate()).padStart(2,'0'); }
 function formatDateTimeLocal(date) { return formatDateInputLokal(date) + 'T' + String(date.getHours()).padStart(2,'0') + ':' + String(date.getMinutes()).padStart(2,'0'); }
+
+// --- IDENTITAS PEMINJAM BERBASIS NIP ---
+function configIdentitasPeminjam(tipe) {
+  const map = {
+    ruangan: { nip: 'nipPeminjamRuangan', nama: 'namaPeminjamRuangan', info: 'infoPegawaiRuangan', waBox: 'waBoxRuangan', waStored: 'waStoredRuangan', waMasked: 'waMaskedRuangan', waWrap: 'waInputWrapRuangan', waInput: 'waPeminjamRuangan' },
+    kendaraan: { nip: 'nipPeminjamKendaraan', nama: 'namaPeminjamKendaraan', info: 'infoPegawaiKendaraan', waBox: 'waBoxKendaraan', waStored: 'waStoredKendaraan', waMasked: 'waMaskedKendaraan', waWrap: 'waInputWrapKendaraan', waInput: 'waPeminjamKendaraan' },
+    sarpras: { nip: 'nipPeminjamSarpras', nama: 'namaPeminjamSarpras', info: 'infoPegawaiSarpras', waBox: 'waBoxSarpras', waStored: 'waStoredSarpras', waMasked: 'waMaskedSarpras', waWrap: 'waInputWrapSarpras', waInput: 'waPeminjamSarpras' }
+  };
+  return map[tipe] || null;
+}
+
+function resetIdentitasPeminjam(tipe, pertahankanNip) {
+  const cfg = configIdentitasPeminjam(tipe);
+  const state = identitasPeminjam[tipe];
+  if (!cfg || !state) return;
+  if (state.timer) clearTimeout(state.timer);
+  state.verifiedNip = '';
+  state.whatsappTerdaftar = false;
+  state.ubahWhatsapp = false;
+  state.requestId++;
+  const nipEl = document.getElementById(cfg.nip);
+  const namaEl = document.getElementById(cfg.nama);
+  const infoEl = document.getElementById(cfg.info);
+  const waBox = document.getElementById(cfg.waBox);
+  const stored = document.getElementById(cfg.waStored);
+  const masked = document.getElementById(cfg.waMasked);
+  const wrap = document.getElementById(cfg.waWrap);
+  const waInput = document.getElementById(cfg.waInput);
+  if (nipEl && !pertahankanNip) nipEl.value = '';
+  if (namaEl) namaEl.value = '';
+  if (infoEl) { infoEl.textContent = 'Masukkan NIP untuk memvalidasi nama pegawai.'; infoEl.className = 'identity-status muted'; }
+  if (waBox) waBox.classList.add('hidden');
+  if (stored) stored.classList.add('hidden');
+  if (masked) masked.textContent = '-';
+  if (wrap) wrap.classList.add('hidden');
+  if (waInput) { waInput.value = ''; waInput.required = false; }
+}
+
+function onNipInput(tipe) {
+  const cfg = configIdentitasPeminjam(tipe);
+  const state = identitasPeminjam[tipe];
+  if (!cfg || !state) return;
+  const nipEl = document.getElementById(cfg.nip);
+  if (!nipEl) return;
+  nipEl.value = String(nipEl.value || '').replace(/\D/g, '').slice(0, 18);
+  const nip = nipEl.value;
+  if (state.verifiedNip && state.verifiedNip !== nip) resetIdentitasPeminjam(tipe, true);
+  if (state.timer) clearTimeout(state.timer);
+  if (nip.length === 18 && state.verifiedNip !== nip) {
+    state.timer = setTimeout(function() {
+      if (val(cfg.nip) === nip) cekPegawaiNip(tipe);
+    }, 180);
+  }
+}
+
+function cekPegawaiNip(tipe) {
+  const cfg = configIdentitasPeminjam(tipe);
+  const state = identitasPeminjam[tipe];
+  if (!cfg || !state) return;
+  const nip = val(cfg.nip).replace(/\D/g, '');
+  const infoEl = document.getElementById(cfg.info);
+  if (!/^\d{18}$/.test(nip)) {
+    resetIdentitasPeminjam(tipe, true);
+    if (infoEl) { infoEl.textContent = 'NIP harus terdiri dari 18 digit.'; infoEl.className = 'identity-status is-error'; }
+    return;
+  }
+  if (state.verifiedNip === nip && val(cfg.nama)) return;
+
+  const requestId = ++state.requestId;
+  if (infoEl) { infoEl.textContent = 'Memeriksa NIP...'; infoEl.className = 'identity-status is-loading'; }
+
+  google.script.run.withSuccessHandler(function(result) {
+    if (requestId !== state.requestId || val(cfg.nip).replace(/\D/g, '') !== nip) return;
+    if (!result || result.found !== true) {
+      resetIdentitasPeminjam(tipe, true);
+      if (infoEl) { infoEl.textContent = (result && result.message) || 'NIP tidak ditemukan pada Master Pegawai.'; infoEl.className = 'identity-status is-error'; }
+      return;
+    }
+
+    state.verifiedNip = nip;
+    state.whatsappTerdaftar = !!result.whatsappTerdaftar;
+    state.ubahWhatsapp = false;
+    const namaEl = document.getElementById(cfg.nama);
+    if (namaEl) namaEl.value = result.nama || '';
+    if (infoEl) {
+      infoEl.textContent = '✓ ' + (result.nama || 'Pegawai ditemukan') + (result.jabatan ? ' · ' + result.jabatan : '');
+      infoEl.className = 'identity-status is-valid';
+    }
+
+    const waBox = document.getElementById(cfg.waBox);
+    const stored = document.getElementById(cfg.waStored);
+    const masked = document.getElementById(cfg.waMasked);
+    const wrap = document.getElementById(cfg.waWrap);
+    const waInput = document.getElementById(cfg.waInput);
+    if (waBox) waBox.classList.remove('hidden');
+    if (result.whatsappTerdaftar) {
+      if (stored) stored.classList.remove('hidden');
+      if (masked) masked.textContent = result.whatsappMasked || 'Nomor tersimpan';
+      if (wrap) wrap.classList.add('hidden');
+      if (waInput) { waInput.value = ''; waInput.required = false; }
+    } else {
+      if (stored) stored.classList.add('hidden');
+      if (wrap) wrap.classList.remove('hidden');
+      if (waInput) { waInput.required = true; setTimeout(() => waInput.focus(), 60); }
+    }
+  }).withFailureHandler(function(err) {
+    if (requestId !== state.requestId) return;
+    resetIdentitasPeminjam(tipe, true);
+    if (infoEl) { infoEl.textContent = 'Gagal memeriksa NIP: ' + ((err && err.message) || err || 'Kesalahan backend.'); infoEl.className = 'identity-status is-error'; }
+  }).getPegawaiByNip(nip);
+}
+
+function aktifkanUbahWhatsapp(tipe) {
+  const cfg = configIdentitasPeminjam(tipe);
+  const state = identitasPeminjam[tipe];
+  if (!cfg || !state || !state.verifiedNip) return;
+  state.ubahWhatsapp = true;
+  const wrap = document.getElementById(cfg.waWrap);
+  const waInput = document.getElementById(cfg.waInput);
+  if (wrap) wrap.classList.remove('hidden');
+  if (waInput) { waInput.required = true; waInput.value = ''; setTimeout(() => waInput.focus(), 60); }
+}
+
+function normalisasiWhatsappClient(value) {
+  let nomor = String(value || '').replace(/\D/g, '');
+  if (nomor.startsWith('0')) nomor = '62' + nomor.slice(1);
+  if (nomor.startsWith('8')) nomor = '62' + nomor;
+  return /^628\d{7,12}$/.test(nomor) ? nomor : '';
+}
+
+function identitasUntukSubmit(tipe) {
+  const cfg = configIdentitasPeminjam(tipe);
+  const state = identitasPeminjam[tipe];
+  if (!cfg || !state) throw new Error('Konfigurasi identitas peminjam tidak tersedia.');
+  const nip = val(cfg.nip).replace(/\D/g, '');
+  if (!/^\d{18}$/.test(nip) || state.verifiedNip !== nip || !val(cfg.nama)) {
+    throw new Error('Validasi NIP terlebih dahulu sampai nama pegawai muncul.');
+  }
+  let whatsapp = '';
+  if (!state.whatsappTerdaftar || state.ubahWhatsapp) {
+    whatsapp = normalisasiWhatsappClient(val(cfg.waInput));
+    if (!whatsapp) throw new Error('Nomor WhatsApp tidak valid. Gunakan nomor aktif, contoh 081234567890.');
+  }
+  return { nip: nip, nama: val(cfg.nama), whatsapp: whatsapp, ubahWhatsapp: !!state.ubahWhatsapp };
+}
+
+// --- KETERSEDIAAN KENDARAAN ---
+function resetKetersediaanKendaraan() {
+  daftarKetersediaanKendaraan = [];
+  requestKetersediaanKendaraanAktif++;
+  const select = document.getElementById('jenisMobilKendaraan');
+  const box = document.getElementById('ketersediaanKendaraan');
+  if (select) { select.disabled = true; select.innerHTML = '<option value="">Isi waktu penggunaan terlebih dahulu</option>'; }
+  if (box) box.innerHTML = '<span class="muted">Isi waktu mulai dan batas kembali untuk melihat ketersediaan kendaraan.</span>';
+}
+
+function muatKetersediaanKendaraan() {
+  const mulai = val('mulaiKendaraan');
+  const selesai = val('batasKembaliKendaraan');
+  const select = document.getElementById('jenisMobilKendaraan');
+  const box = document.getElementById('ketersediaanKendaraan');
+  if (!select || !box) return;
+
+  if (!mulai || !selesai) { resetKetersediaanKendaraan(); return; }
+  const start = new Date(mulai);
+  const end = new Date(selesai);
+  if (isNaN(start.getTime()) || isNaN(end.getTime()) || end <= start) {
+    resetKetersediaanKendaraan();
+    box.innerHTML = '<span class="vehicle-availability-error">Batas kembali harus setelah waktu mulai penggunaan.</span>';
+    return;
+  }
+  if (start < new Date()) {
+    resetKetersediaanKendaraan();
+    box.innerHTML = '<span class="vehicle-availability-error">Waktu mulai penggunaan tidak boleh berada di masa lalu.</span>';
+    return;
+  }
+
+  const requestId = ++requestKetersediaanKendaraanAktif;
+  const pilihanSebelumnya = select.value;
+  select.disabled = true;
+  select.innerHTML = '<option value="">Memeriksa kendaraan...</option>';
+  box.innerHTML = '<span class="muted">Memeriksa ketersediaan kendaraan...</span>';
+
+  google.script.run.withSuccessHandler(function(data) {
+    if (requestId !== requestKetersediaanKendaraanAktif) return;
+    daftarKetersediaanKendaraan = Array.isArray(data) ? data : [];
+    renderKetersediaanKendaraan(pilihanSebelumnya);
+  }).withFailureHandler(function(err) {
+    if (requestId !== requestKetersediaanKendaraanAktif) return;
+    daftarKetersediaanKendaraan = [];
+    select.disabled = true;
+    select.innerHTML = '<option value="">Ketersediaan gagal dimuat</option>';
+    box.innerHTML = '<span class="vehicle-availability-error">' + escapeHtml((err && err.message) || String(err || 'Gagal memuat ketersediaan.')) + '</span>';
+  }).getKetersediaanKendaraan(mulai, selesai);
+}
+
+function renderKetersediaanKendaraan(pilihanSebelumnya) {
+  const select = document.getElementById('jenisMobilKendaraan');
+  const box = document.getElementById('ketersediaanKendaraan');
+  if (!select || !box) return;
+
+  const data = Array.isArray(daftarKetersediaanKendaraan)
+    ? daftarKetersediaanKendaraan
+    : [];
+
+  if (!data.length) {
+    select.disabled = true;
+    select.innerHTML = '<option value="">Belum ada kendaraan aktif</option>';
+    box.innerHTML = '<span class="vehicle-availability-error">Master kendaraan belum memiliki unit aktif.</span>';
+    return;
+  }
+
+  const tersediaData = data.filter(function(item) {
+    return Number(item.tersedia || 0) > 0;
+  });
+
+  const pilihanMasihValid = !!pilihanSebelumnya && data.some(function(item) {
+    return item.jenisMobil === pilihanSebelumnya && Number(item.tersedia || 0) > 0;
+  });
+
+  select.innerHTML =
+    '<option value="">Pilih jenis mobil</option>' +
+    data.map(function(item) {
+      const tersedia = Number(item.tersedia || 0);
+      const total = Number(item.total || 0);
+      const penuh = tersedia < 1;
+
+      const label = penuh
+        ? item.jenisMobil + ' — PENUH / sudah terbooking'
+        : item.jenisMobil + ' — ' + tersedia + ' dari ' + total + ' tersedia';
+
+      return '<option value="' + escapeHtml(item.jenisMobil) + '"' +
+        (penuh ? ' disabled' : '') +
+        '>' + escapeHtml(label) + '</option>';
+    }).join('');
+
+  select.disabled = tersediaData.length < 1;
+
+  if (pilihanMasihValid) {
+    select.value = pilihanSebelumnya;
+  } else {
+    select.value = '';
+  }
+
+  const semuaPenuh = tersediaData.length < 1;
+
+  box.innerHTML =
+    (semuaPenuh
+      ? '<div class="vehicle-availability-error" style="margin-bottom:10px;">' +
+          'Semua kendaraan pada jadwal ini sudah terbooking/ACC. Silakan ubah waktu penggunaan.' +
+        '</div>'
+      : '') +
+    '<div class="vehicle-availability-grid">' +
+      data.map(function(item) {
+        const tersedia = Number(item.tersedia || 0);
+        const total = Number(item.total || 0);
+        const penuh = tersedia < 1;
+        const cls = penuh ? 'is-unavailable' : 'is-available';
+
+        const status = penuh
+          ? 'PENUH — tidak dapat dipilih'
+          : tersedia + ' dari ' + total + ' tersedia';
+
+        return '<div class="vehicle-availability-item ' + cls + '">' +
+          '<strong>' + escapeHtml(item.jenisMobil) + '</strong>' +
+          '<span>' + escapeHtml(status) + '</span>' +
+        '</div>';
+      }).join('') +
+    '</div>';
+
+  // Bila jadwal diubah dan jenis yang sebelumnya dipilih kini penuh,
+  // tampilkan peringatan seperti booking ruangan yang sudah terisi.
+  if (pilihanSebelumnya && !pilihanMasihValid) {
+    tampilAlert(
+      'alertPinjam',
+      'Jenis mobil yang sebelumnya dipilih sudah terbooking pada jadwal tersebut. Silakan pilih jenis mobil lain atau ubah waktu penggunaan.',
+      'error'
+    );
+  }
+}
+
+function formatDateTimeRingkas(value) {
+  const teks = String(value || '').trim();
+  if (!teks) return '-';
+  const m = teks.match(/^(\d{4})-(\d{2})-(\d{2})[T\s]+(\d{2}):(\d{2})(?::(\d{2}))?/);
+  if (!m) return teks;
+  const tahun = Number(m[1]);
+  const bulan = Number(m[2]) - 1;
+  const tanggal = Number(m[3]);
+  const jam = Number(m[4]);
+  const menit = Number(m[5]);
+  const detik = Number(m[6] || 0);
+  const hasil = new Date(tahun, bulan, tanggal, jam, menit, detik, 0);
+  if (
+    isNaN(hasil.getTime()) ||
+    hasil.getFullYear() !== tahun ||
+    hasil.getMonth() !== bulan ||
+    hasil.getDate() !== tanggal ||
+    hasil.getHours() !== jam ||
+    hasil.getMinutes() !== menit
+  ) {
+    return teks;
+  }
+  return m[3] + '/' + m[2] + '/' + m[1] + ' ' + m[4] + ':' + m[5] + ' WITA';
+}
 
 function muatMasterData(callback, forceRefresh) {
   if (typeof callback === 'function') masterDataCallbacks.push(callback);
@@ -279,13 +772,38 @@ function updateBMNPinjamTerpilih() { const values = Array.from(document.querySel
 function normalizeRoom(value) { return normalizeText(value).replace(/ruang /g,'').replace(/ruangan /g,''); }
 
 function muatJadwal() {
-  ['tabelJadwalUtama','tabelJadwalPinjam'].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = '<tr><td colspan="8">Memuat data...</td></tr>'; });
-  google.script.run.withSuccessHandler(function (data) { daftarJadwal = data || []; renderTabelJadwal('tabelJadwalUtama', daftarJadwal, false); renderTabelJadwal('tabelJadwalPinjam', daftarJadwal, true); }).withFailureHandler(function (err) { renderError('tabelJadwalUtama', err.message, 7); }).getJadwalRingkas(LIMIT_USER);
+  if (!tanggalJadwalAktif) tanggalJadwalAktif = tanggalHariIniWita();
+  const tanggalRequest = tanggalJadwalAktif;
+  const requestId = ++requestJadwalUserAktif;
+  const tbody = document.getElementById('tabelJadwalPinjam');
+  const ringkasan = document.getElementById('ringkasanTanggalJadwal');
+
+  if (tbody) tbody.innerHTML = '<tr><td colspan="8">Memuat jadwal...</td></tr>';
+  if (ringkasan) ringkasan.textContent = 'Memuat · ' + formatTanggalJadwal(tanggalRequest);
+
+  google.script.run
+    .withSuccessHandler(function (data) {
+      if (requestId !== requestJadwalUserAktif || tanggalRequest !== tanggalJadwalAktif) return;
+      daftarJadwalUser = Array.isArray(data) ? data : [];
+      renderTabelJadwal('tabelJadwalPinjam', daftarJadwalUser, true);
+      perbaruiLabelTanggalJadwal(daftarJadwalUser.length);
+    })
+    .withFailureHandler(function (err) {
+      if (requestId !== requestJadwalUserAktif || tanggalRequest !== tanggalJadwalAktif) return;
+      daftarJadwalUser = [];
+      renderError('tabelJadwalPinjam', err && err.message ? err.message : String(err || 'Gagal memuat jadwal.'), 8);
+      if (ringkasan) ringkasan.textContent = 'Gagal memuat · ' + formatTanggalJadwal(tanggalRequest);
+    })
+    .getJadwalRingkas(tanggalRequest, LIMIT_USER);
 }
 function renderTabelJadwal(targetId, data, detail) {
   const tbody = document.getElementById(targetId); if (!tbody) return;
   const colspan = detail ? 8 : 7;
-  if (!data.length) { tbody.innerHTML = `<tr><td colspan="${colspan}">Belum ada jadwal ruangan hari ini.</td></tr>`; return; }
+  if (!data.length) {
+    const tanggal = formatTanggalJadwal(tanggalJadwalAktif || tanggalHariIniWita());
+    tbody.innerHTML = `<tr class="schedule-empty-row"><td colspan="${colspan}">Belum ada jadwal ruangan pada ${escapeHtml(tanggal)}.</td></tr>`;
+    return;
+  }
   tbody.innerHTML = data.map(row => detail ? `<tr><td>${escapeHtml(row.tanggal)}</td><td>${escapeHtml(row.ruangan)}</td><td>${escapeHtml(row.mulai)} - ${escapeHtml(row.selesai)}</td><td>${escapeHtml(row.nama)}</td><td>${escapeHtml(row.namaKegiatan || '-')}</td><td>${escapeHtml(row.jumlahPeserta || '-')}<br><span class="muted">${escapeHtml(row.pesertaJabatan || '-')}</span></td><td>${escapeHtml(row.bmnPinjam || '-')}</td><td>${badgeStatus(row.status)}</td></tr>` : `<tr><td>${escapeHtml(row.tanggal)}</td><td>${escapeHtml(row.ruangan)}</td><td>${escapeHtml(row.mulai)} - ${escapeHtml(row.selesai)}</td><td>${escapeHtml(row.nama)}</td><td>${escapeHtml(row.namaKegiatan || '-')}</td><td>${escapeHtml(row.bmnPinjam || '-')}</td><td>${badgeStatus(row.status)}</td></tr>`).join('');
 }
 
@@ -300,43 +818,190 @@ function pesanValidasiWaktuBooking(tanggal, mulai, selesai) {
   if (start < new Date()) return 'Tanggal dan jam mulai tidak boleh berada di masa lalu.';
   return '';
 }
+function parseJamClientKeMenit(value) {
+  const match = String(value || '').trim().match(/^(\d{1,2})[:.](\d{2})/);
+  if (!match) return null;
+  const jam = Number(match[1]);
+  const menit = Number(match[2]);
+  if (jam < 0 || jam > 23 || menit < 0 || menit > 59) return null;
+  return jam * 60 + menit;
+}
+
 function cariJadwalBentrokClient(form) {
-  const start = new Date(form.tanggal + 'T' + form.jamMulai); const end = new Date(form.tanggal + 'T' + form.jamSelesai);
-  return (daftarJadwal || []).find(row => !normalizeText(row.status).includes('tolak') && normalizeRoom(row.ruangan) === normalizeRoom(form.ruangan) && new Date(row.tanggal + 'T' + row.mulai) < end && new Date(row.tanggal + 'T' + row.selesai) > start);
+  // Pengecekan client hanya digunakan sebagai peringatan cepat jika tanggal form
+  // sama dengan tanggal jadwal yang sedang dimuat. Backend tetap menjadi otoritas final.
+  if (!form || form.tanggal !== tanggalJadwalAktif) return null;
+  const mulaiBaru = parseJamClientKeMenit(form.jamMulai);
+  const selesaiBaru = parseJamClientKeMenit(form.jamSelesai);
+  if (mulaiBaru === null || selesaiBaru === null) return null;
+
+  return (daftarJadwalUser || []).find(function(row) {
+    if (normalizeText(row.status).includes('tolak')) return false;
+    if (normalizeRoom(row.ruangan) !== normalizeRoom(form.ruangan)) return false;
+    const mulaiLama = parseJamClientKeMenit(row.mulai);
+    const selesaiLama = parseJamClientKeMenit(row.selesai);
+    if (mulaiLama === null || selesaiLama === null) return false;
+    return mulaiBaru < selesaiLama && selesaiBaru > mulaiLama;
+  }) || null;
 }
 
 function submitBooking(event) {
-  event.preventDefault(); updateBMNPinjamTerpilih();
-  const form = { tanggal: val('tanggalBooking'), ruangan: val('ruanganBooking'), jamMulai: val('jamMulaiBooking'), jamSelesai: val('jamSelesaiBooking'), nama: val('namaPeminjamRuangan'), bmnDipinjam: val('bmnDipinjam') || '-', namaKegiatan: val('namaKegiatanRuangan'), jumlahPeserta: val('jumlahPesertaRuangan'), pesertaJabatan: val('pesertaJabatanRuangan') };
-  const pesanWaktu = pesanValidasiWaktuBooking(form.tanggal, form.jamMulai, form.jamSelesai); if (pesanWaktu) return tampilAlert('alertPinjam', pesanWaktu, 'error');
-  const bentrok = cariJadwalBentrokClient(form); if (bentrok) return tampilAlert('alertPinjam', 'Jadwal bentrok dengan ' + bentrok.ruangan + ' pukul ' + bentrok.mulai + ' - ' + bentrok.selesai + ' oleh ' + bentrok.nama + '.', 'error');
-  runSubmit('btnSubmitBooking', 'Mengirim...', 'Kirim Pengajuan Pinjam Ruangan', 'alertPinjam', function(runner) { runner.simpanBooking(form); }, function() { document.getElementById('formBooking').reset(); setTanggalHariIni(); renderChecklistBMNPinjam(); muatJadwal(); });
+  event.preventDefault();
+  updateBMNPinjamTerpilih();
+  let identitas;
+  try { identitas = identitasUntukSubmit('ruangan'); }
+  catch (e) { return tampilAlert('alertPinjam', e.message || String(e), 'error'); }
+
+  const form = {
+    nip: identitas.nip, nama: identitas.nama, whatsapp: identitas.whatsapp, ubahWhatsapp: identitas.ubahWhatsapp,
+    tanggal: val('tanggalBooking'), ruangan: val('ruanganBooking'), jamMulai: val('jamMulaiBooking'), jamSelesai: val('jamSelesaiBooking'),
+    bmnDipinjam: val('bmnDipinjam') || '-', namaKegiatan: val('namaKegiatanRuangan'), jumlahPeserta: val('jumlahPesertaRuangan'), pesertaJabatan: val('pesertaJabatanRuangan')
+  };
+  const pesanWaktu = pesanValidasiWaktuBooking(form.tanggal, form.jamMulai, form.jamSelesai);
+  if (pesanWaktu) return tampilAlert('alertPinjam', pesanWaktu, 'error');
+  const bentrok = cariJadwalBentrokClient(form);
+  if (bentrok) return tampilAlert('alertPinjam', 'Jadwal bentrok dengan ' + bentrok.ruangan + ' pukul ' + bentrok.mulai + ' - ' + bentrok.selesai + ' oleh ' + bentrok.nama + '.', 'error');
+
+  runSubmit('btnSubmitBooking', 'Mengirim...', 'Kirim Pengajuan Pinjam Ruangan', 'alertPinjam', function(runner) {
+    runner.simpanBooking(form);
+  }, function() {
+    document.getElementById('formBooking').reset();
+    resetIdentitasPeminjam('ruangan');
+    setTanggalHariIni();
+    renderChecklistBMNPinjam();
+    pilihTanggalJadwal(form.tanggal);
+  });
 }
 
 function submitPinjamKendaraan(event) {
-  event.preventDefault(); setMinDateTimeLocal();
-  const form = { nama: val('namaPeminjamKendaraan'), kegiatan: val('kegiatanKendaraan'), tujuan: val('tujuanKendaraan'), lama: val('lamaKendaraan'), batasKembali: val('batasKembaliKendaraan') };
-  if (new Date(form.batasKembali) < new Date()) return tampilAlert('alertPinjam', 'Batas kembali kendaraan tidak boleh berada di masa lalu.', 'error');
-  runSubmit('btnSubmitKendaraan', 'Mengirim...', 'Kirim Pengajuan Pinjam Kendaraan', 'alertPinjam', r => r.simpanPinjamKendaraan(form), function() { document.getElementById('formPinjamKendaraan').reset(); setMinDateTimeLocal(); muatPinjamKendaraan(); });
-}
-function submitPinjamSarpras(event) {
-  event.preventDefault(); setMinDateTimeLocal();
-  const form = { nama: val('namaPeminjamSarpras'), kegiatan: val('kegiatanSarpras'), tempat: val('tempatSarpras'), tujuan: val('tempatSarpras'), jenisBarang: val('jenisBarangSarpras'), lama: val('lamaSarpras'), batasKembali: val('batasKembaliSarpras') };
-  if (new Date(form.batasKembali) < new Date()) return tampilAlert('alertPinjam', 'Batas kembali sarpras tidak boleh berada di masa lalu.', 'error');
-  runSubmit('btnSubmitSarpras', 'Mengirim...', 'Kirim Pengajuan Pinjam Sarpras', 'alertPinjam', r => r.simpanPinjamSarpras(form), function() { document.getElementById('formPinjamSarpras').reset(); setMinDateTimeLocal(); muatPinjamSarpras(); });
+  event.preventDefault();
+  setMinDateTimeLocal();
+
+  let identitas;
+  try {
+    identitas = identitasUntukSubmit('kendaraan');
+  } catch (e) {
+    return tampilAlert('alertPinjam', e.message || String(e), 'error');
+  }
+
+  const mulai = val('mulaiKendaraan');
+  const batasKembali = val('batasKembaliKendaraan');
+  const jenisMobil = val('jenisMobilKendaraan');
+  const start = new Date(mulai);
+  const end = new Date(batasKembali);
+
+  if (!mulai || !batasKembali || isNaN(start.getTime()) || isNaN(end.getTime()) || end <= start) {
+    return tampilAlert('alertPinjam', 'Waktu penggunaan kendaraan belum valid.', 'error');
+  }
+
+  if (start < new Date()) {
+    return tampilAlert('alertPinjam', 'Waktu mulai penggunaan kendaraan tidak boleh berada di masa lalu.', 'error');
+  }
+
+  if (!jenisMobil) {
+    return tampilAlert(
+      'alertPinjam',
+      'Pilih jenis mobil yang masih tersedia. Kendaraan yang sudah terbooking/ACC tidak dapat dipilih.',
+      'error'
+    );
+  }
+
+  const infoJenis = (daftarKetersediaanKendaraan || []).find(function(item) {
+    return item.jenisMobil === jenisMobil;
+  });
+
+  if (!infoJenis || Number(infoJenis.tersedia || 0) < 1) {
+    const select = document.getElementById('jenisMobilKendaraan');
+    if (select) select.value = '';
+
+    return tampilAlert(
+      'alertPinjam',
+      'Jenis mobil tersebut sudah penuh/terbooking pada jadwal ini. Silakan pilih jenis mobil lain atau ubah waktu penggunaan.',
+      'error'
+    );
+  }
+
+  const form = {
+    nip: identitas.nip,
+    nama: identitas.nama,
+    whatsapp: identitas.whatsapp,
+    ubahWhatsapp: identitas.ubahWhatsapp,
+    kegiatan: val('kegiatanKendaraan'),
+    tujuan: val('tujuanKendaraan'),
+    jenisMobil: jenisMobil,
+    mulaiPenggunaan: mulai,
+    batasKembali: batasKembali
+  };
+
+  runSubmit(
+    'btnSubmitKendaraan',
+    'Mengirim...',
+    'Kirim Pengajuan Pinjam Kendaraan',
+    'alertPinjam',
+    function(runner) {
+      runner.simpanPinjamKendaraan(form);
+    },
+    function() {
+      document.getElementById('formPinjamKendaraan').reset();
+      resetIdentitasPeminjam('kendaraan');
+      resetKetersediaanKendaraan();
+      setMinDateTimeLocal();
+      muatPinjamKendaraan();
+    }
+  );
 }
 
-function muatPinjamKendaraan() { google.script.run.withSuccessHandler(function(data) { daftarKendaraan = data || []; renderPinjamKendaraan('tabelPinjamKendaraan', daftarKendaraan, false); }).withFailureHandler(err => renderError('tabelPinjamKendaraan', err.message, 8)).getPinjamKendaraanRingkas(LIMIT_USER); }
+function submitPinjamSarpras(event) {
+  event.preventDefault();
+  setMinDateTimeLocal();
+  let identitas;
+  try { identitas = identitasUntukSubmit('sarpras'); }
+  catch (e) { return tampilAlert('alertPinjam', e.message || String(e), 'error'); }
+
+  const form = {
+    nip: identitas.nip, nama: identitas.nama, whatsapp: identitas.whatsapp, ubahWhatsapp: identitas.ubahWhatsapp,
+    kegiatan: val('kegiatanSarpras'), tempat: val('tempatSarpras'), tujuan: val('tempatSarpras'),
+    jenisBarang: val('jenisBarangSarpras'), lama: val('lamaSarpras'), batasKembali: val('batasKembaliSarpras')
+  };
+  if (new Date(form.batasKembali) < new Date()) return tampilAlert('alertPinjam', 'Batas kembali sarpras tidak boleh berada di masa lalu.', 'error');
+  runSubmit('btnSubmitSarpras', 'Mengirim...', 'Kirim Pengajuan Pinjam Sarpras', 'alertPinjam', r => r.simpanPinjamSarpras(form), function() {
+    document.getElementById('formPinjamSarpras').reset();
+    resetIdentitasPeminjam('sarpras');
+    setMinDateTimeLocal();
+    muatPinjamSarpras();
+  });
+}
+
+function muatPinjamKendaraan() {
+  google.script.run.withSuccessHandler(function(data) {
+    daftarKendaraan = data || [];
+    renderPinjamKendaraan('tabelPinjamKendaraan', daftarKendaraan, false);
+  }).withFailureHandler(err => renderError('tabelPinjamKendaraan', err.message, 10)).getPinjamKendaraanRingkas(LIMIT_USER);
+}
 function muatPinjamSarpras() { google.script.run.withSuccessHandler(function(data) { daftarSarpras = data || []; renderPinjamSarpras('tabelPinjamSarpras', daftarSarpras, false); }).withFailureHandler(err => renderError('tabelPinjamSarpras', err.message, 8)).getPinjamSarprasRingkas(LIMIT_USER); }
+
+function renderUnitKendaraanAdmin(row) {
+  const assigned = String(row.mobilDitugaskan || '').trim();
+  if (assigned) return '<span class="assigned-vehicle">' + escapeHtml(assigned) + '</span>';
+  const modern = !!(row.jenisMobil && row.mulaiPenggunaan && row.batasKembali);
+  const pending = normalizeText(row.status).includes('pending') || !normalizeText(row.status);
+  if (!modern || !pending) return '<span class="muted">-</span>';
+  const options = Array.isArray(row.opsiMobilDitugaskan) ? row.opsiMobilDitugaskan : [];
+  const selectId = buatDomId('unitKendaraan_' + (row.idPinjam || ''));
+  if (!options.length) return '<select id="' + selectId + '" class="unit-vehicle-select" data-requires-assignment="1" disabled><option value="">Tidak ada unit tersedia</option></select>';
+  return '<select id="' + selectId + '" class="unit-vehicle-select" data-requires-assignment="1"><option value="">Pilih unit...</option>' + options.map(unit => '<option value="' + escapeHtml(unit) + '">' + escapeHtml(unit) + '</option>').join('') + '</select>';
+}
+
 function renderPinjamKendaraan(id, data, admin) {
   const tbody = document.getElementById(id); if (!tbody) return;
-  const colspan = admin ? 10 : 8;
+  const colspan = admin ? 12 : 10;
   let rows = data || [];
   if (admin && id === 'tabelAdminKendaraan') {
-    rows = filterAdminPinjamRows(rows, 'filterAdminKendaraan', 'filterStatusAdminKendaraan', row => [row.idPinjam,row.tanggalPengajuan,row.nama,row.kegiatan,row.tujuan,row.lama,row.batasKembali,row.status,statusDenganTerlambat(row),row.keteranganAdmin].join(' '));
+    rows = filterAdminPinjamRows(rows, 'filterAdminKendaraan', 'filterStatusAdminKendaraan', row => [row.idPinjam,row.tanggalPengajuan,row.nama,row.kegiatan,row.tujuan,row.jenisMobil,row.mulaiPenggunaan,row.batasKembali,row.mobilDitugaskan,row.status,statusDenganTerlambat(row),row.keteranganAdmin].join(' '));
     setTextIfExists('summaryAdminKendaraan', rows.length + ' dari ' + (data || []).length + ' pengajuan kendaraan');
   }
   if (!rows.length) { tbody.innerHTML = `<tr><td colspan="${colspan}">Data pinjam kendaraan tidak ditemukan.</td></tr>`; return; }
+
   tbody.innerHTML = rows.map(row => {
     const ket = row.keteranganAdmin || '';
     const idEncoded = encodeURIComponent(row.idPinjam || '');
@@ -344,9 +1009,20 @@ function renderPinjamKendaraan(id, data, admin) {
     const noteCell = admin
       ? `<td class="admin-note-cell"><textarea class="admin-note-input" id="${noteId}" maxlength="500" placeholder="Catatan untuk peminjam kendaraan, opsional...">${escapeHtml(ket)}</textarea><div style="margin-top:6px;"><button class="btn-light btn-small" onclick="simpanKeteranganKendaraan('${idEncoded}', '${noteId}', this)">Simpan Catatan</button></div></td>`
       : `<td><span class="admin-note-view">${escapeHtml(ket || '-')}</span></td>`;
-    return `<tr class="${isOverdue(row) ? 'return-warning' : ''}"><td>${escapeHtml(row.idPinjam)}</td>${admin ? `<td>${escapeHtml(row.tanggalPengajuan || '-')}</td>` : ''}<td>${escapeHtml(row.nama)}</td><td>${escapeHtml(row.kegiatan)}</td><td>${escapeHtml(row.tujuan)}</td><td>${escapeHtml(row.lama)}</td><td>${escapeHtml(row.batasKembali)}</td><td>${badgeStatus(statusDenganTerlambat(row))}</td>${noteCell}${admin ? `<td>${tombolAksiStatus('kendaraan', row.idPinjam, row.status, statusDenganTerlambat(row))}</td>` : ''}</tr>`;
+    const jenis = escapeHtml(row.jenisMobil || '-');
+    const mulai = escapeHtml(formatDateTimeRingkas(row.mulaiPenggunaan));
+    const kembali = escapeHtml(formatDateTimeRingkas(row.batasKembali));
+    const unit = admin ? renderUnitKendaraanAdmin(row) : escapeHtml(row.mobilDitugaskan || 'Menunggu penetapan admin');
+    const status = badgeStatus(statusDenganTerlambat(row));
+    const cls = isOverdue(row) ? 'return-warning' : '';
+
+    if (admin) {
+      return `<tr class="${cls}"><td>${escapeHtml(row.idPinjam)}</td><td>${escapeHtml(row.tanggalPengajuan || '-')}</td><td>${escapeHtml(row.nama)}</td><td>${escapeHtml(row.kegiatan)}</td><td>${escapeHtml(row.tujuan)}</td><td>${jenis}</td><td>${mulai}</td><td>${kembali}</td><td>${unit}</td><td>${status}</td>${noteCell}<td>${tombolAksiStatus('kendaraan', row.idPinjam, row.status, statusDenganTerlambat(row))}</td></tr>`;
+    }
+    return `<tr class="${cls}"><td>${escapeHtml(row.idPinjam)}</td><td>${escapeHtml(row.nama)}</td><td>${escapeHtml(row.kegiatan)}</td><td>${escapeHtml(row.tujuan)}</td><td>${jenis}</td><td>${mulai}</td><td>${kembali}</td><td>${unit}</td><td>${status}</td>${noteCell}</tr>`;
   }).join('');
 }
+
 function renderPinjamSarpras(id, data, admin) {
   const tbody = document.getElementById(id); if (!tbody) return;
   const colspan = admin ? 10 : 8;
@@ -356,7 +1032,7 @@ function renderPinjamSarpras(id, data, admin) {
     setTextIfExists('summaryAdminSarpras', rows.length + ' dari ' + (data || []).length + ' pengajuan sarpras');
   }
   if (!rows.length) { tbody.innerHTML = `<tr><td colspan="${colspan}">Data pinjam sarpras tidak ditemukan.</td></tr>`; return; }
-  tbody.innerHTML = rows.map(row => `<tr class="${isOverdue(row) ? 'return-warning' : ''}"><td>${escapeHtml(row.idPinjam)}</td>${admin ? `<td>${escapeHtml(row.tanggalPengajuan || '-')}</td>` : ''}<td>${escapeHtml(row.nama)}</td><td>${escapeHtml(row.kegiatan)}</td><td>${escapeHtml(row.tempat)}</td><td>${escapeHtml(row.jenisBarang)}</td><td>${escapeHtml(row.lama)}</td><td>${escapeHtml(row.batasKembali)}</td><td>${badgeStatus(statusDenganTerlambat(row))}</td>${admin ? `<td>${tombolAksiStatus('sarpras', row.idPinjam, row.status, statusDenganTerlambat(row))}</td>` : ''}</tr>`).join('');
+  tbody.innerHTML = rows.map(row => `<tr class="${isOverdue(row) ? 'return-warning' : ''}"><td>${escapeHtml(row.idPinjam)}</td>${admin ? `<td>${escapeHtml(row.tanggalPengajuan || '-')}</td>` : ''}<td>${escapeHtml(row.nama)}</td><td>${escapeHtml(row.kegiatan)}</td><td>${escapeHtml(row.tempat)}</td><td>${escapeHtml(row.jenisBarang)}</td><td>${escapeHtml(row.lama)}</td><td>${escapeHtml(formatDateTimeRingkas(row.batasKembali))}</td><td>${badgeStatus(statusDenganTerlambat(row))}</td>${admin ? `<td>${tombolAksiStatus('sarpras', row.idPinjam, row.status, statusDenganTerlambat(row))}</td>` : ''}</tr>`).join('');
 }
 function isOverdue(row) { const st = normalizeText(row.status); if (st.includes('dikembalikan') || st.includes('tolak')) return false; const t = row.batasKembali ? new Date(row.batasKembali) : null; return t && !isNaN(t.getTime()) && t < new Date(); }
 function statusDenganTerlambat(row) { return isOverdue(row) ? 'Terlambat' : row.status; }
@@ -562,7 +1238,7 @@ function renderTabelPemeliharaanAdmin(data) { const tbody = document.getElementB
 
 function muatPinjamPakaiAdmin() { muatJadwalAdmin(); muatPinjamKendaraanAdmin(); muatPinjamSarprasAdmin(); }
 function muatJadwalAdmin() { google.script.run.withSuccessHandler(data => { daftarJadwal = data || []; renderTabelJadwalAdmin(daftarJadwal); }).withFailureHandler(err => renderError('tabelAdminJadwal', err.message, 11)).getJadwalAdminRingkas(LIMIT_ADMIN); }
-function muatPinjamKendaraanAdmin() { google.script.run.withSuccessHandler(data => { daftarKendaraan = data || []; renderPinjamKendaraan('tabelAdminKendaraan', daftarKendaraan, true); }).withFailureHandler(err => renderError('tabelAdminKendaraan', err.message, 10)).getPinjamKendaraanAdminRingkas(LIMIT_ADMIN); }
+function muatPinjamKendaraanAdmin() { google.script.run.withSuccessHandler(data => { daftarKendaraan = data || []; renderPinjamKendaraan('tabelAdminKendaraan', daftarKendaraan, true); }).withFailureHandler(err => renderError('tabelAdminKendaraan', err.message, 12)).getPinjamKendaraanAdminRingkas(LIMIT_ADMIN); }
 function muatPinjamSarprasAdmin() { google.script.run.withSuccessHandler(data => { daftarSarpras = data || []; renderPinjamSarpras('tabelAdminSarpras', daftarSarpras, true); }).withFailureHandler(err => renderError('tabelAdminSarpras', err.message, 10)).getPinjamSarprasAdminRingkas(LIMIT_ADMIN); }
 function filterAdminPinjamRows(data, inputId, statusId, textFn) {
   let hasil = data || [];
@@ -642,7 +1318,32 @@ function tombolAksiStatus(tipe, idData, statusSekarang, statusTampil) {
 function ubahStatusAdmin(tipe, idEncoded, statusBaru, tombol) {
   if (!pastikanAdminLogin()) return;
   const id = decodeURIComponent(idEncoded || '');
-  if (!confirm('Ubah status data ' + id + ' menjadi ' + statusBaru + '?')) return;
+  let keteranganAdmin = '';
+  let mobilDitugaskan = '';
+
+  if (tipe === 'kendaraan') {
+    const noteEl = document.getElementById(buatDomId('ketKendaraan_' + id));
+    keteranganAdmin = noteEl ? String(noteEl.value || '').trim() : '';
+    if (statusBaru === 'ACC') {
+      const unitEl = document.getElementById(buatDomId('unitKendaraan_' + id));
+      if (unitEl) {
+        mobilDitugaskan = String(unitEl.value || '').trim();
+        if (unitEl.dataset.requiresAssignment === '1' && !mobilDitugaskan) {
+          return tampilAlert('alertAdminPinjam', 'Pilih mobil yang ditugaskan sebelum ACC.', 'error');
+        }
+      }
+    }
+  }
+
+  if (statusBaru === 'Ditolak' && !keteranganAdmin) {
+    const alasan = window.prompt('Keterangan/alasan penolakan untuk peminjam (opsional):', '');
+    if (alasan === null) return;
+    keteranganAdmin = String(alasan || '').trim();
+  }
+  if (keteranganAdmin.length > 500) return tampilAlert('alertAdminPinjam', 'Keterangan admin maksimal 500 karakter.', 'error');
+
+  const detailKonfirmasi = tipe === 'kendaraan' && statusBaru === 'ACC' && mobilDitugaskan ? ' dengan unit ' + mobilDitugaskan : '';
+  if (!confirm('Ubah status data ' + id + ' menjadi ' + statusBaru + detailKonfirmasi + '?')) return;
 
   const wrapperAksi = tombol ? tombol.closest('.action-group') : null;
   if (wrapperAksi) {
@@ -660,7 +1361,7 @@ function ubahStatusAdmin(tipe, idEncoded, statusBaru, tombol) {
       if (isVisible('panelPinjamRuangan')) muatJadwal();
     } else if (tipe === 'kendaraan') {
       muatPinjamKendaraanAdmin();
-      if (isVisible('panelPinjamKendaraan')) muatPinjamKendaraan();
+      if (isVisible('panelPinjamKendaraan')) { muatPinjamKendaraan(); muatKetersediaanKendaraan(); }
     } else if (tipe === 'sarpras') {
       muatPinjamSarprasAdmin();
       if (isVisible('panelPinjamSarpras')) muatPinjamSarpras();
@@ -675,9 +1376,9 @@ function ubahStatusAdmin(tipe, idEncoded, statusBaru, tombol) {
   });
 
   if (tipe === 'pemeliharaan') return runner.ubahStatusPemeliharaan(id, statusBaru);
-  if (tipe === 'booking') return runner.ubahStatusBooking(id, statusBaru);
-  if (tipe === 'kendaraan') return runner.ubahStatusKendaraan(id, statusBaru);
-  if (tipe === 'sarpras') return runner.ubahStatusSarpras(id, statusBaru);
+  if (tipe === 'booking') return runner.ubahStatusBooking(id, statusBaru, keteranganAdmin);
+  if (tipe === 'kendaraan') return runner.ubahStatusKendaraan(id, statusBaru, mobilDitugaskan, keteranganAdmin);
+  if (tipe === 'sarpras') return runner.ubahStatusSarpras(id, statusBaru, keteranganAdmin);
 }
 
 function buatDomId(value) { return String(value || '').replace(/[^a-zA-Z0-9_-]/g, '_'); }

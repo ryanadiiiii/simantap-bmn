@@ -117,7 +117,7 @@
 
       <div class="module-grid">
         <button class="module-card" data-panel="ruangan" onclick="bukaPanelPinjam('ruangan')"><div class="module-icon">🏛️</div><h3>Pinjam Ruangan</h3><p>Ruang Aula, Zona Integritas, dan Transit lengkap dengan jadwal dan checklist BMN.</p></button>
-        <button class="module-card" data-panel="kendaraan" onclick="bukaPanelPinjam('kendaraan')"><div class="module-icon">🚗</div><h3>Pinjam Kendaraan</h3><p>Ajukan kendaraan dinas dengan kegiatan, tujuan, lama pakai, dan batas kembali.</p></button>
+        <button class="module-card" data-panel="kendaraan" onclick="bukaPanelPinjam('kendaraan')"><div class="module-icon">🚗</div><h3>Pinjam Kendaraan</h3><p>Ajukan kendaraan dinas berdasarkan waktu penggunaan, jenis mobil, dan ketersediaan unit.</p></button>
         <button class="module-card" data-panel="sarpras" onclick="bukaPanelPinjam('sarpras')"><div class="module-icon">🎛️</div><h3>Pinjam Sarpras</h3><p>Ajukan sarpras kegiatan seperti laptop, proyektor, sound system, atau barang lainnya.</p></button>
       </div>
       <div id="guidePinjam" class="empty-guide">Pilih salah satu jenis pinjam pakai di atas untuk membuka form dan riwayatnya.</div>
@@ -132,7 +132,20 @@
               <div><label for="ruanganBooking">Ruangan</label><select id="ruanganBooking" required onchange="renderChecklistBMNPinjam(); validasiBookingRealtime();"><option value="">Pilih ruangan</option><option value="Ruang Aula">Ruang Aula</option><option value="Ruang Zona Integritas">Ruang Zona Integritas</option><option value="Ruang Transit">Ruang Transit</option></select></div>
               <div><label for="jamMulaiBooking">Jam Mulai</label><input type="time" id="jamMulaiBooking" required onchange="validasiBookingRealtime()"></div>
               <div><label for="jamSelesaiBooking">Jam Selesai</label><input type="time" id="jamSelesaiBooking" required onchange="validasiBookingRealtime()"></div>
-              <div><label for="namaPeminjamRuangan">Nama Peminjam</label><input type="text" id="namaPeminjamRuangan" list="listPegawai" placeholder="Ketik nama pegawai..." required></div>
+              <div class="identity-block full">
+                <div class="identity-grid">
+                  <div>
+                    <label for="nipPeminjamRuangan">NIP Peminjam</label>
+                    <div class="identity-input-row"><input type="text" id="nipPeminjamRuangan" inputmode="numeric" maxlength="18" autocomplete="off" placeholder="Masukkan 18 digit NIP" required oninput="onNipInput('ruangan')"><button class="btn-light identity-check-btn" type="button" onclick="cekPegawaiNip('ruangan')">Cek NIP</button></div>
+                  </div>
+                  <div><label for="namaPeminjamRuangan">Nama Peminjam</label><input type="text" id="namaPeminjamRuangan" placeholder="Terisi otomatis setelah NIP valid" readonly required></div>
+                </div>
+                <div id="infoPegawaiRuangan" class="identity-status muted">Masukkan NIP untuk memvalidasi nama pegawai.</div>
+                <div id="waBoxRuangan" class="whatsapp-box hidden">
+                  <div id="waStoredRuangan" class="whatsapp-stored hidden"><span>WhatsApp: <strong id="waMaskedRuangan">-</strong> ✓ tersimpan</span><button type="button" class="btn-light btn-small" onclick="aktifkanUbahWhatsapp('ruangan')">Ubah Nomor</button></div>
+                  <div id="waInputWrapRuangan" class="hidden"><label for="waPeminjamRuangan">Nomor WhatsApp</label><input type="tel" id="waPeminjamRuangan" inputmode="tel" autocomplete="tel" placeholder="Contoh: 081234567890"><small class="small-note">Nomor ini disimpan sekali untuk notifikasi status pengajuan berikutnya.</small></div>
+                </div>
+              </div>
               <div><label for="namaKegiatanRuangan">Nama Kegiatan</label><input type="text" id="namaKegiatanRuangan" placeholder="Contoh: Rapat koordinasi" required></div>
               <div><label for="jumlahPesertaRuangan">Jumlah Peserta</label><input type="number" id="jumlahPesertaRuangan" min="1" placeholder="Contoh: 50" required></div>
               <div><label for="pesertaJabatanRuangan">Peserta / Jabatan</label><input type="text" id="pesertaJabatanRuangan" placeholder="Contoh: Pejabat struktural, JF, pegawai, tamu eksternal" required></div>
@@ -141,18 +154,109 @@
             <div style="margin-top:16px;"><button id="btnSubmitBooking" class="btn-green" type="submit">Kirim Pengajuan Pinjam Ruangan</button></div>
           </form>
         </div>
-        <div class="card"><div class="panel-header"><div><h3>Jadwal Ruangan Hari Ini</h3><p class="muted">Hanya jadwal pada hari ini yang ditampilkan pada halaman pengguna. <span id="labelTanggalJadwalHariIni"></span></p></div><button class="btn-light" onclick="muatJadwal()">Refresh</button></div><div class="table-wrap"><table><thead><tr><th>Tanggal</th><th>Ruangan</th><th>Waktu</th><th>Peminjam</th><th>Kegiatan</th><th>Peserta</th><th>BMN</th><th>Status</th></tr></thead><tbody id="tabelJadwalPinjam"><tr><td colspan="8">Klik modul Pinjam Ruangan untuk memuat jadwal hari ini.</td></tr></tbody></table></div></div>
+        <div class="card schedule-card">
+          <div class="schedule-head">
+            <div class="schedule-head-copy">
+              <h3>Jadwal Ruangan</h3>
+              <p class="muted">Lihat jadwal ruangan per tanggal. Gunakan navigasi hari atau pilih tanggal dari kalender.</p>
+            </div>
+
+            <div class="schedule-date-picker">
+              <button id="btnTanggalJadwal" class="schedule-date-trigger" type="button" aria-expanded="false" aria-controls="kalenderJadwal" onclick="toggleKalenderJadwal()">
+                <svg class="schedule-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2v3M17 2v3M3.5 9h17M5.5 4h13a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span id="labelTanggalJadwal">Memuat tanggal...</span>
+                <svg id="ikonChevronTanggalJadwal" class="schedule-chevron" viewBox="0 0 20 20" aria-hidden="true"><path d="m6 8 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+
+              <div id="kalenderJadwal" class="schedule-calendar-popover hidden" role="dialog" aria-label="Pilih tanggal jadwal ruangan">
+                <div class="schedule-calendar-header">
+                  <button class="schedule-calendar-arrow" type="button" onclick="gantiBulanKalenderJadwal(-1)" aria-label="Bulan sebelumnya">‹</button>
+                  <strong id="labelBulanKalenderJadwal">Bulan</strong>
+                  <button class="schedule-calendar-arrow" type="button" onclick="gantiBulanKalenderJadwal(1)" aria-label="Bulan berikutnya">›</button>
+                </div>
+                <div class="schedule-calendar-weekdays" aria-hidden="true"><span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span><span>Min</span></div>
+                <div id="gridKalenderJadwal" class="schedule-calendar-grid"></div>
+                <div class="schedule-calendar-footer">
+                  <button class="schedule-calendar-today" type="button" onclick="kembaliJadwalHariIni()">Ke hari ini</button>
+                </div>
+              </div>
+            </div>
+
+            <button class="btn-light schedule-refresh" type="button" onclick="muatJadwal()" aria-label="Muat ulang jadwal">Refresh</button>
+          </div>
+
+          <div class="schedule-navigation" aria-label="Navigasi tanggal jadwal">
+            <button class="schedule-today-button" type="button" onclick="kembaliJadwalHariIni()">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2v3M17 2v3M3.5 9h17M5.5 4h13a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Today
+            </button>
+            <button class="schedule-day-arrow" type="button" onclick="geserTanggalJadwal(-1)" aria-label="Satu hari sebelumnya">
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m12 5-5 5 5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button class="schedule-day-arrow" type="button" onclick="geserTanggalJadwal(1)" aria-label="Satu hari berikutnya">
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m8 5 5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <span id="ringkasanTanggalJadwal" class="schedule-selected-summary">Memuat jadwal...</span>
+          </div>
+
+          <div class="table-wrap schedule-table-wrap"><table><thead><tr><th>Tanggal</th><th>Ruangan</th><th>Waktu</th><th>Peminjam</th><th>Kegiatan</th><th>Peserta</th><th>BMN</th><th>Status</th></tr></thead><tbody id="tabelJadwalPinjam"><tr><td colspan="8">Klik modul Pinjam Ruangan untuk memuat jadwal.</td></tr></tbody></table></div>
+        </div>
       </div>
 
       <div id="panelPinjamKendaraan" class="panel-card hidden">
-        <div class="panel-header"><div><h3>Pinjam Kendaraan</h3><p class="muted">Ajukan kendaraan dan tentukan batas kembali agar mudah dipantau.</p></div></div>
-        <div class="card"><h3>Form Pinjam Kendaraan</h3><form id="formPinjamKendaraan" onsubmit="submitPinjamKendaraan(event)"><div class="form-grid"><div><label for="namaPeminjamKendaraan">Nama Peminjam</label><input id="namaPeminjamKendaraan" list="listPegawai" placeholder="Ketik nama pegawai..." required></div><div><label for="kegiatanKendaraan">Kegiatan Apa</label><input id="kegiatanKendaraan" placeholder="Contoh: Koordinasi ke Pemda" required></div><div><label for="tujuanKendaraan">Tujuan</label><input id="tujuanKendaraan" placeholder="Contoh: Kantor Bupati Lombok Barat" required></div><div><label for="lamaKendaraan">Berapa Lama</label><input id="lamaKendaraan" placeholder="Contoh: 1 hari / 08.00-16.00" required></div><div class="full"><label for="batasKembaliKendaraan">Batas Kembali</label><input type="datetime-local" id="batasKembaliKendaraan" required><small class="small-note">Ini dipakai untuk mengontrol agar kendaraan dikembalikan tepat waktu.</small></div></div><div style="margin-top:16px;"><button id="btnSubmitKendaraan" class="btn-green" type="submit">Kirim Pengajuan Pinjam Kendaraan</button></div></form></div>
-        <div class="card"><div class="panel-header"><div><h3>Riwayat Pinjam Kendaraan</h3><p class="muted">Status akan berubah menjadi Terlambat jika melewati batas kembali. Keterangan admin hanya dapat diisi oleh admin.</p></div><button class="btn-light" onclick="muatPinjamKendaraan()">Refresh</button></div><div class="table-wrap"><table><thead><tr><th>ID</th><th>Peminjam</th><th>Kegiatan</th><th>Tujuan</th><th>Lama</th><th>Batas Kembali</th><th>Status</th><th>Keterangan Admin</th></tr></thead><tbody id="tabelPinjamKendaraan"><tr><td colspan="8">Klik modul Pinjam Kendaraan untuk memuat data.</td></tr></tbody></table></div></div>
+        <div class="panel-header"><div><h3>Pinjam Kendaraan</h3><p class="muted">Tentukan waktu penggunaan, lalu sistem menampilkan jenis mobil yang tersedia. Unit dan nomor polisi ditentukan Administrator saat ACC.</p></div></div>
+        <div class="card">
+          <h3>Form Pinjam Kendaraan</h3>
+          <form id="formPinjamKendaraan" onsubmit="submitPinjamKendaraan(event)">
+            <div class="form-grid">
+              <div class="identity-block full">
+                <div class="identity-grid">
+                  <div><label for="nipPeminjamKendaraan">NIP Peminjam</label><div class="identity-input-row"><input type="text" id="nipPeminjamKendaraan" inputmode="numeric" maxlength="18" autocomplete="off" placeholder="Masukkan 18 digit NIP" required oninput="onNipInput('kendaraan')"><button class="btn-light identity-check-btn" type="button" onclick="cekPegawaiNip('kendaraan')">Cek NIP</button></div></div>
+                  <div><label for="namaPeminjamKendaraan">Nama Peminjam</label><input id="namaPeminjamKendaraan" placeholder="Terisi otomatis setelah NIP valid" readonly required></div>
+                </div>
+                <div id="infoPegawaiKendaraan" class="identity-status muted">Masukkan NIP untuk memvalidasi nama pegawai.</div>
+                <div id="waBoxKendaraan" class="whatsapp-box hidden">
+                  <div id="waStoredKendaraan" class="whatsapp-stored hidden"><span>WhatsApp: <strong id="waMaskedKendaraan">-</strong> ✓ tersimpan</span><button type="button" class="btn-light btn-small" onclick="aktifkanUbahWhatsapp('kendaraan')">Ubah Nomor</button></div>
+                  <div id="waInputWrapKendaraan" class="hidden"><label for="waPeminjamKendaraan">Nomor WhatsApp</label><input type="tel" id="waPeminjamKendaraan" inputmode="tel" autocomplete="tel" placeholder="Contoh: 081234567890"><small class="small-note">Nomor ini disimpan sekali untuk notifikasi status pengajuan berikutnya.</small></div>
+                </div>
+              </div>
+              <div><label for="kegiatanKendaraan">Kegiatan</label><input id="kegiatanKendaraan" placeholder="Contoh: Koordinasi ke Pemda" required></div>
+              <div><label for="tujuanKendaraan">Tujuan</label><input id="tujuanKendaraan" placeholder="Contoh: Kantor Bupati Lombok Barat" required></div>
+              <div><label for="mulaiKendaraan">Mulai Penggunaan</label><input type="datetime-local" id="mulaiKendaraan" required onchange="muatKetersediaanKendaraan()"></div>
+              <div><label for="batasKembaliKendaraan">Batas Kembali</label><input type="datetime-local" id="batasKembaliKendaraan" required onchange="muatKetersediaanKendaraan()"></div>
+              <div class="full"><label for="jenisMobilKendaraan">Jenis Mobil yang Dibutuhkan</label><select id="jenisMobilKendaraan" required disabled><option value="">Isi waktu penggunaan terlebih dahulu</option></select><div id="ketersediaanKendaraan" class="vehicle-availability"><span class="muted">Isi waktu mulai dan batas kembali untuk melihat ketersediaan kendaraan.</span></div><small class="small-note">Anda memilih jenis mobil. Administrator akan menetapkan unit dan nomor polisi yang tersedia saat pengajuan disetujui.</small></div>
+            </div>
+            <div style="margin-top:16px;"><button id="btnSubmitKendaraan" class="btn-green" type="submit">Kirim Pengajuan Pinjam Kendaraan</button></div>
+          </form>
+        </div>
+        <div class="card"><div class="panel-header"><div><h3>Riwayat Pinjam Kendaraan</h3><p class="muted">Pantau jenis mobil yang diminta, unit yang ditugaskan, status, dan batas kembali.</p></div><button class="btn-light" onclick="muatPinjamKendaraan()">Refresh</button></div><div class="table-wrap"><table><thead><tr><th>ID</th><th>Peminjam</th><th>Kegiatan</th><th>Tujuan</th><th>Jenis Mobil</th><th>Mulai</th><th>Batas Kembali</th><th>Mobil Ditugaskan</th><th>Status</th><th>Keterangan Admin</th></tr></thead><tbody id="tabelPinjamKendaraan"><tr><td colspan="10">Klik modul Pinjam Kendaraan untuk memuat data.</td></tr></tbody></table></div></div>
       </div>
-
       <div id="panelPinjamSarpras" class="panel-card hidden">
         <div class="panel-header"><div><h3>Pinjam Sarpras</h3><p class="muted">Ajukan sarpras kegiatan dan tentukan batas kembali.</p></div></div>
-        <div class="card"><h3>Form Pinjam Sarpras</h3><form id="formPinjamSarpras" onsubmit="submitPinjamSarpras(event)"><div class="form-grid"><div><label for="namaPeminjamSarpras">Nama Peminjam</label><input id="namaPeminjamSarpras" list="listPegawai" placeholder="Ketik nama pegawai..." required></div><div><label for="kegiatanSarpras">Kegiatan Apa</label><input id="kegiatanSarpras" placeholder="Contoh: Sosialisasi layanan" required></div><div><label for="tempatSarpras">Tempat Kegiatan</label><input id="tempatSarpras" placeholder="Contoh: Aula Kanwil" required></div><div><label for="jenisBarangSarpras">Jenis Barang</label><input id="jenisBarangSarpras" placeholder="Contoh: Laptop, proyektor, sound system" required></div><div><label for="lamaSarpras">Berapa Lama</label><input id="lamaSarpras" placeholder="Contoh: 3 jam / 1 hari" required></div><div><label for="batasKembaliSarpras">Batas Kembali</label><input type="datetime-local" id="batasKembaliSarpras" required></div></div><div style="margin-top:16px;"><button id="btnSubmitSarpras" class="btn-green" type="submit">Kirim Pengajuan Pinjam Sarpras</button></div></form></div>
+        <div class="card">
+          <h3>Form Pinjam Sarpras</h3>
+          <form id="formPinjamSarpras" onsubmit="submitPinjamSarpras(event)">
+            <div class="form-grid">
+              <div class="identity-block full">
+                <div class="identity-grid">
+                  <div><label for="nipPeminjamSarpras">NIP Peminjam</label><div class="identity-input-row"><input type="text" id="nipPeminjamSarpras" inputmode="numeric" maxlength="18" autocomplete="off" placeholder="Masukkan 18 digit NIP" required oninput="onNipInput('sarpras')"><button class="btn-light identity-check-btn" type="button" onclick="cekPegawaiNip('sarpras')">Cek NIP</button></div></div>
+                  <div><label for="namaPeminjamSarpras">Nama Peminjam</label><input id="namaPeminjamSarpras" placeholder="Terisi otomatis setelah NIP valid" readonly required></div>
+                </div>
+                <div id="infoPegawaiSarpras" class="identity-status muted">Masukkan NIP untuk memvalidasi nama pegawai.</div>
+                <div id="waBoxSarpras" class="whatsapp-box hidden">
+                  <div id="waStoredSarpras" class="whatsapp-stored hidden"><span>WhatsApp: <strong id="waMaskedSarpras">-</strong> ✓ tersimpan</span><button type="button" class="btn-light btn-small" onclick="aktifkanUbahWhatsapp('sarpras')">Ubah Nomor</button></div>
+                  <div id="waInputWrapSarpras" class="hidden"><label for="waPeminjamSarpras">Nomor WhatsApp</label><input type="tel" id="waPeminjamSarpras" inputmode="tel" autocomplete="tel" placeholder="Contoh: 081234567890"><small class="small-note">Nomor ini disimpan sekali untuk notifikasi status pengajuan berikutnya.</small></div>
+                </div>
+              </div>
+              <div><label for="kegiatanSarpras">Kegiatan</label><input id="kegiatanSarpras" placeholder="Contoh: Sosialisasi layanan" required></div>
+              <div><label for="tempatSarpras">Tempat Kegiatan</label><input id="tempatSarpras" placeholder="Contoh: Aula Kanwil" required></div>
+              <div><label for="jenisBarangSarpras">Jenis Barang</label><input id="jenisBarangSarpras" placeholder="Contoh: Laptop, proyektor, sound system" required></div>
+              <div><label for="lamaSarpras">Berapa Lama</label><input id="lamaSarpras" placeholder="Contoh: 3 jam / 1 hari" required></div>
+              <div><label for="batasKembaliSarpras">Batas Kembali</label><input type="datetime-local" id="batasKembaliSarpras" required></div>
+            </div>
+            <div style="margin-top:16px;"><button id="btnSubmitSarpras" class="btn-green" type="submit">Kirim Pengajuan Pinjam Sarpras</button></div>
+          </form>
+        </div>
         <div class="card"><div class="panel-header"><div><h3>Riwayat Pinjam Sarpras</h3><p class="muted">Status akan berubah menjadi Terlambat jika melewati batas kembali.</p></div><button class="btn-light" onclick="muatPinjamSarpras()">Refresh</button></div><div class="table-wrap"><table><thead><tr><th>ID</th><th>Peminjam</th><th>Kegiatan</th><th>Tempat</th><th>Jenis Barang</th><th>Lama</th><th>Batas Kembali</th><th>Status</th></tr></thead><tbody id="tabelPinjamSarpras"><tr><td colspan="8">Klik modul Pinjam Sarpras untuk memuat data.</td></tr></tbody></table></div></div>
       </div>
     </section>
@@ -249,7 +353,7 @@
       <div class="module-grid"><button class="module-card" data-admin-panel="ruangan" onclick="bukaPanelAdminPinjam('ruangan')"><div class="module-icon">🏛️</div><h3>Pinjam Ruangan</h3><p>Monitoring dan ACC permintaan penggunaan ruangan.</p></button><button class="module-card" data-admin-panel="kendaraan" onclick="bukaPanelAdminPinjam('kendaraan')"><div class="module-icon">🚗</div><h3>Pinjam Kendaraan</h3><p>Monitoring kendaraan, batas kembali, dan status terlambat.</p></button><button class="module-card" data-admin-panel="sarpras" onclick="bukaPanelAdminPinjam('sarpras')"><div class="module-icon">🎛️</div><h3>Pinjam Sarpras</h3><p>Monitoring sarpras kegiatan dan pengembaliannya.</p></button></div>
       <div id="guideAdminPinjam" class="empty-guide">Pilih salah satu modul di atas untuk membuka data pengajuan.</div>
       <div id="panelAdminRuangan" class="panel-card hidden"><div class="panel-header"><div><h3>Permintaan Pinjam Ruangan</h3><span id="summaryAdminJadwal" class="summary-pill">Belum dimuat</span></div><button class="btn-light" onclick="muatJadwalAdmin()">Refresh</button></div><div class="filter-row"><input id="filterAdminJadwal" placeholder="Cari ID, tanggal, ruangan, peminjam, kegiatan, atau BMN..." oninput="renderTabelJadwalAdmin(daftarJadwal)"><select id="filterStatusAdminJadwal" onchange="renderTabelJadwalAdmin(daftarJadwal)"><option value="Semua">Semua Status</option><option value="Pending">Pending</option><option value="ACC">ACC</option><option value="Ditolak">Ditolak</option></select></div><div class="table-wrap"><table><thead><tr><th>ID</th><th>Tanggal</th><th>Ruangan</th><th>Waktu</th><th>Peminjam</th><th>Kegiatan</th><th>Jumlah Peserta</th><th>Peserta/Jabatan</th><th>BMN</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="tabelAdminJadwal"><tr><td colspan="11">Klik modul Pinjam Ruangan untuk memuat data.</td></tr></tbody></table></div></div>
-      <div id="panelAdminKendaraan" class="panel-card hidden"><div class="panel-header"><div><h3>Permintaan Pinjam Kendaraan</h3><span id="summaryAdminKendaraan" class="summary-pill">Belum dimuat</span></div><button class="btn-light" onclick="muatPinjamKendaraanAdmin()">Refresh</button></div><div class="filter-row"><input id="filterAdminKendaraan" placeholder="Cari ID, peminjam, kegiatan, tujuan, lama, atau keterangan admin..." oninput="renderPinjamKendaraan('tabelAdminKendaraan', daftarKendaraan, true)"><select id="filterStatusAdminKendaraan" onchange="renderPinjamKendaraan('tabelAdminKendaraan', daftarKendaraan, true)"><option value="Semua">Semua Status</option><option value="Pending">Pending</option><option value="ACC">ACC</option><option value="Ditolak">Ditolak</option><option value="Dikembalikan">Dikembalikan</option><option value="Terlambat">Terlambat</option></select></div><div class="table-wrap"><table><thead><tr><th>ID</th><th>Pengajuan</th><th>Peminjam</th><th>Kegiatan</th><th>Tujuan</th><th>Lama</th><th>Batas Kembali</th><th>Status</th><th>Keterangan Admin</th><th>Aksi</th></tr></thead><tbody id="tabelAdminKendaraan"><tr><td colspan="10">Klik modul Pinjam Kendaraan untuk memuat data.</td></tr></tbody></table></div></div>
+      <div id="panelAdminKendaraan" class="panel-card hidden"><div class="panel-header"><div><h3>Permintaan Pinjam Kendaraan</h3><span id="summaryAdminKendaraan" class="summary-pill">Belum dimuat</span></div><button class="btn-light" onclick="muatPinjamKendaraanAdmin()">Refresh</button></div><div class="filter-row"><input id="filterAdminKendaraan" placeholder="Cari ID, peminjam, kegiatan, tujuan, jenis mobil, unit, atau keterangan..." oninput="renderPinjamKendaraan('tabelAdminKendaraan', daftarKendaraan, true)"><select id="filterStatusAdminKendaraan" onchange="renderPinjamKendaraan('tabelAdminKendaraan', daftarKendaraan, true)"><option value="Semua">Semua Status</option><option value="Pending">Pending</option><option value="ACC">ACC</option><option value="Ditolak">Ditolak</option><option value="Dikembalikan">Dikembalikan</option><option value="Terlambat">Terlambat</option></select></div><div class="table-wrap"><table><thead><tr><th>ID</th><th>Pengajuan</th><th>Peminjam</th><th>Kegiatan</th><th>Tujuan</th><th>Jenis Diminta</th><th>Mulai</th><th>Batas Kembali</th><th>Mobil Ditugaskan</th><th>Status</th><th>Keterangan Admin</th><th>Aksi</th></tr></thead><tbody id="tabelAdminKendaraan"><tr><td colspan="12">Klik modul Pinjam Kendaraan untuk memuat data.</td></tr></tbody></table></div></div>
       <div id="panelAdminSarpras" class="panel-card hidden"><div class="panel-header"><div><h3>Permintaan Pinjam Sarpras</h3><span id="summaryAdminSarpras" class="summary-pill">Belum dimuat</span></div><button class="btn-light" onclick="muatPinjamSarprasAdmin()">Refresh</button></div><div class="filter-row"><input id="filterAdminSarpras" placeholder="Cari ID, peminjam, kegiatan, tempat, atau barang..." oninput="renderPinjamSarpras('tabelAdminSarpras', daftarSarpras, true)"><select id="filterStatusAdminSarpras" onchange="renderPinjamSarpras('tabelAdminSarpras', daftarSarpras, true)"><option value="Semua">Semua Status</option><option value="Pending">Pending</option><option value="ACC">ACC</option><option value="Ditolak">Ditolak</option><option value="Dikembalikan">Dikembalikan</option><option value="Terlambat">Terlambat</option></select></div><div class="table-wrap"><table><thead><tr><th>ID</th><th>Pengajuan</th><th>Peminjam</th><th>Kegiatan</th><th>Tempat</th><th>Jenis Barang</th><th>Lama</th><th>Batas Kembali</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="tabelAdminSarpras"><tr><td colspan="10">Klik modul Pinjam Sarpras untuk memuat data.</td></tr></tbody></table></div></div>
     </section>
   </div>

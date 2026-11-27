@@ -1,200 +1,289 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
   <base target="_top">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    * { box-sizing: border-box; }
-    :root {
-      --primary:#003366;
-      --primary-2:#0b5ed7;
-      --accent:#ffcb05;
-      --bg:#eef3f9;
-      --card:#ffffff;
-      --text:#172033;
-      --muted:#667085;
-      --line:#e6eaf0;
-      --success:#198754;
-      --danger:#dc3545;
-      --orange:#fd7e14;
-      --shadow: 0 18px 45px rgba(16, 24, 40, .10);
-    }
-    body { font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif; margin: 0; background: radial-gradient(circle at top left, #ffffff 0, #eef5ff 32%, var(--bg) 100%); color: var(--text); }
-    .app-shell { max-width: 1240px; margin: 0 auto; padding: 22px 18px 34px; }
-    .topbar { background: linear-gradient(135deg, var(--primary), #0657a6); color: #fff; padding: 18px 20px; border-radius: 24px; box-shadow: var(--shadow); display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
-    .brand { display: flex; align-items: center; gap: 12px; }
-    .brand-mark { width: 46px; height: 46px; border-radius: 16px; background: rgba(255,255,255,.16); display: grid; place-items: center; font-size: 25px; border: 1px solid rgba(255,255,255,.22); }
-    .brand h1 { margin: 0; font-size: 22px; letter-spacing: .2px; }
-    .brand p { margin: 3px 0 0; opacity: .83; font-size: 13px; }
-    .container { background: rgba(255,255,255,.86); backdrop-filter: blur(10px); padding: 24px; border-radius: 24px; box-shadow: var(--shadow); border: 1px solid rgba(255,255,255,.74); }
-    .hidden { display: none !important; }
-    .hero { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(280px, .8fr); gap: 18px; align-items: stretch; }
-    .hero-main { background: linear-gradient(135deg, #003366, #0d6efd); color: white; padding: 30px; border-radius: 26px; min-height: 250px; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; position: relative; }
-    .hero-main:after { content:''; position:absolute; width:260px; height:260px; right:-80px; top:-80px; border-radius:50%; background: rgba(255,203,5,.24); }
-    .hero-main h2 { margin: 0 0 10px; font-size: 32px; line-height: 1.12; position: relative; z-index: 1; }
-    .hero-main p { max-width: 680px; margin: 0; line-height: 1.65; opacity: .92; position: relative; z-index: 1; }
-    .hero-badge { display:inline-flex; width:max-content; align-items:center; gap:8px; padding:8px 12px; background: rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.18); border-radius:999px; font-weight:700; font-size:13px; margin-bottom:18px; position: relative; z-index: 1; }
-    .hero-side { display: grid; gap: 14px; }
-    .quick-stat { background: #fff; border: 1px solid var(--line); border-radius: 22px; padding: 18px; box-shadow: 0 10px 26px rgba(16,24,40,.06); }
-    .quick-stat strong { display:block; font-size: 24px; color: var(--primary); }
-    .quick-stat span { color: var(--muted); font-size: 13px; }
-    .feature-grid, .module-grid, .admin-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 18px; }
-    .feature-card, .module-card, .admin-card { text-align: left; background: #fff; border: 1px solid var(--line); border-radius: 22px; padding: 22px; cursor: pointer; transition: .22s ease; box-shadow: 0 9px 24px rgba(16,24,40,.05); width: 100%; color: var(--text); }
-    .feature-card:hover, .module-card:hover, .admin-card:hover, .module-card.active { transform: translateY(-4px); box-shadow: var(--shadow); border-color: #b7d7ff; }
-    .feature-icon, .module-icon { width: 52px; height: 52px; display: grid; place-items: center; border-radius: 18px; background: #eff6ff; font-size: 26px; margin-bottom: 14px; }
-    .feature-card h3, .module-card h3, .admin-card h3 { margin: 0 0 8px; font-size: 18px; }
-    .feature-card p, .module-card p, .admin-card p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.55; }
-    .toolbar { display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 18px; flex-wrap: wrap; }
-    .toolbar h2 { margin: 0 0 4px; font-size: 26px; }
-    .muted { color: var(--muted); font-size: 14px; }
-    .card { background: #fff; border: 1px solid var(--line); border-radius: 22px; padding: 20px; margin-bottom: 18px; box-shadow: 0 8px 22px rgba(16,24,40,.05); }
-    .panel-card { border: 1px solid #d8e9ff; background: linear-gradient(180deg, #fff, #fbfdff); border-radius: 24px; padding: 18px; margin-top: 18px; box-shadow: var(--shadow); }
-    .panel-header { display:flex; justify-content:space-between; align-items:flex-start; gap:14px; margin-bottom: 14px; flex-wrap:wrap; }
-    .panel-header h3 { margin: 0 0 4px; font-size: 21px; }
-    button { padding: 12px 18px; border: 0; border-radius: 12px; cursor: pointer; font-weight: 800; transition: .22s; font-size: 14px; }
-    button:disabled { opacity: .65; cursor: not-allowed; }
-    .btn-main { background: var(--primary-2); color: #fff; }
-    .btn-main:hover { background: #074db2; }
-    .btn-green { background: var(--success); color: #fff; }
-    .btn-green:hover { background: #146c43; }
-    .btn-orange { background: var(--orange); color: #fff; }
-    .btn-orange:hover { background: #d8660f; }
-    .btn-dark { background: #111827; color: #fff; }
-    .btn-dark:hover { background: #020617; }
-    .btn-danger { background: var(--danger); color: #fff; }
-    .btn-danger:hover { background: #bb2d3b; }
-    .btn-light { background: #eef2f7; color: #1f2937; }
-    .btn-light:hover { background: #e1e7ef; }
-    .btn-small { padding: 7px 10px; font-size: 12px; border-radius: 9px; margin: 2px; width: auto; }
-    .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
-    .form-grid .full { grid-column: 1 / -1; }
-    label { display: block; font-size: 13px; font-weight: 800; margin-bottom: 7px; color: #263244; }
-    input, select, textarea { width: 100%; padding: 12px 13px; border: 1px solid #cfd7e3; border-radius: 12px; font-size: 14px; background: #fff; outline: none; transition: .18s; }
-    input:focus, select:focus, textarea:focus { border-color: #72a7ff; box-shadow: 0 0 0 4px rgba(13,110,253,.10); }
-    textarea { min-height: 90px; resize: vertical; }
-    .small-note { display: block; margin-top: 6px; color: var(--muted); font-size: 12px; }
-    .alert { padding: 12px 14px; border-radius: 14px; margin: 12px 0; display: none; }
-    .alert.show { display: block; }
-    .alert-info { background: #e8f7ff; color: #055160; border:1px solid #b6effb; }
-    .alert-success { background: #eaf7ef; color: #0f5132; border:1px solid #badbcc; }
-    .alert-error { background: #fff1f2; color: #842029; border:1px solid #f5c2c7; }
-    .checkbox-panel { background: #fff; border: 1px solid #cfd7e3; border-radius: 14px; padding: 10px; min-height: 48px; max-height: 240px; overflow-y: auto; }
-    .checkbox-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 8px; border-bottom: 1px solid #eef1f4; font-weight: 600; cursor: pointer; }
-    .checkbox-item:last-child { border-bottom: 0; }
-    .checkbox-item input { width: auto; margin-top: 4px; }
-    .checkbox-item span { display: block; font-size: 12px; color: var(--muted); font-weight: 400; margin-top: 2px; }
-    .table-wrap { overflow-x: auto; border-radius: 16px; border: 1px solid var(--line); }
-    table { width: 100%; border-collapse: collapse; font-size: 14px; background: #fff; }
-    th, td { border-bottom: 1px solid var(--line); padding: 12px; text-align: left; vertical-align: top; }
-    th { background: #f8fafc; color:#344054; font-size:13px; position: sticky; top: 0; z-index: 1; }
-    tr:last-child td { border-bottom: 0; }
-    .status { display: inline-block; padding: 6px 10px; border-radius: 999px; font-size: 12px; font-weight: 900; white-space: nowrap; }
-    .status-pending { background: #fff3cd; color: #856404; }
-    .status-acc, .status-disetujui { background: #d1e7dd; color: #0f5132; }
-    .status-tolak, .status-ditolak { background: #f8d7da; color: #842029; }
-    .status-dikembalikan { background: #cff4fc; color: #055160; }
-    .status-dipakai { background: #e0cffc; color: #3d0a91; }
-    .status-terlambat { background: #f8d7da; color: #842029; }
-    .status-default { background: #e2e3e5; color: #41464b; }
-    .action-group { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
-    .action-group button:disabled { opacity: .65; cursor: not-allowed; }
-    .admin-note-cell { min-width: 240px; }
-    .admin-note-input { min-height: 72px; font-size: 13px; padding: 10px; border-radius: 11px; }
-    .admin-note-view { display:block; min-width: 180px; max-width: 280px; white-space: pre-wrap; line-height: 1.45; color: #344054; }
-    .filter-row { display: flex; gap: 10px; align-items: center; margin: 12px 0 14px; flex-wrap: wrap; }
-    .filter-row input { min-width: min(420px, 100%); flex: 1; }
-    .filter-row select { max-width: 220px; }
-    .summary-pill { display: inline-block; padding: 7px 11px; background: #eef2ff; color: #1e3a8a; border-radius: 999px; font-size: 13px; font-weight: 800; margin-top: 7px; }
-    .return-warning { border-left: 5px solid var(--danger); }
-    .empty-guide { background: #f8fbff; border: 1px dashed #bad7ff; border-radius: 22px; padding: 22px; color: var(--muted); text-align: center; margin-top: 18px; }
-    .stack { display: grid; gap: 16px; }
+* { box-sizing: border-box; }
+:root {
+  --primary:#003366;
+  --primary-2:#0b5ed7;
+  --accent:#ffcb05;
+  --bg:#eef3f9;
+  --card:#ffffff;
+  --text:#172033;
+  --muted:#667085;
+  --line:#e6eaf0;
+  --success:#198754;
+  --danger:#dc3545;
+  --orange:#fd7e14;
+  --shadow: 0 18px 45px rgba(16, 24, 40, .10);
+}
+body { font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif; margin: 0; background: radial-gradient(circle at top left, #ffffff 0, #eef5ff 32%, var(--bg) 100%); color: var(--text); }
+.app-shell { max-width: 1240px; margin: 0 auto; padding: 22px 18px 34px; }
+.topbar { background: linear-gradient(135deg, var(--primary), #0657a6); color: #fff; padding: 18px 20px; border-radius: 24px; box-shadow: var(--shadow); display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+.brand { display: flex; align-items: center; gap: 12px; }
+.brand-mark { width: 46px; height: 46px; border-radius: 16px; background: rgba(255,255,255,.16); display: grid; place-items: center; font-size: 25px; border: 1px solid rgba(255,255,255,.22); }
+.brand-mark img { width: 34px; height: 38px; object-fit: contain; display: block; }
+.brand h1 { margin: 0; font-size: 22px; letter-spacing: .2px; }
+.brand p { margin: 3px 0 0; opacity: .83; font-size: 13px; }
+.container { background: rgba(255,255,255,.86); backdrop-filter: blur(10px); padding: 24px; border-radius: 24px; box-shadow: var(--shadow); border: 1px solid rgba(255,255,255,.74); }
+.hidden { display: none !important; }
+.hero { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(280px, .8fr); gap: 18px; align-items: stretch; }
+.hero-main { background: linear-gradient(135deg, #003366, #0d6efd); color: white; padding: 30px; border-radius: 26px; min-height: 250px; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; position: relative; }
+.hero-main:after { content:''; position:absolute; width:260px; height:260px; right:-80px; top:-80px; border-radius:50%; background: rgba(255,203,5,.24); }
+.hero-main h2 { margin: 0 0 10px; font-size: 32px; line-height: 1.12; position: relative; z-index: 1; }
+.hero-main p { max-width: 680px; margin: 0; line-height: 1.65; opacity: .92; position: relative; z-index: 1; }
+.hero-badge { display:inline-flex; width:max-content; align-items:center; gap:8px; padding:8px 12px; background: rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.18); border-radius:999px; font-weight:700; font-size:13px; margin-bottom:18px; position: relative; z-index: 1; }
+.hero-side { display: grid; gap: 14px; }
+.quick-stat { background: #fff; border: 1px solid var(--line); border-radius: 22px; padding: 18px; box-shadow: 0 10px 26px rgba(16,24,40,.06); }
+.quick-stat strong { display:block; font-size: 24px; color: var(--primary); }
+.quick-stat span { color: var(--muted); font-size: 13px; }
+.feature-grid, .module-grid, .admin-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 18px; }
+.feature-card, .module-card, .admin-card { text-align: left; background: #fff; border: 1px solid var(--line); border-radius: 22px; padding: 22px; cursor: pointer; transition: .22s ease; box-shadow: 0 9px 24px rgba(16,24,40,.05); width: 100%; color: var(--text); }
+.feature-card:hover, .module-card:hover, .admin-card:hover, .module-card.active { transform: translateY(-4px); box-shadow: var(--shadow); border-color: #b7d7ff; }
+.feature-icon, .module-icon { width: 52px; height: 52px; display: grid; place-items: center; border-radius: 18px; background: #eff6ff; font-size: 26px; margin-bottom: 14px; }
+.feature-card h3, .module-card h3, .admin-card h3 { margin: 0 0 8px; font-size: 18px; }
+.feature-card p, .module-card p, .admin-card p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.55; }
+.toolbar { display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 18px; flex-wrap: wrap; }
+.toolbar h2 { margin: 0 0 4px; font-size: 26px; }
+.muted { color: var(--muted); font-size: 14px; }
+.card { background: #fff; border: 1px solid var(--line); border-radius: 22px; padding: 20px; margin-bottom: 18px; box-shadow: 0 8px 22px rgba(16,24,40,.05); }
+.panel-card { border: 1px solid #d8e9ff; background: linear-gradient(180deg, #fff, #fbfdff); border-radius: 24px; padding: 18px; margin-top: 18px; box-shadow: var(--shadow); }
+.panel-header { display:flex; justify-content:space-between; align-items:flex-start; gap:14px; margin-bottom: 14px; flex-wrap:wrap; }
+.panel-header h3 { margin: 0 0 4px; font-size: 21px; }
+button { padding: 12px 18px; border: 0; border-radius: 12px; cursor: pointer; font-weight: 800; transition: .22s; font-size: 14px; }
+button:disabled { opacity: .65; cursor: not-allowed; }
+.btn-main { background: var(--primary-2); color: #fff; }
+.btn-main:hover { background: #074db2; }
+.btn-green { background: var(--success); color: #fff; }
+.btn-green:hover { background: #146c43; }
+.btn-orange { background: var(--orange); color: #fff; }
+.btn-orange:hover { background: #d8660f; }
+.btn-dark { background: #111827; color: #fff; }
+.btn-dark:hover { background: #020617; }
+.btn-danger { background: var(--danger); color: #fff; }
+.btn-danger:hover { background: #bb2d3b; }
+.btn-light { background: #eef2f7; color: #1f2937; }
+.btn-light:hover { background: #e1e7ef; }
+.btn-small { padding: 7px 10px; font-size: 12px; border-radius: 99px; margin: 2px; width: auto; }
+.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.form-grid .full { grid-column: 1 / -1; }
+label { display: block; font-size: 13px; font-weight: 800; margin-bottom: 7px; color: #263244; }
+input, select, textarea { width: 100%; padding: 12px 13px; border: 1px solid #cfd7e3; border-radius: 12px; font-size: 14px; background: #fff; outline: none; transition: .18s; }
+input:focus, select:focus, textarea:focus { border-color: #72a7ff; box-shadow: 0 0 0 4px rgba(13,110,253,.10); }
+textarea { min-height: 90px; resize: vertical; }
+.small-note { display: block; margin-top: 6px; color: var(--muted); font-size: 12px; }
+.alert { padding: 12px 14px; border-radius: 14px; margin: 12px 0; display: none; }
+.alert.show { display: block; }
+.alert-info { background: #e8f7ff; color: #055160; border:1px solid #b6effb; }
+.alert-success { background: #eaf7ef; color: #0f5132; border:1px solid #badbcc; }
+.alert-error { background: #fff1f2; color: #842029; border:1px solid #f5c2c7; }
+.checkbox-panel { background: #fff; border: 1px solid #cfd7e3; border-radius: 14px; padding: 10px; min-height: 48px; max-height: 240px; overflow-y: auto; }
+.checkbox-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 8px; border-bottom: 1px solid #eef1f4; font-weight: 600; cursor: pointer; }
+.checkbox-item:last-child { border-bottom: 0; }
+.checkbox-item input { width: auto; margin-top: 4px; }
+.checkbox-item span { display: block; font-size: 12px; color: var(--muted); font-weight: 400; margin-top: 2px; }
+.table-wrap { overflow-x: auto; border-radius: 16px; border: 1px solid var(--line); }
+table { width: 100%; border-collapse: collapse; font-size: 14px; background: #fff; }
+th, td { border-bottom: 1px solid var(--line); padding: 12px; text-align: left; vertical-align: top; }
+th { background: #f8fafc; color:#344054; font-size:13px; position: sticky; top: 0; z-index: 1; }
+tr:last-child td { border-bottom: 0; }
+.status { display: inline-block; padding: 6px 10px; border-radius: 999px; font-size: 12px; font-weight: 900; white-space: nowrap; }
+.status-pending { background: #fff3cd; color: #856404; }
+.status-acc, .status-disetujui { background: #d1e7dd; color: #0f5132; }
+.status-tolak, .status-ditolak { background: #f8d7da; color: #842029; }
+.status-dikembalikan { background: #cff4fc; color: #055160; }
+.status-dipakai { background: #e0cffc; color: #3d0a91; }
+.status-terlambat { background: #f8d7da; color: #842029; }
+.status-default { background: #e2e3e5; color: #41464b; }
+.action-group { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.action-group button:disabled { opacity: .65; cursor: not-allowed; }
+.admin-note-cell { min-width: 240px; }
+.admin-note-input { min-height: 72px; font-size: 13px; padding: 10px; border-radius: 11px; }
+.admin-note-view { display:block; min-width: 180px; max-width: 280px; white-space: pre-wrap; line-height: 1.45; color: #344054; }
+.filter-row { display: flex; gap: 10px; align-items: center; margin: 12px 0 14px; flex-wrap: wrap; }
+.filter-row input { min-width: min(420px, 100%); flex: 1; }
+.filter-row select { max-width: 220px; }
+.summary-pill { display: inline-block; padding: 7px 11px; background: #eef2ff; color: #1e3a8a; border-radius: 999px; font-size: 13px; font-weight: 800; margin-top: 7px; }
+.return-warning { border-left: 5px solid var(--danger); }
+.empty-guide { background: #f8fbff; border: 1px dashed #bad7ff; border-radius: 22px; padding: 22px; color: var(--muted); text-align: center; margin-top: 18px; }
+.stack { display: grid; gap: 16px; }
 
-    .home-clean { min-height: calc(100vh - 180px); display: grid; place-items: center; padding: 18px 0 8px; }
-    .home-panel { width: 100%; max-width: 980px; text-align: center; }
-    .home-logo-wrap { width: 132px; height: 146px; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; background: transparent; border: 0; box-shadow: none; overflow: visible; }
-    .home-logo-wrap img { width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: contain; object-position: center; display: block; }
-    .home-title { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.06; color: var(--primary); letter-spacing: -.5px; }
-    .home-subtitle { margin: 10px auto 0; color: var(--muted); font-size: 15px; max-width: 540px; line-height: 1.55; }
-    .home-feature-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-top: 26px; }
-    .home-feature-card { min-height: 150px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 1px solid var(--line); border-radius: 26px; background: rgba(255,255,255,.96); box-shadow: 0 12px 30px rgba(16,24,40,.07); cursor: pointer; transition: .22s ease; color: var(--text); padding: 22px 16px; }
-    .home-feature-card:hover { transform: translateY(-5px); box-shadow: var(--shadow); border-color: rgba(255,203,5,.8); }
-    .home-feature-icon { width: 58px; height: 58px; border-radius: 20px; display: grid; place-items: center; font-size: 29px; background: linear-gradient(135deg, #eff6ff, #fff8cc); margin-bottom: 12px; }
-    .home-feature-card h3 { margin: 0; font-size: 18px; color: var(--primary); }
-    .home-feature-card span { display: block; margin-top: 6px; font-size: 13px; color: var(--muted); font-weight: 600; }
-    .inventory-room-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 14px 0 18px; }
-    .inventory-room-card { text-align:left; border:1px solid var(--line); background:#fff; border-radius:20px; padding:16px; cursor:pointer; transition:.2s ease; box-shadow:0 8px 18px rgba(16,24,40,.05); }
-    .inventory-room-card:hover, .inventory-room-card.active { transform:translateY(-3px); border-color:#9cc5ff; box-shadow:var(--shadow); }
-    .inventory-room-card h3 { margin:0 0 6px; color:var(--primary); font-size:17px; }
-    .inventory-room-card .count { font-size:28px; font-weight:900; color:#0b5ed7; margin:8px 0 4px; }
-    .inventory-meta { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
-    .inventory-meta span { display:inline-flex; padding:5px 8px; border-radius:999px; background:#f1f5f9; color:#344054; font-size:12px; font-weight:800; }
-    .inventory-control { display:grid; grid-template-columns: minmax(220px, .7fr) minmax(260px, 1fr) auto; gap:10px; align-items:end; }
-    .compact-filter-row { justify-content: flex-end; }
-    .sort-row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:flex-end; margin:0 0 14px; }
-    .sort-label { font-size:12px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; }
-    .sort-chip { padding:9px 12px; border:1px solid #d7dfeb; background:#fff; color:#24364f; border-radius:999px; font-size:12px; font-weight:800; cursor:pointer; transition:.2s; }
-    .sort-chip:hover { border-color:#9db8dd; transform:translateY(-1px); }
-    .sort-chip.active { background:var(--primary); color:#fff; border-color:var(--primary); box-shadow:0 8px 18px rgba(0,51,102,.18); }
 
-    /* --- FOOTER RESMI SIMANTAP BMN: FIXED / FREEZE --- */
-    body { padding-bottom: 160px; }
-    .app-footer {
-      position: fixed;
-      left: 50%;
-      bottom: 12px;
-      transform: translateX(-50%);
-      z-index: 1200;
-      width: min(calc(100% - 36px), 1204px);
-      margin: 0;
-      border-radius: 22px;
-      overflow: hidden;
-      background: linear-gradient(135deg, #002b57 0%, #003d78 58%, #075ca8 100%);
-      color: #fff;
-      border: 1px solid rgba(255,255,255,.14);
-      box-shadow: 0 18px 46px rgba(0,51,102,.24);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-    }
-    .footer-inner { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 24px; align-items: center; padding: 20px 22px 17px; }
-    .footer-brand { display: flex; align-items: center; gap: 14px; min-width: 0; }
-    .footer-logo-wrap { width: 54px; height: 60px; flex: 0 0 54px; display: flex; align-items: center; justify-content: center; }
-    .footer-logo { width: 100%; height: 100%; object-fit: contain; display: block; }
-    .footer-title { margin: 0; font-size: 17px; font-weight: 900; letter-spacing: .2px; }
-    .footer-subtitle { margin: 4px 0 0; font-size: 12.5px; line-height: 1.5; color: rgba(255,255,255,.78); }
-    .footer-office { margin: 2px 0 0; font-size: 12.5px; line-height: 1.5; color: rgba(255,255,255,.92); font-weight: 700; }
-    .footer-meta { text-align: right; min-width: 190px; }
-    .footer-badge { display: inline-flex; align-items: center; gap: 8px; padding: 7px 11px; border-radius: 999px; background: rgba(255,203,5,.14); border: 1px solid rgba(255,203,5,.36); color: #fff3ad; font-size: 12px; font-weight: 900; }
-    .footer-status-dot { width: 8px; height: 8px; border-radius: 999px; background: var(--accent); box-shadow: 0 0 0 4px rgba(255,203,5,.12); }
-    .footer-meta small { display: block; margin-top: 8px; color: rgba(255,255,255,.68); font-size: 11.5px; }
-    .footer-bottom { display: flex; justify-content: space-between; gap: 14px; flex-wrap: wrap; padding: 10px 22px; border-top: 1px solid rgba(255,255,255,.12); background: rgba(0,0,0,.08); color: rgba(255,255,255,.70); font-size: 11.5px; }
-    .footer-bottom strong { color: rgba(255,255,255,.92); }
+/* --- JADWAL RUANGAN: NAVIGASI TANGGAL ALA ZOOM --- */
+.schedule-card { position: relative; overflow: visible; }
+.schedule-head { display: grid; grid-template-columns: minmax(220px, 1fr) auto minmax(100px, 1fr); gap: 14px; align-items: start; margin-bottom: 12px; }
+.schedule-head-copy { min-width: 0; }
+.schedule-head-copy h3 { margin: 0 0 4px; font-size: 21px; }
+.schedule-head-copy p { margin: 0; line-height: 1.5; }
+.schedule-date-picker { position: relative; justify-self: center; min-width: 0; }
+.schedule-date-trigger { width: auto; min-height: 46px; display: inline-flex; align-items: center; justify-content: center; gap: 9px; padding: 10px 14px; border: 1px solid #d7dee8; border-radius: 14px; background: #f5f6f8; color: #172033; box-shadow: none; font-size: 15px; font-weight: 900; white-space: nowrap; }
+.schedule-date-trigger:hover { background: #eceff3; border-color: #c9d1dc; }
+.schedule-date-trigger:focus-visible, .schedule-today-button:focus-visible, .schedule-day-arrow:focus-visible, .schedule-calendar-arrow:focus-visible, .schedule-calendar-day:focus-visible, .schedule-calendar-today:focus-visible { outline: 3px solid rgba(13,110,253,.22); outline-offset: 2px; }
+.schedule-icon { width: 18px; height: 18px; flex: 0 0 18px; }
+.schedule-chevron { width: 16px; height: 16px; flex: 0 0 16px; transition: transform .18s ease; }
+.schedule-date-trigger[aria-expanded="true"] .schedule-chevron { transform: rotate(180deg); }
+.schedule-refresh { justify-self: end; width: auto; }
+.schedule-navigation { min-height: 54px; display: flex; align-items: center; gap: 8px; padding: 10px 0 14px; border-top: 1px solid var(--line); }
+.schedule-today-button, .schedule-day-arrow { width: auto; min-height: 40px; border: 1px solid #cbd5e1; background: #fff; color: #172033; box-shadow: none; }
+.schedule-today-button { display: inline-flex; align-items: center; gap: 8px; padding: 8px 13px; border-radius: 999px; }
+.schedule-today-button svg { width: 17px; height: 17px; }
+.schedule-day-arrow { width: 40px; height: 40px; padding: 0; border: 0; border-radius: 999px; display: grid; place-items: center; background: transparent; }
+.schedule-day-arrow svg { width: 20px; height: 20px; }
+.schedule-today-button:hover, .schedule-day-arrow:hover { background: #f1f3f5; }
+.schedule-selected-summary { margin-left: auto; color: var(--muted); font-size: 13px; font-weight: 700; text-align: right; }
+.schedule-table-wrap { position: relative; z-index: 1; }
+.schedule-calendar-popover { position: absolute; z-index: 60; top: calc(100% + 10px); left: 50%; transform: translateX(-50%); width: min(360px, calc(100vw - 44px)); padding: 16px; border: 1px solid #d9e0e8; border-radius: 20px; background: #fff; box-shadow: 0 20px 50px rgba(16,24,40,.18); }
+.schedule-calendar-popover::before { content: ''; position: absolute; top: -7px; left: 50%; width: 13px; height: 13px; transform: translateX(-50%) rotate(45deg); background: #fff; border-left: 1px solid #d9e0e8; border-top: 1px solid #d9e0e8; }
+.schedule-calendar-header { position: relative; z-index: 1; display: grid; grid-template-columns: 40px 1fr 40px; align-items: center; gap: 8px; margin-bottom: 12px; }
+.schedule-calendar-header strong { text-align: center; font-size: 16px; color: #202939; }
+.schedule-calendar-arrow { width: 40px; height: 40px; padding: 0; display: grid; place-items: center; border-radius: 999px; background: transparent; color: #475467; font-size: 25px; line-height: 1; }
+.schedule-calendar-arrow:hover { background: #f2f4f7; }
+.schedule-calendar-weekdays, .schedule-calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.schedule-calendar-weekdays { margin-bottom: 4px; }
+.schedule-calendar-weekdays span { padding: 6px 0; text-align: center; color: #667085; font-size: 11px; font-weight: 900; }
+.schedule-calendar-day { width: 100%; min-width: 0; aspect-ratio: 1 / 1; min-height: 38px; padding: 0; border: 1px solid transparent; border-radius: 12px; background: transparent; color: #202939; font-size: 13px; font-weight: 700; }
+.schedule-calendar-day:hover { background: #f2f4f7; }
+.schedule-calendar-day.is-outside { color: #98a2b3; font-weight: 600; }
+.schedule-calendar-day.is-today { border-color: #91b8f7; color: #0b5ed7; }
+.schedule-calendar-day.is-selected { background: #eaf2ff; border-color: #0b5ed7; color: #064da7; box-shadow: inset 0 0 0 1px #0b5ed7; }
+.schedule-calendar-day.is-selected:hover { background: #dfeaff; }
+.schedule-calendar-footer { display: flex; justify-content: center; padding-top: 12px; margin-top: 10px; border-top: 1px solid #eef1f4; }
+.schedule-calendar-today { width: auto; padding: 8px 12px; border-radius: 10px; background: #eef4ff; color: #0b5ed7; font-size: 12px; }
+.schedule-calendar-today:hover { background: #e1ebff; }
+.schedule-empty-row td { padding: 34px 16px; text-align: center; color: var(--muted); }
 
-    @media (max-width: 900px) { .hero, .feature-grid, .module-grid, .admin-grid, .home-feature-grid, .inventory-room-grid, .inventory-control { grid-template-columns: 1fr; } .topbar { border-radius: 0 0 24px 24px; margin: -22px -18px 18px; } .home-clean { min-height: auto; padding: 6px 0; } .home-logo-wrap { width: 108px; height: 120px; } }
-    @media (max-width: 760px) {
-      body { padding-bottom: 215px; }
-      .container { padding: 16px; }
-      .form-grid { grid-template-columns: 1fr; }
-      button { width: 100%; }
-      .btn-small { width: auto; }
-      .hero-main { padding: 22px; }
-      .hero-main h2 { font-size: 25px; }
-      .app-footer { width: calc(100% - 20px); bottom: 8px; border-radius: 18px; }
-      .footer-inner { grid-template-columns: 1fr; gap: 10px; padding: 14px 16px 12px; }
-      .footer-brand { gap: 10px; }
-      .footer-meta { text-align: left; min-width: 0; }
-      .footer-meta small { display: none; }
-      .footer-bottom { flex-direction: column; gap: 3px; padding: 8px 16px; }
-      .footer-logo-wrap { width: 42px; height: 48px; flex-basis: 42px; }
-      .footer-title { font-size: 15px; }
-      .footer-subtitle, .footer-office { font-size: 11.5px; }
-    }
-  </style>
+.home-clean { min-height: calc(100vh - 180px); display: grid; place-items: center; padding: 18px 0 8px; }
+.home-panel { width: 100%; max-width: 980px; text-align: center; }
+.home-logo-wrap { width: 132px; height: 146px; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; background: transparent; border: 0; box-shadow: none; overflow: visible; }
+.home-logo-wrap img { width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: contain; object-position: center; display: block; }
+.home-title { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.06; color: var(--primary); letter-spacing: -.5px; }
+.home-subtitle { margin: 10px auto 0; color: var(--muted); font-size: 15px; max-width: 540px; line-height: 1.55; }
+.home-feature-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-top: 26px; }
+.home-feature-card { min-height: 150px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 1px solid var(--line); border-radius: 26px; background: rgba(255,255,255,.96); box-shadow: 0 12px 30px rgba(16,24,40,.07); cursor: pointer; transition: .22s ease; color: var(--text); padding: 22px 16px; }
+.home-feature-card:hover { transform: translateY(-5px); box-shadow: var(--shadow); border-color: rgba(255,203,5,.8); }
+.home-feature-icon { width: 58px; height: 58px; border-radius: 20px; display: grid; place-items: center; font-size: 29px; background: linear-gradient(135deg, #eff6ff, #fff8cc); margin-bottom: 12px; }
+.home-feature-card h3 { margin: 0; font-size: 18px; color: var(--primary); }
+.home-feature-card span { display: block; margin-top: 6px; font-size: 13px; color: var(--muted); font-weight: 600; }
+.inventory-room-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 14px 0 18px; }
+.inventory-room-card { text-align:left; border:1px solid var(--line); background:#fff; border-radius:20px; padding:16px; cursor:pointer; transition:.2s ease; box-shadow:0 8px 18px rgba(16,24,40,.05); }
+.inventory-room-card:hover, .inventory-room-card.active { transform:translateY(-3px); border-color:#9cc5ff; box-shadow:var(--shadow); }
+.inventory-room-card h3 { margin:0 0 6px; color:var(--primary); font-size:17px; }
+.inventory-room-card .count { font-size:28px; font-weight:900; color:#0b5ed7; margin:8px 0 4px; }
+.inventory-meta { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+.inventory-meta span { display:inline-flex; padding:5px 8px; border-radius:999px; background:#f1f5f9; color:#344054; font-size:12px; font-weight:800; }
+.inventory-control { display:grid; grid-template-columns: minmax(220px, .7fr) minmax(260px, 1fr) auto; gap:10px; align-items:end; }
+.compact-filter-row { justify-content: flex-end; }
+.sort-row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:flex-end; margin:0 0 14px; }
+.sort-label { font-size:12px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; }
+.sort-chip { padding:9px 12px; border:1px solid #d7dfeb; background:#fff; color:#24364f; border-radius:999px; font-size:12px; font-weight:800; cursor:pointer; transition:.2s; }
+.sort-chip:hover { border-color:#9db8dd; transform:translateY(-1px); }
+.sort-chip.active { background:var(--primary); color:#fff; border-color:var(--primary); box-shadow:0 8px 18px rgba(0,51,102,.18); }
+
+/* --- FOOTER RESMI SIMANTAP BMN: NORMAL / DI BAWAH HALAMAN --- */
+.app-footer {
+  position: static;
+  left: auto;
+  bottom: auto;
+  transform: none;
+  z-index: auto;
+  width: 100%;
+  margin: 22px 0 0;
+  border-radius: 22px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #002b57 0%, #003d78 58%, #075ca8 100%);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,.14);
+  box-shadow: 0 18px 46px rgba(0,51,102,.24);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.footer-inner { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 24px; align-items: center; padding: 20px 22px 17px; }
+.footer-brand { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.footer-logo-wrap { width: 54px; height: 60px; flex: 0 0 54px; display: flex; align-items: center; justify-content: center; }
+.footer-logo { width: 100%; height: 100%; object-fit: contain; display: block; }
+.footer-title { margin: 0; font-size: 17px; font-weight: 900; letter-spacing: .2px; }
+.footer-subtitle { margin: 4px 0 0; font-size: 12.5px; line-height: 1.5; color: rgba(255,255,255,.78); }
+.footer-office { margin: 2px 0 0; font-size: 12.5px; line-height: 1.5; color: rgba(255,255,255,.92); font-weight: 700; }
+.footer-meta { text-align: right; min-width: 190px; }
+.footer-badge { display: inline-flex; align-items: center; gap: 8px; padding: 7px 11px; border-radius: 999px; background: rgba(255,203,5,.14); border: 1px solid rgba(255,203,5,.36); color: #fff3ad; font-size: 12px; font-weight: 900; }
+.footer-status-dot { width: 8px; height: 8px; border-radius: 999px; background: var(--accent); box-shadow: 0 0 0 4px rgba(255,203,5,.12); }
+.footer-meta small { display: block; margin-top: 8px; color: rgba(255,255,255,.68); font-size: 11.5px; }
+.footer-bottom { display: flex; justify-content: space-between; gap: 14px; flex-wrap: wrap; padding: 10px 22px; border-top: 1px solid rgba(255,255,255,.12); background: rgba(0,0,0,.08); color: rgba(255,255,255,.70); font-size: 11.5px; }
+.footer-bottom strong { color: rgba(255,255,255,.92); }
+
+@media (max-width: 900px) { .hero, .feature-grid, .module-grid, .admin-grid, .home-feature-grid, .inventory-room-grid, .inventory-control { grid-template-columns: 1fr; } .topbar { border-radius: 0 0 24px 24px; margin: -22px -18px 18px; } .home-clean { min-height: auto; padding: 6px 0; } .home-logo-wrap { width: 108px; height: 120px; } }
+@media (max-width: 760px) {
+  .container { padding: 16px; }
+  .schedule-head { grid-template-columns: 1fr; gap: 10px; }
+  .schedule-head-copy { text-align: left; }
+  .schedule-date-picker { justify-self: stretch; width: 100%; }
+  .schedule-date-trigger { width: 100%; white-space: normal; }
+  .schedule-refresh { justify-self: stretch; width: 100%; }
+  .schedule-navigation { flex-wrap: wrap; }
+  .schedule-today-button { width: auto; }
+  .schedule-day-arrow { width: 40px; }
+  .schedule-selected-summary { flex-basis: 100%; margin-left: 0; text-align: left; padding-top: 2px; }
+  .schedule-calendar-popover { width: min(340px, calc(100vw - 52px)); }
+
+  .form-grid { grid-template-columns: 1fr; }
+  button { width: 100%; }
+  .btn-small { width: auto; }
+  .hero-main { padding: 22px; }
+  .hero-main h2 { font-size: 25px; }
+  .app-footer { width: 100%; margin-top: 16px; border-radius: 18px; }
+  .footer-inner { grid-template-columns: 1fr; gap: 10px; padding: 14px 16px 12px; }
+  .footer-brand { gap: 10px; }
+  .footer-meta { text-align: left; min-width: 0; }
+  .footer-meta small { display: none; }
+  .footer-bottom { flex-direction: column; gap: 3px; padding: 8px 16px; }
+  .footer-logo-wrap { width: 42px; height: 48px; flex-basis: 42px; }
+  .footer-title { font-size: 15px; }
+  .footer-subtitle, .footer-office { font-size: 11.5px; }
+}
+
+/* --- VALIDASI NIP, WHATSAPP & KETERSEDIAAN KENDARAAN --- */
+.identity-block { border: 1px solid #dbe5f0; border-radius: 18px; padding: 16px; background: linear-gradient(180deg, #fbfdff 0%, #f7faff 100%); }
+.identity-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.identity-input-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: end; }
+.identity-check-btn { width: auto; min-width: 94px; white-space: nowrap; }
+.identity-status { margin-top: 10px; padding: 9px 11px; border-radius: 10px; font-size: 12.5px; font-weight: 700; background: #f3f6fa; }
+.identity-status.is-loading { color: #365b88; background: #edf5ff; }
+.identity-status.is-valid { color: #17643a; background: #eaf8f0; border: 1px solid #ccebd9; }
+.identity-status.is-error { color: #9a2b2b; background: #fff0f0; border: 1px solid #f4cccc; }
+.whatsapp-box { margin-top: 12px; border-top: 1px dashed #cbd8e6; padding-top: 12px; }
+.whatsapp-stored { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px; border-radius: 12px; background: #edf8f1; color: #255b3b; }
+.whatsapp-stored strong { color: #173f2a; }
+.vehicle-availability { margin-top: 10px; }
+.vehicle-availability-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.vehicle-availability-item { min-width: 0; padding: 10px 11px; border-radius: 12px; border: 1px solid #dce5ef; background: #f8fafc; }
+.vehicle-availability-item strong { display: block; color: #263b56; font-size: 12.5px; line-height: 1.35; }
+.vehicle-availability-item span { display: block; margin-top: 4px; font-size: 11.5px; font-weight: 800; }
+.vehicle-availability-item.is-available { border-color: #cce7d7; background: #eff9f3; }
+.vehicle-availability-item.is-available span { color: #247147; }
+.vehicle-availability-item.is-unavailable { border-color: #f0d2d2; background: #fff5f5; }
+.vehicle-availability-item.is-unavailable span, .vehicle-availability-error { color: #a23838; font-size: 12.5px; font-weight: 700; }
+.unit-vehicle-select { min-width: 215px; }
+.assigned-vehicle { display: inline-block; font-weight: 800; color: #23486f; line-height: 1.4; }
+
+@media (max-width: 760px) {
+  .identity-grid { grid-template-columns: 1fr; }
+  .identity-input-row { grid-template-columns: 1fr; }
+  .identity-check-btn { width: 100%; }
+  .whatsapp-stored { align-items: stretch; flex-direction: column; }
+  .vehicle-availability-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .unit-vehicle-select { min-width: 180px; }
+}
+
+</style>
 </head>
 <body>
 <div class="app-shell">
   <div class="topbar hidden" id="appTopbar">
     <div class="brand">
-      <div class="brand-mark">📦</div>
+      <div class="brand-mark"><img id="topbarLogo" alt="Logo Pengayoman"></div>
       <div>
         <h1>SIMANTAP BMN</h1>
         <p>Sistem Monitoring Terpadu Penatausahaan Barang Milik Negara</p>
@@ -301,7 +390,7 @@
 
       <div class="module-grid">
         <button class="module-card" data-panel="ruangan" onclick="bukaPanelPinjam('ruangan')"><div class="module-icon">🏛️</div><h3>Pinjam Ruangan</h3><p>Ruang Aula, Zona Integritas, dan Transit lengkap dengan jadwal dan checklist BMN.</p></button>
-        <button class="module-card" data-panel="kendaraan" onclick="bukaPanelPinjam('kendaraan')"><div class="module-icon">🚗</div><h3>Pinjam Kendaraan</h3><p>Ajukan kendaraan dinas dengan kegiatan, tujuan, lama pakai, dan batas kembali.</p></button>
+        <button class="module-card" data-panel="kendaraan" onclick="bukaPanelPinjam('kendaraan')"><div class="module-icon">🚗</div><h3>Pinjam Kendaraan</h3><p>Ajukan kendaraan dinas berdasarkan waktu penggunaan, jenis mobil, dan ketersediaan unit.</p></button>
         <button class="module-card" data-panel="sarpras" onclick="bukaPanelPinjam('sarpras')"><div class="module-icon">🎛️</div><h3>Pinjam Sarpras</h3><p>Ajukan sarpras kegiatan seperti laptop, proyektor, sound system, atau barang lainnya.</p></button>
       </div>
       <div id="guidePinjam" class="empty-guide">Pilih salah satu jenis pinjam pakai di atas untuk membuka form dan riwayatnya.</div>
@@ -316,7 +405,20 @@
               <div><label for="ruanganBooking">Ruangan</label><select id="ruanganBooking" required onchange="renderChecklistBMNPinjam(); validasiBookingRealtime();"><option value="">Pilih ruangan</option><option value="Ruang Aula">Ruang Aula</option><option value="Ruang Zona Integritas">Ruang Zona Integritas</option><option value="Ruang Transit">Ruang Transit</option></select></div>
               <div><label for="jamMulaiBooking">Jam Mulai</label><input type="time" id="jamMulaiBooking" required onchange="validasiBookingRealtime()"></div>
               <div><label for="jamSelesaiBooking">Jam Selesai</label><input type="time" id="jamSelesaiBooking" required onchange="validasiBookingRealtime()"></div>
-              <div><label for="namaPeminjamRuangan">Nama Peminjam</label><input type="text" id="namaPeminjamRuangan" list="listPegawai" placeholder="Ketik nama pegawai..." required></div>
+              <div class="identity-block full">
+                <div class="identity-grid">
+                  <div>
+                    <label for="nipPeminjamRuangan">NIP Peminjam</label>
+                    <div class="identity-input-row"><input type="text" id="nipPeminjamRuangan" inputmode="numeric" maxlength="18" autocomplete="off" placeholder="Masukkan 18 digit NIP" required oninput="onNipInput('ruangan')"><button class="btn-light identity-check-btn" type="button" onclick="cekPegawaiNip('ruangan')">Cek NIP</button></div>
+                  </div>
+                  <div><label for="namaPeminjamRuangan">Nama Peminjam</label><input type="text" id="namaPeminjamRuangan" placeholder="Terisi otomatis setelah NIP valid" readonly required></div>
+                </div>
+                <div id="infoPegawaiRuangan" class="identity-status muted">Masukkan NIP untuk memvalidasi nama pegawai.</div>
+                <div id="waBoxRuangan" class="whatsapp-box hidden">
+                  <div id="waStoredRuangan" class="whatsapp-stored hidden"><span>WhatsApp: <strong id="waMaskedRuangan">-</strong> ✓ tersimpan</span><button type="button" class="btn-light btn-small" onclick="aktifkanUbahWhatsapp('ruangan')">Ubah Nomor</button></div>
+                  <div id="waInputWrapRuangan" class="hidden"><label for="waPeminjamRuangan">Nomor WhatsApp</label><input type="tel" id="waPeminjamRuangan" inputmode="tel" autocomplete="tel" placeholder="Contoh: 081234567890"><small class="small-note">Nomor ini disimpan sekali untuk notifikasi status pengajuan berikutnya.</small></div>
+                </div>
+              </div>
               <div><label for="namaKegiatanRuangan">Nama Kegiatan</label><input type="text" id="namaKegiatanRuangan" placeholder="Contoh: Rapat koordinasi" required></div>
               <div><label for="jumlahPesertaRuangan">Jumlah Peserta</label><input type="number" id="jumlahPesertaRuangan" min="1" placeholder="Contoh: 50" required></div>
               <div><label for="pesertaJabatanRuangan">Peserta / Jabatan</label><input type="text" id="pesertaJabatanRuangan" placeholder="Contoh: Pejabat struktural, JF, pegawai, tamu eksternal" required></div>
@@ -325,18 +427,109 @@
             <div style="margin-top:16px;"><button id="btnSubmitBooking" class="btn-green" type="submit">Kirim Pengajuan Pinjam Ruangan</button></div>
           </form>
         </div>
-        <div class="card"><div class="panel-header"><div><h3>Jadwal Ruangan Hari Ini</h3><p class="muted">Hanya jadwal pada hari ini yang ditampilkan pada halaman pengguna. <span id="labelTanggalJadwalHariIni"></span></p></div><button class="btn-light" onclick="muatJadwal()">Refresh</button></div><div class="table-wrap"><table><thead><tr><th>Tanggal</th><th>Ruangan</th><th>Waktu</th><th>Peminjam</th><th>Kegiatan</th><th>Peserta</th><th>BMN</th><th>Status</th></tr></thead><tbody id="tabelJadwalPinjam"><tr><td colspan="8">Klik modul Pinjam Ruangan untuk memuat jadwal hari ini.</td></tr></tbody></table></div></div>
+        <div class="card schedule-card">
+          <div class="schedule-head">
+            <div class="schedule-head-copy">
+              <h3>Jadwal Ruangan</h3>
+              <p class="muted">Lihat jadwal ruangan per tanggal. Gunakan navigasi hari atau pilih tanggal dari kalender.</p>
+            </div>
+
+            <div class="schedule-date-picker">
+              <button id="btnTanggalJadwal" class="schedule-date-trigger" type="button" aria-expanded="false" aria-controls="kalenderJadwal" onclick="toggleKalenderJadwal()">
+                <svg class="schedule-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2v3M17 2v3M3.5 9h17M5.5 4h13a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span id="labelTanggalJadwal">Memuat tanggal...</span>
+                <svg id="ikonChevronTanggalJadwal" class="schedule-chevron" viewBox="0 0 20 20" aria-hidden="true"><path d="m6 8 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+
+              <div id="kalenderJadwal" class="schedule-calendar-popover hidden" role="dialog" aria-label="Pilih tanggal jadwal ruangan">
+                <div class="schedule-calendar-header">
+                  <button class="schedule-calendar-arrow" type="button" onclick="gantiBulanKalenderJadwal(-1)" aria-label="Bulan sebelumnya">‹</button>
+                  <strong id="labelBulanKalenderJadwal">Bulan</strong>
+                  <button class="schedule-calendar-arrow" type="button" onclick="gantiBulanKalenderJadwal(1)" aria-label="Bulan berikutnya">›</button>
+                </div>
+                <div class="schedule-calendar-weekdays" aria-hidden="true"><span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span><span>Min</span></div>
+                <div id="gridKalenderJadwal" class="schedule-calendar-grid"></div>
+                <div class="schedule-calendar-footer">
+                  <button class="schedule-calendar-today" type="button" onclick="kembaliJadwalHariIni()">Ke hari ini</button>
+                </div>
+              </div>
+            </div>
+
+            <button class="btn-light schedule-refresh" type="button" onclick="muatJadwal()" aria-label="Muat ulang jadwal">Refresh</button>
+          </div>
+
+          <div class="schedule-navigation" aria-label="Navigasi tanggal jadwal">
+            <button class="schedule-today-button" type="button" onclick="kembaliJadwalHariIni()">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2v3M17 2v3M3.5 9h17M5.5 4h13a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Today
+            </button>
+            <button class="schedule-day-arrow" type="button" onclick="geserTanggalJadwal(-1)" aria-label="Satu hari sebelumnya">
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m12 5-5 5 5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button class="schedule-day-arrow" type="button" onclick="geserTanggalJadwal(1)" aria-label="Satu hari berikutnya">
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m8 5 5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <span id="ringkasanTanggalJadwal" class="schedule-selected-summary">Memuat jadwal...</span>
+          </div>
+
+          <div class="table-wrap schedule-table-wrap"><table><thead><tr><th>Tanggal</th><th>Ruangan</th><th>Waktu</th><th>Peminjam</th><th>Kegiatan</th><th>Peserta</th><th>BMN</th><th>Status</th></tr></thead><tbody id="tabelJadwalPinjam"><tr><td colspan="8">Klik modul Pinjam Ruangan untuk memuat jadwal.</td></tr></tbody></table></div>
+        </div>
       </div>
 
       <div id="panelPinjamKendaraan" class="panel-card hidden">
-        <div class="panel-header"><div><h3>Pinjam Kendaraan</h3><p class="muted">Ajukan kendaraan dan tentukan batas kembali agar mudah dipantau.</p></div></div>
-        <div class="card"><h3>Form Pinjam Kendaraan</h3><form id="formPinjamKendaraan" onsubmit="submitPinjamKendaraan(event)"><div class="form-grid"><div><label for="namaPeminjamKendaraan">Nama Peminjam</label><input id="namaPeminjamKendaraan" list="listPegawai" placeholder="Ketik nama pegawai..." required></div><div><label for="kegiatanKendaraan">Kegiatan Apa</label><input id="kegiatanKendaraan" placeholder="Contoh: Koordinasi ke Pemda" required></div><div><label for="tujuanKendaraan">Tujuan</label><input id="tujuanKendaraan" placeholder="Contoh: Kantor Bupati Lombok Barat" required></div><div><label for="lamaKendaraan">Berapa Lama</label><input id="lamaKendaraan" placeholder="Contoh: 1 hari / 08.00-16.00" required></div><div class="full"><label for="batasKembaliKendaraan">Batas Kembali</label><input type="datetime-local" id="batasKembaliKendaraan" required><small class="small-note">Ini dipakai untuk mengontrol agar kendaraan dikembalikan tepat waktu.</small></div></div><div style="margin-top:16px;"><button id="btnSubmitKendaraan" class="btn-green" type="submit">Kirim Pengajuan Pinjam Kendaraan</button></div></form></div>
-        <div class="card"><div class="panel-header"><div><h3>Riwayat Pinjam Kendaraan</h3><p class="muted">Status akan berubah menjadi Terlambat jika melewati batas kembali. Keterangan admin hanya dapat diisi oleh admin.</p></div><button class="btn-light" onclick="muatPinjamKendaraan()">Refresh</button></div><div class="table-wrap"><table><thead><tr><th>ID</th><th>Peminjam</th><th>Kegiatan</th><th>Tujuan</th><th>Lama</th><th>Batas Kembali</th><th>Status</th><th>Keterangan Admin</th></tr></thead><tbody id="tabelPinjamKendaraan"><tr><td colspan="8">Klik modul Pinjam Kendaraan untuk memuat data.</td></tr></tbody></table></div></div>
+        <div class="panel-header"><div><h3>Pinjam Kendaraan</h3><p class="muted">Tentukan waktu penggunaan, lalu sistem menampilkan jenis mobil yang tersedia. Unit dan nomor polisi ditentukan Administrator saat ACC.</p></div></div>
+        <div class="card">
+          <h3>Form Pinjam Kendaraan</h3>
+          <form id="formPinjamKendaraan" onsubmit="submitPinjamKendaraan(event)">
+            <div class="form-grid">
+              <div class="identity-block full">
+                <div class="identity-grid">
+                  <div><label for="nipPeminjamKendaraan">NIP Peminjam</label><div class="identity-input-row"><input type="text" id="nipPeminjamKendaraan" inputmode="numeric" maxlength="18" autocomplete="off" placeholder="Masukkan 18 digit NIP" required oninput="onNipInput('kendaraan')"><button class="btn-light identity-check-btn" type="button" onclick="cekPegawaiNip('kendaraan')">Cek NIP</button></div></div>
+                  <div><label for="namaPeminjamKendaraan">Nama Peminjam</label><input id="namaPeminjamKendaraan" placeholder="Terisi otomatis setelah NIP valid" readonly required></div>
+                </div>
+                <div id="infoPegawaiKendaraan" class="identity-status muted">Masukkan NIP untuk memvalidasi nama pegawai.</div>
+                <div id="waBoxKendaraan" class="whatsapp-box hidden">
+                  <div id="waStoredKendaraan" class="whatsapp-stored hidden"><span>WhatsApp: <strong id="waMaskedKendaraan">-</strong> ✓ tersimpan</span><button type="button" class="btn-light btn-small" onclick="aktifkanUbahWhatsapp('kendaraan')">Ubah Nomor</button></div>
+                  <div id="waInputWrapKendaraan" class="hidden"><label for="waPeminjamKendaraan">Nomor WhatsApp</label><input type="tel" id="waPeminjamKendaraan" inputmode="tel" autocomplete="tel" placeholder="Contoh: 081234567890"><small class="small-note">Nomor ini disimpan sekali untuk notifikasi status pengajuan berikutnya.</small></div>
+                </div>
+              </div>
+              <div><label for="kegiatanKendaraan">Kegiatan</label><input id="kegiatanKendaraan" placeholder="Contoh: Koordinasi ke Pemda" required></div>
+              <div><label for="tujuanKendaraan">Tujuan</label><input id="tujuanKendaraan" placeholder="Contoh: Kantor Bupati Lombok Barat" required></div>
+              <div><label for="mulaiKendaraan">Mulai Penggunaan</label><input type="datetime-local" id="mulaiKendaraan" required onchange="muatKetersediaanKendaraan()"></div>
+              <div><label for="batasKembaliKendaraan">Batas Kembali</label><input type="datetime-local" id="batasKembaliKendaraan" required onchange="muatKetersediaanKendaraan()"></div>
+              <div class="full"><label for="jenisMobilKendaraan">Jenis Mobil yang Dibutuhkan</label><select id="jenisMobilKendaraan" required disabled><option value="">Isi waktu penggunaan terlebih dahulu</option></select><div id="ketersediaanKendaraan" class="vehicle-availability"><span class="muted">Isi waktu mulai dan batas kembali untuk melihat ketersediaan kendaraan.</span></div><small class="small-note">Anda memilih jenis mobil. Administrator akan menetapkan unit dan nomor polisi yang tersedia saat pengajuan disetujui.</small></div>
+            </div>
+            <div style="margin-top:16px;"><button id="btnSubmitKendaraan" class="btn-green" type="submit">Kirim Pengajuan Pinjam Kendaraan</button></div>
+          </form>
+        </div>
+        <div class="card"><div class="panel-header"><div><h3>Riwayat Pinjam Kendaraan</h3><p class="muted">Pantau jenis mobil yang diminta, unit yang ditugaskan, status, dan batas kembali.</p></div><button class="btn-light" onclick="muatPinjamKendaraan()">Refresh</button></div><div class="table-wrap"><table><thead><tr><th>ID</th><th>Peminjam</th><th>Kegiatan</th><th>Tujuan</th><th>Jenis Mobil</th><th>Mulai</th><th>Batas Kembali</th><th>Mobil Ditugaskan</th><th>Status</th><th>Keterangan Admin</th></tr></thead><tbody id="tabelPinjamKendaraan"><tr><td colspan="10">Klik modul Pinjam Kendaraan untuk memuat data.</td></tr></tbody></table></div></div>
       </div>
-
       <div id="panelPinjamSarpras" class="panel-card hidden">
         <div class="panel-header"><div><h3>Pinjam Sarpras</h3><p class="muted">Ajukan sarpras kegiatan dan tentukan batas kembali.</p></div></div>
-        <div class="card"><h3>Form Pinjam Sarpras</h3><form id="formPinjamSarpras" onsubmit="submitPinjamSarpras(event)"><div class="form-grid"><div><label for="namaPeminjamSarpras">Nama Peminjam</label><input id="namaPeminjamSarpras" list="listPegawai" placeholder="Ketik nama pegawai..." required></div><div><label for="kegiatanSarpras">Kegiatan Apa</label><input id="kegiatanSarpras" placeholder="Contoh: Sosialisasi layanan" required></div><div><label for="tempatSarpras">Tempat Kegiatan</label><input id="tempatSarpras" placeholder="Contoh: Aula Kanwil" required></div><div><label for="jenisBarangSarpras">Jenis Barang</label><input id="jenisBarangSarpras" placeholder="Contoh: Laptop, proyektor, sound system" required></div><div><label for="lamaSarpras">Berapa Lama</label><input id="lamaSarpras" placeholder="Contoh: 3 jam / 1 hari" required></div><div><label for="batasKembaliSarpras">Batas Kembali</label><input type="datetime-local" id="batasKembaliSarpras" required></div></div><div style="margin-top:16px;"><button id="btnSubmitSarpras" class="btn-green" type="submit">Kirim Pengajuan Pinjam Sarpras</button></div></form></div>
+        <div class="card">
+          <h3>Form Pinjam Sarpras</h3>
+          <form id="formPinjamSarpras" onsubmit="submitPinjamSarpras(event)">
+            <div class="form-grid">
+              <div class="identity-block full">
+                <div class="identity-grid">
+                  <div><label for="nipPeminjamSarpras">NIP Peminjam</label><div class="identity-input-row"><input type="text" id="nipPeminjamSarpras" inputmode="numeric" maxlength="18" autocomplete="off" placeholder="Masukkan 18 digit NIP" required oninput="onNipInput('sarpras')"><button class="btn-light identity-check-btn" type="button" onclick="cekPegawaiNip('sarpras')">Cek NIP</button></div></div>
+                  <div><label for="namaPeminjamSarpras">Nama Peminjam</label><input id="namaPeminjamSarpras" placeholder="Terisi otomatis setelah NIP valid" readonly required></div>
+                </div>
+                <div id="infoPegawaiSarpras" class="identity-status muted">Masukkan NIP untuk memvalidasi nama pegawai.</div>
+                <div id="waBoxSarpras" class="whatsapp-box hidden">
+                  <div id="waStoredSarpras" class="whatsapp-stored hidden"><span>WhatsApp: <strong id="waMaskedSarpras">-</strong> ✓ tersimpan</span><button type="button" class="btn-light btn-small" onclick="aktifkanUbahWhatsapp('sarpras')">Ubah Nomor</button></div>
+                  <div id="waInputWrapSarpras" class="hidden"><label for="waPeminjamSarpras">Nomor WhatsApp</label><input type="tel" id="waPeminjamSarpras" inputmode="tel" autocomplete="tel" placeholder="Contoh: 081234567890"><small class="small-note">Nomor ini disimpan sekali untuk notifikasi status pengajuan berikutnya.</small></div>
+                </div>
+              </div>
+              <div><label for="kegiatanSarpras">Kegiatan</label><input id="kegiatanSarpras" placeholder="Contoh: Sosialisasi layanan" required></div>
+              <div><label for="tempatSarpras">Tempat Kegiatan</label><input id="tempatSarpras" placeholder="Contoh: Aula Kanwil" required></div>
+              <div><label for="jenisBarangSarpras">Jenis Barang</label><input id="jenisBarangSarpras" placeholder="Contoh: Laptop, proyektor, sound system" required></div>
+              <div><label for="lamaSarpras">Berapa Lama</label><input id="lamaSarpras" placeholder="Contoh: 3 jam / 1 hari" required></div>
+              <div><label for="batasKembaliSarpras">Batas Kembali</label><input type="datetime-local" id="batasKembaliSarpras" required></div>
+            </div>
+            <div style="margin-top:16px;"><button id="btnSubmitSarpras" class="btn-green" type="submit">Kirim Pengajuan Pinjam Sarpras</button></div>
+          </form>
+        </div>
         <div class="card"><div class="panel-header"><div><h3>Riwayat Pinjam Sarpras</h3><p class="muted">Status akan berubah menjadi Terlambat jika melewati batas kembali.</p></div><button class="btn-light" onclick="muatPinjamSarpras()">Refresh</button></div><div class="table-wrap"><table><thead><tr><th>ID</th><th>Peminjam</th><th>Kegiatan</th><th>Tempat</th><th>Jenis Barang</th><th>Lama</th><th>Batas Kembali</th><th>Status</th></tr></thead><tbody id="tabelPinjamSarpras"><tr><td colspan="8">Klik modul Pinjam Sarpras untuk memuat data.</td></tr></tbody></table></div></div>
       </div>
     </section>
@@ -433,7 +626,7 @@
       <div class="module-grid"><button class="module-card" data-admin-panel="ruangan" onclick="bukaPanelAdminPinjam('ruangan')"><div class="module-icon">🏛️</div><h3>Pinjam Ruangan</h3><p>Monitoring dan ACC permintaan penggunaan ruangan.</p></button><button class="module-card" data-admin-panel="kendaraan" onclick="bukaPanelAdminPinjam('kendaraan')"><div class="module-icon">🚗</div><h3>Pinjam Kendaraan</h3><p>Monitoring kendaraan, batas kembali, dan status terlambat.</p></button><button class="module-card" data-admin-panel="sarpras" onclick="bukaPanelAdminPinjam('sarpras')"><div class="module-icon">🎛️</div><h3>Pinjam Sarpras</h3><p>Monitoring sarpras kegiatan dan pengembaliannya.</p></button></div>
       <div id="guideAdminPinjam" class="empty-guide">Pilih salah satu modul di atas untuk membuka data pengajuan.</div>
       <div id="panelAdminRuangan" class="panel-card hidden"><div class="panel-header"><div><h3>Permintaan Pinjam Ruangan</h3><span id="summaryAdminJadwal" class="summary-pill">Belum dimuat</span></div><button class="btn-light" onclick="muatJadwalAdmin()">Refresh</button></div><div class="filter-row"><input id="filterAdminJadwal" placeholder="Cari ID, tanggal, ruangan, peminjam, kegiatan, atau BMN..." oninput="renderTabelJadwalAdmin(daftarJadwal)"><select id="filterStatusAdminJadwal" onchange="renderTabelJadwalAdmin(daftarJadwal)"><option value="Semua">Semua Status</option><option value="Pending">Pending</option><option value="ACC">ACC</option><option value="Ditolak">Ditolak</option></select></div><div class="table-wrap"><table><thead><tr><th>ID</th><th>Tanggal</th><th>Ruangan</th><th>Waktu</th><th>Peminjam</th><th>Kegiatan</th><th>Jumlah Peserta</th><th>Peserta/Jabatan</th><th>BMN</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="tabelAdminJadwal"><tr><td colspan="11">Klik modul Pinjam Ruangan untuk memuat data.</td></tr></tbody></table></div></div>
-      <div id="panelAdminKendaraan" class="panel-card hidden"><div class="panel-header"><div><h3>Permintaan Pinjam Kendaraan</h3><span id="summaryAdminKendaraan" class="summary-pill">Belum dimuat</span></div><button class="btn-light" onclick="muatPinjamKendaraanAdmin()">Refresh</button></div><div class="filter-row"><input id="filterAdminKendaraan" placeholder="Cari ID, peminjam, kegiatan, tujuan, lama, atau keterangan admin..." oninput="renderPinjamKendaraan('tabelAdminKendaraan', daftarKendaraan, true)"><select id="filterStatusAdminKendaraan" onchange="renderPinjamKendaraan('tabelAdminKendaraan', daftarKendaraan, true)"><option value="Semua">Semua Status</option><option value="Pending">Pending</option><option value="ACC">ACC</option><option value="Ditolak">Ditolak</option><option value="Dikembalikan">Dikembalikan</option><option value="Terlambat">Terlambat</option></select></div><div class="table-wrap"><table><thead><tr><th>ID</th><th>Pengajuan</th><th>Peminjam</th><th>Kegiatan</th><th>Tujuan</th><th>Lama</th><th>Batas Kembali</th><th>Status</th><th>Keterangan Admin</th><th>Aksi</th></tr></thead><tbody id="tabelAdminKendaraan"><tr><td colspan="10">Klik modul Pinjam Kendaraan untuk memuat data.</td></tr></tbody></table></div></div>
+      <div id="panelAdminKendaraan" class="panel-card hidden"><div class="panel-header"><div><h3>Permintaan Pinjam Kendaraan</h3><span id="summaryAdminKendaraan" class="summary-pill">Belum dimuat</span></div><button class="btn-light" onclick="muatPinjamKendaraanAdmin()">Refresh</button></div><div class="filter-row"><input id="filterAdminKendaraan" placeholder="Cari ID, peminjam, kegiatan, tujuan, jenis mobil, unit, atau keterangan..." oninput="renderPinjamKendaraan('tabelAdminKendaraan', daftarKendaraan, true)"><select id="filterStatusAdminKendaraan" onchange="renderPinjamKendaraan('tabelAdminKendaraan', daftarKendaraan, true)"><option value="Semua">Semua Status</option><option value="Pending">Pending</option><option value="ACC">ACC</option><option value="Ditolak">Ditolak</option><option value="Dikembalikan">Dikembalikan</option><option value="Terlambat">Terlambat</option></select></div><div class="table-wrap"><table><thead><tr><th>ID</th><th>Pengajuan</th><th>Peminjam</th><th>Kegiatan</th><th>Tujuan</th><th>Jenis Diminta</th><th>Mulai</th><th>Batas Kembali</th><th>Mobil Ditugaskan</th><th>Status</th><th>Keterangan Admin</th><th>Aksi</th></tr></thead><tbody id="tabelAdminKendaraan"><tr><td colspan="12">Klik modul Pinjam Kendaraan untuk memuat data.</td></tr></tbody></table></div></div>
       <div id="panelAdminSarpras" class="panel-card hidden"><div class="panel-header"><div><h3>Permintaan Pinjam Sarpras</h3><span id="summaryAdminSarpras" class="summary-pill">Belum dimuat</span></div><button class="btn-light" onclick="muatPinjamSarprasAdmin()">Refresh</button></div><div class="filter-row"><input id="filterAdminSarpras" placeholder="Cari ID, peminjam, kegiatan, tempat, atau barang..." oninput="renderPinjamSarpras('tabelAdminSarpras', daftarSarpras, true)"><select id="filterStatusAdminSarpras" onchange="renderPinjamSarpras('tabelAdminSarpras', daftarSarpras, true)"><option value="Semua">Semua Status</option><option value="Pending">Pending</option><option value="ACC">ACC</option><option value="Ditolak">Ditolak</option><option value="Dikembalikan">Dikembalikan</option><option value="Terlambat">Terlambat</option></select></div><div class="table-wrap"><table><thead><tr><th>ID</th><th>Pengajuan</th><th>Peminjam</th><th>Kegiatan</th><th>Tempat</th><th>Jenis Barang</th><th>Lama</th><th>Batas Kembali</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="tabelAdminSarpras"><tr><td colspan="10">Klik modul Pinjam Sarpras untuk memuat data.</td></tr></tbody></table></div></div>
     </section>
   </div>
@@ -462,696 +655,1400 @@
   </footer>
 </div>
 
-<script>
-  let masterData = { pegawai: [], bmn: [] };
-  let daftarJadwal = [];
-  let daftarKendaraan = [];
-  let daftarSarpras = [];
-  let adminLogin = sessionStorage.getItem('adminLoginBMN') === '1';
-  let sortDataBMN = { key: 'kodeBarang', dir: 'asc' };
-  let sortLokasiBMN = { key: 'lokasi', dir: 'asc' };
-  let inventarisLokasiAktif = '';
-  let skipPushHistory = false;
-  let masterDataLoaded = false;
-  let masterDataLoading = false;
-  let masterDataCallbacks = [];
-  const LIMIT_USER = 50;
-  const LIMIT_ADMIN = 100;
+  <script>
+let masterData = { pegawai: [], bmn: [] };
+let daftarJadwal = [];
+let daftarJadwalUser = [];
+let tanggalJadwalAktif = '';
+let bulanKalenderJadwal = '';
+let requestJadwalUserAktif = 0;
+let daftarKendaraan = [];
+let daftarSarpras = [];
+let adminLogin = sessionStorage.getItem('adminLoginBMN') === '1';
+let sortDataBMN = { key: 'kodeBarang', dir: 'asc' };
+let sortLokasiBMN = { key: 'lokasi', dir: 'asc' };
+let inventarisLokasiAktif = '';
+let skipPushHistory = false;
+let masterDataLoaded = false;
+let masterDataLoading = false;
+let masterDataCallbacks = [];
+const LIMIT_USER = 50;
+const LIMIT_ADMIN = 100;
+let daftarKetersediaanKendaraan = [];
+let requestKetersediaanKendaraanAktif = 0;
+const identitasPeminjam = {
+  ruangan: { verifiedNip: '', whatsappTerdaftar: false, ubahWhatsapp: false, requestId: 0, timer: null },
+  kendaraan: { verifiedNip: '', whatsappTerdaftar: false, ubahWhatsapp: false, requestId: 0, timer: null },
+  sarpras: { verifiedNip: '', whatsappTerdaftar: false, ubahWhatsapp: false, requestId: 0, timer: null }
+};
 
-  document.addEventListener('DOMContentLoaded', function () {
-    initBrowserBackNavigation();
-    setTanggalHariIni();
-    setMinDateTimeLocal();
-    resetPanelPinjam();
-    inisialisasiFooter();
-    setLabelJadwalHariIni();
+document.addEventListener('DOMContentLoaded', function () {
+  initBrowserBackNavigation();
+  setTanggalHariIni();
+  setMinDateTimeLocal();
+  resetPanelPinjam();
+  inisialisasiFooter();
+  inisialisasiJadwalRuangan();
+});
+
+function inisialisasiFooter() {
+  const homeLogo = document.querySelector('.home-logo-wrap img');
+  const footerLogo = document.getElementById('footerLogo');
+  const topbarLogo = document.getElementById('topbarLogo');
+  if (homeLogo && footerLogo) footerLogo.src = homeLogo.src;
+  if (homeLogo && topbarLogo) topbarLogo.src = homeLogo.src;
+
+  const yearEl = document.getElementById('footerYear');
+  if (yearEl) yearEl.textContent = String(new Date().getFullYear());
+}
+
+function inisialisasiJadwalRuangan() {
+  tanggalJadwalAktif = tanggalHariIniWita();
+  bulanKalenderJadwal = tanggalJadwalAktif.slice(0, 7) + '-01';
+  perbaruiLabelTanggalJadwal();
+  renderKalenderJadwal();
+
+  document.addEventListener('click', function(event) {
+    const picker = document.querySelector('.schedule-date-picker');
+    if (!picker || picker.contains(event.target)) return;
+    tutupKalenderJadwal();
   });
 
-  function inisialisasiFooter() {
-    const homeLogo = document.querySelector('.home-logo-wrap img');
-    const footerLogo = document.getElementById('footerLogo');
-    if (homeLogo && footerLogo) footerLogo.src = homeLogo.src;
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') tutupKalenderJadwal();
+  });
+}
 
-    const yearEl = document.getElementById('footerYear');
-    if (yearEl) yearEl.textContent = String(new Date().getFullYear());
+function tanggalHariIniWita() {
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'Asia/Makassar',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    }).formatToParts(new Date());
+    const map = {};
+    parts.forEach(part => { if (part.type !== 'literal') map[part.type] = part.value; });
+    if (map.year && map.month && map.day) return map.year + '-' + map.month + '-' + map.day;
+  } catch (e) {
+    console.warn('Timezone Asia/Makassar tidak tersedia, memakai tanggal lokal browser.', e);
+  }
+  return formatDateInputLokal(new Date());
+}
+
+function parseYmdParts(value) {
+  const match = String(value || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return null;
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const probe = new Date(Date.UTC(year, month - 1, day));
+  if (probe.getUTCFullYear() !== year || probe.getUTCMonth() !== month - 1 || probe.getUTCDate() !== day) return null;
+  return { year, month, day };
+}
+
+function ymdDariUtc(date) {
+  return date.getUTCFullYear() + '-' + String(date.getUTCMonth() + 1).padStart(2, '0') + '-' + String(date.getUTCDate()).padStart(2, '0');
+}
+
+function geserYmd(value, jumlahHari) {
+  const parts = parseYmdParts(value);
+  if (!parts) return tanggalHariIniWita();
+  const date = new Date(Date.UTC(parts.year, parts.month - 1, parts.day));
+  date.setUTCDate(date.getUTCDate() + Number(jumlahHari || 0));
+  return ymdDariUtc(date);
+}
+
+function formatTanggalJadwal(value) {
+  const parts = parseYmdParts(value);
+  if (!parts) return String(value || '-');
+  const date = new Date(parts.year, parts.month - 1, parts.day, 12, 0, 0, 0);
+  try {
+    return new Intl.DateTimeFormat('id-ID', {
+      weekday: 'long',
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
+    }).format(date);
+  } catch (e) {
+    return String(parts.day).padStart(2, '0') + '/' + String(parts.month).padStart(2, '0') + '/' + parts.year;
+  }
+}
+
+function perbaruiLabelTanggalJadwal(jumlahJadwal) {
+  const label = document.getElementById('labelTanggalJadwal');
+  const ringkasan = document.getElementById('ringkasanTanggalJadwal');
+  const teksTanggal = formatTanggalJadwal(tanggalJadwalAktif);
+  const hariIni = tanggalJadwalAktif === tanggalHariIniWita();
+
+  if (label) label.textContent = teksTanggal;
+  if (ringkasan) {
+    const prefix = hariIni ? 'Hari ini' : 'Tanggal terpilih';
+    ringkasan.textContent = Number.isInteger(jumlahJadwal)
+      ? prefix + ' · ' + jumlahJadwal + ' jadwal'
+      : prefix + ' · ' + teksTanggal;
+  }
+}
+
+function toggleKalenderJadwal() {
+  const popover = document.getElementById('kalenderJadwal');
+  const trigger = document.getElementById('btnTanggalJadwal');
+  if (!popover || !trigger) return;
+
+  const akanBuka = popover.classList.contains('hidden');
+  if (akanBuka) {
+    bulanKalenderJadwal = tanggalJadwalAktif.slice(0, 7) + '-01';
+    renderKalenderJadwal();
+    popover.classList.remove('hidden');
+  } else {
+    popover.classList.add('hidden');
+  }
+  trigger.setAttribute('aria-expanded', akanBuka ? 'true' : 'false');
+}
+
+function tutupKalenderJadwal() {
+  const popover = document.getElementById('kalenderJadwal');
+  const trigger = document.getElementById('btnTanggalJadwal');
+  if (popover) popover.classList.add('hidden');
+  if (trigger) trigger.setAttribute('aria-expanded', 'false');
+}
+
+function gantiBulanKalenderJadwal(delta) {
+  const parts = parseYmdParts(bulanKalenderJadwal || tanggalJadwalAktif);
+  if (!parts) return;
+  const date = new Date(Date.UTC(parts.year, parts.month - 1 + Number(delta || 0), 1));
+  bulanKalenderJadwal = ymdDariUtc(date);
+  renderKalenderJadwal();
+}
+
+function renderKalenderJadwal() {
+  const grid = document.getElementById('gridKalenderJadwal');
+  const labelBulan = document.getElementById('labelBulanKalenderJadwal');
+  if (!grid || !labelBulan) return;
+
+  const parts = parseYmdParts(bulanKalenderJadwal || tanggalJadwalAktif || tanggalHariIniWita());
+  if (!parts) return;
+
+  const firstDay = new Date(Date.UTC(parts.year, parts.month - 1, 1));
+  const offsetSenin = (firstDay.getUTCDay() + 6) % 7;
+  const start = new Date(firstDay.getTime());
+  start.setUTCDate(start.getUTCDate() - offsetSenin);
+
+  try {
+    labelBulan.textContent = new Intl.DateTimeFormat('id-ID', { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(firstDay);
+  } catch (e) {
+    labelBulan.textContent = String(parts.month).padStart(2, '0') + '/' + parts.year;
   }
 
-  function setLabelJadwalHariIni() {
-    const el = document.getElementById('labelTanggalJadwalHariIni');
-    if (!el) return;
-    try {
-      const teks = new Intl.DateTimeFormat('id-ID', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' }).format(new Date());
-      el.textContent = 'Tanggal: ' + teks + '.';
-    } catch (e) {
-      el.textContent = '';
-    }
+  const hariIni = tanggalHariIniWita();
+  const buttons = [];
+  for (let i = 0; i < 42; i++) {
+    const date = new Date(start.getTime());
+    date.setUTCDate(start.getUTCDate() + i);
+    const ymd = ymdDariUtc(date);
+    const isOutside = date.getUTCMonth() !== parts.month - 1;
+    const classes = ['schedule-calendar-day'];
+    if (isOutside) classes.push('is-outside');
+    if (ymd === hariIni) classes.push('is-today');
+    if (ymd === tanggalJadwalAktif) classes.push('is-selected');
+    const ariaCurrent = ymd === hariIni ? ' aria-current="date"' : '';
+    const ariaPressed = ymd === tanggalJadwalAktif ? 'true' : 'false';
+    buttons.push('<button type="button" class="' + classes.join(' ') + '" data-tanggal="' + ymd + '" aria-label="' + escapeHtml(formatTanggalJadwal(ymd)) + '" aria-pressed="' + ariaPressed + '"' + ariaCurrent + '>' + date.getUTCDate() + '</button>');
+  }
+  grid.innerHTML = buttons.join('');
+  grid.querySelectorAll('[data-tanggal]').forEach(function(button) {
+    button.addEventListener('click', function() { pilihTanggalJadwal(button.dataset.tanggal); });
+  });
+}
+
+function pilihTanggalJadwal(value) {
+  if (!parseYmdParts(value)) return;
+  tanggalJadwalAktif = value;
+  bulanKalenderJadwal = value.slice(0, 7) + '-01';
+  tutupKalenderJadwal();
+  perbaruiLabelTanggalJadwal();
+  renderKalenderJadwal();
+  muatJadwal();
+}
+
+function geserTanggalJadwal(delta) {
+  tanggalJadwalAktif = geserYmd(tanggalJadwalAktif || tanggalHariIniWita(), delta);
+  bulanKalenderJadwal = tanggalJadwalAktif.slice(0, 7) + '-01';
+  tutupKalenderJadwal();
+  perbaruiLabelTanggalJadwal();
+  renderKalenderJadwal();
+  muatJadwal();
+}
+
+function kembaliJadwalHariIni() {
+  const hariIni = tanggalHariIniWita();
+  tanggalJadwalAktif = hariIni;
+  bulanKalenderJadwal = hariIni.slice(0, 7) + '-01';
+  tutupKalenderJadwal();
+  perbaruiLabelTanggalJadwal();
+  renderKalenderJadwal();
+  muatJadwal();
+}
+
+function allSections() { return ['dashboardUtama','dashboardInventarisRuangan','dashboardPinjamPakaiBMN','dashboardPemeliharaan','dashboardLoginAdmin','dashboardAdmin','adminDataBMN','adminLokasiBMN','adminPemeliharaan','adminPinjamPakaiBMN']; }
+
+function aturTopbar(sectionId) {
+  const topbar = document.getElementById('appTopbar');
+  if (!topbar) return;
+  if (sectionId === 'dashboardUtama') topbar.classList.add('hidden');
+  else topbar.classList.remove('hidden');
+}
+
+function currentVisibleSection() {
+  return allSections().find(id => {
+    const el = document.getElementById(id);
+    return el && !el.classList.contains('hidden');
+  }) || 'dashboardUtama';
+}
+
+function pushHistoryState(state) {
+  if (skipPushHistory) return;
+  const section = (state && state.section) || currentVisibleSection();
+  const finalState = Object.assign({ appBMN: true, section: section }, state || {});
+  history.pushState(finalState, '', '#' + encodeURIComponent(section));
+}
+
+function initBrowserBackNavigation() {
+  history.replaceState({ appBMN: true, section: 'dashboardUtama' }, '', '#dashboardUtama');
+  aturTopbar('dashboardUtama');
+  window.addEventListener('popstate', function(event) {
+    const state = event.state;
+    if (!state || !state.appBMN) return;
+    applyHistoryState(state);
+  });
+}
+
+function applyHistoryState(state) {
+  skipPushHistory = true;
+  const section = state.section || 'dashboardUtama';
+  tampilkanSection(section, false);
+
+  if (section === 'dashboardPemeliharaan') {
+    muatPemeliharaan();
+    tutupFormPemeliharaanUser();
   }
 
-  function allSections() { return ['dashboardUtama','dashboardInventarisRuangan','dashboardPinjamPakaiBMN','dashboardPemeliharaan','dashboardLoginAdmin','dashboardAdmin','adminDataBMN','adminLokasiBMN','adminPemeliharaan','adminPinjamPakaiBMN']; }
-
-  function aturTopbar(sectionId) {
-    const topbar = document.getElementById('appTopbar');
-    if (!topbar) return;
-    if (sectionId === 'dashboardUtama') topbar.classList.add('hidden');
-    else topbar.classList.remove('hidden');
-  }
-
-  function currentVisibleSection() {
-    return allSections().find(id => {
-      const el = document.getElementById(id);
-      return el && !el.classList.contains('hidden');
-    }) || 'dashboardUtama';
-  }
-
-  function pushHistoryState(state) {
-    if (skipPushHistory) return;
-    const section = (state && state.section) || currentVisibleSection();
-    const finalState = Object.assign({ appBMN: true, section: section }, state || {});
-    history.pushState(finalState, '', '#' + encodeURIComponent(section));
-  }
-
-  function initBrowserBackNavigation() {
-    history.replaceState({ appBMN: true, section: 'dashboardUtama' }, '', '#dashboardUtama');
-    aturTopbar('dashboardUtama');
-    window.addEventListener('popstate', function(event) {
-      const state = event.state;
-      if (!state || !state.appBMN) return;
-      applyHistoryState(state);
-    });
-  }
-
-  function applyHistoryState(state) {
-    skipPushHistory = true;
-    const section = state.section || 'dashboardUtama';
-    tampilkanSection(section, false);
-
-    if (section === 'dashboardPemeliharaan') {
-      muatPemeliharaan();
-      tutupFormPemeliharaanUser();
-    }
-
-    if (section === 'dashboardPinjamPakaiBMN') {
-      resetPanelPinjam();
-      if (state.panelPinjam) bukaPanelPinjam(state.panelPinjam, false);
-    }
-
-    if (section === 'dashboardInventarisRuangan') {
-      if (state.inventarisLokasi) inventarisLokasiAktif = state.inventarisLokasi;
-      pastikanMasterData(function() { renderInventarisRuangan(!state.inventarisLokasi); });
-    }
-
-    if (section === 'dashboardLoginAdmin') {
-      setTimeout(() => { const pin = document.getElementById('pinAdmin'); if (pin) pin.focus(); }, 100);
-    }
-
-    if (section === 'adminDataBMN') pastikanMasterData(renderAdminDataBMN);
-    if (section === 'adminLokasiBMN') pastikanMasterData(renderAdminLokasiBMN);
-    if (section === 'adminPemeliharaan') muatPemeliharaanAdmin();
-    if (section === 'adminPinjamPakaiBMN') {
-      resetPanelAdminPinjam();
-      if (state.panelAdminPinjam) bukaPanelAdminPinjam(state.panelAdminPinjam, false);
-    }
-
-    skipPushHistory = false;
-  }
-
-  function tampilkanSection(id, pushHistory) {
-    allSections().forEach(s => {
-      const el = document.getElementById(s);
-      if (el) el.classList.add('hidden');
-    });
-    const target = document.getElementById(id);
-    if (target) target.classList.remove('hidden');
-    aturTopbar(id);
-    if (pushHistory !== false) pushHistoryState({ section: id });
-    window.scrollTo({top:0, behavior:'smooth'});
-  }
-
-  function bukaDashboard(id, pushHistory) {
-    tampilkanSection(id, pushHistory);
-    if (id === 'dashboardPemeliharaan') {
-      muatPemeliharaan();
-      tutupFormPemeliharaanUser();
-    }
-    if (id === 'dashboardPinjamPakaiBMN') {
-      resetPanelPinjam();
-    }
-    if (id === 'dashboardInventarisRuangan') {
-      pastikanMasterData(function() { renderInventarisRuangan(true); });
-    }
-  }
-  function kembaliKeUtama() { tampilkanSection('dashboardUtama'); }
-  function bukaLoginAdmin() { tampilkanSection('dashboardLoginAdmin'); setTimeout(() => document.getElementById('pinAdmin').focus(), 100); }
-
-  function resetPanelPinjam() {
-    ['panelPinjamRuangan','panelPinjamKendaraan','panelPinjamSarpras'].forEach(id => { const el = document.getElementById(id); if (el) el.classList.add('hidden'); });
-    document.querySelectorAll('.module-card[data-panel]').forEach(el => el.classList.remove('active'));
-    const guide = document.getElementById('guidePinjam'); if (guide) guide.classList.remove('hidden');
-  }
-  function bukaPanelPinjam(tipe, pushHistory) {
+  if (section === 'dashboardPinjamPakaiBMN') {
     resetPanelPinjam();
-    const map = { ruangan: 'panelPinjamRuangan', kendaraan: 'panelPinjamKendaraan', sarpras: 'panelPinjamSarpras' };
-    const panelId = map[tipe];
-    const panel = document.getElementById(panelId);
-    const guide = document.getElementById('guidePinjam'); if (guide) guide.classList.add('hidden');
-    if (panel) panel.classList.remove('hidden');
-    const btn = document.querySelector(`.module-card[data-panel="${tipe}"]`);
-    if (btn) btn.classList.add('active');
-    if (tipe === 'ruangan') {
-      pastikanMasterData(function() {
-        renderChecklistBMNPinjam();
-        muatJadwal();
-      });
-    }
-    if (tipe === 'kendaraan') muatPinjamKendaraan();
-    if (tipe === 'sarpras') muatPinjamSarpras();
-    setMinDateTimeLocal();
-    if (pushHistory !== false) pushHistoryState({ section: 'dashboardPinjamPakaiBMN', panelPinjam: tipe });
-    setTimeout(() => panel && panel.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+    if (state.panelPinjam) bukaPanelPinjam(state.panelPinjam, false);
   }
 
-  function tutupFormPemeliharaanUser() {
-    const form = document.getElementById('cardFormPemeliharaanUser');
-    const btn = document.getElementById('btnToggleFormPemeliharaanUser');
-    if (form) form.classList.add('hidden');
-    if (btn) btn.textContent = '➕ Buat Laporan Pemeliharaan';
-  }
-  function toggleFormPemeliharaanUser() {
-    const form = document.getElementById('cardFormPemeliharaanUser');
-    const btn = document.getElementById('btnToggleFormPemeliharaanUser');
-    if (!form) return;
-    const akanBuka = form.classList.contains('hidden');
-    form.classList.toggle('hidden', !akanBuka);
-    if (btn) btn.textContent = akanBuka ? 'Tutup Form' : '➕ Buat Laporan Pemeliharaan';
-    if (akanBuka) {
-      pastikanMasterData();
-      setTimeout(() => form.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
-    }
+  if (section === 'dashboardInventarisRuangan') {
+    if (state.inventarisLokasi) inventarisLokasiAktif = state.inventarisLokasi;
+    pastikanMasterData(function() { renderInventarisRuangan(!state.inventarisLokasi); });
   }
 
-  function resetPanelAdminPinjam() {
-    ['panelAdminRuangan','panelAdminKendaraan','panelAdminSarpras'].forEach(id => { const el = document.getElementById(id); if (el) el.classList.add('hidden'); });
-    document.querySelectorAll('.module-card[data-admin-panel]').forEach(el => el.classList.remove('active'));
-    const guide = document.getElementById('guideAdminPinjam'); if (guide) guide.classList.remove('hidden');
+  if (section === 'dashboardLoginAdmin') {
+    setTimeout(() => { const pin = document.getElementById('pinAdmin'); if (pin) pin.focus(); }, 100);
   }
-  function bukaPanelAdminPinjam(tipe, pushHistory) {
-    if (!pastikanAdminLogin()) return;
+
+  if (section === 'adminDataBMN') pastikanMasterData(renderAdminDataBMN);
+  if (section === 'adminLokasiBMN') pastikanMasterData(renderAdminLokasiBMN);
+  if (section === 'adminPemeliharaan') muatPemeliharaanAdmin();
+  if (section === 'adminPinjamPakaiBMN') {
     resetPanelAdminPinjam();
-    const map = { ruangan: 'panelAdminRuangan', kendaraan: 'panelAdminKendaraan', sarpras: 'panelAdminSarpras' };
-    const panelId = map[tipe];
-    const panel = document.getElementById(panelId);
-    const guide = document.getElementById('guideAdminPinjam'); if (guide) guide.classList.add('hidden');
-    if (panel) panel.classList.remove('hidden');
-    const btn = document.querySelector(`.module-card[data-admin-panel="${tipe}"]`);
-    if (btn) btn.classList.add('active');
-    if (tipe === 'ruangan') muatJadwalAdmin();
-    if (tipe === 'kendaraan') muatPinjamKendaraanAdmin();
-    if (tipe === 'sarpras') muatPinjamSarprasAdmin();
-    if (pushHistory !== false) pushHistoryState({ section: 'adminPinjamPakaiBMN', panelAdminPinjam: tipe });
-    setTimeout(() => panel && panel.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+    if (state.panelAdminPinjam) bukaPanelAdminPinjam(state.panelAdminPinjam, false);
   }
 
-  function setTanggalHariIni() {
-    const today = formatDateInputLokal(new Date());
-    ['tanggalBooking','tanggalPemeliharaan','tanggalAdminPemeliharaan'].forEach(id => { const el = document.getElementById(id); if (el) { el.min = today; if (!el.value) el.value = today; } });
+  skipPushHistory = false;
+}
+
+function tampilkanSection(id, pushHistory) {
+  allSections().forEach(s => {
+    const el = document.getElementById(s);
+    if (el) el.classList.add('hidden');
+  });
+  const target = document.getElementById(id);
+  if (target) target.classList.remove('hidden');
+  aturTopbar(id);
+  if (pushHistory !== false) pushHistoryState({ section: id });
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function bukaDashboard(id, pushHistory) {
+  tampilkanSection(id, pushHistory);
+  if (id === 'dashboardPemeliharaan') {
+    muatPemeliharaan();
+    tutupFormPemeliharaanUser();
   }
-  function setMinDateTimeLocal() {
-    const min = formatDateTimeLocal(new Date());
-    ['batasKembaliKendaraan','batasKembaliSarpras'].forEach(id => { const el = document.getElementById(id); if (el) el.min = min; });
+  if (id === 'dashboardPinjamPakaiBMN') {
+    resetPanelPinjam();
   }
-  function formatDateInputLokal(date) { return date.getFullYear() + '-' + String(date.getMonth()+1).padStart(2,'0') + '-' + String(date.getDate()).padStart(2,'0'); }
-  function formatDateTimeLocal(date) { return formatDateInputLokal(date) + 'T' + String(date.getHours()).padStart(2,'0') + ':' + String(date.getMinutes()).padStart(2,'0'); }
+  if (id === 'dashboardInventarisRuangan') {
+    pastikanMasterData(function() { renderInventarisRuangan(true); });
+  }
+}
+function kembaliKeUtama() { tampilkanSection('dashboardUtama'); }
+function bukaLoginAdmin() { tampilkanSection('dashboardLoginAdmin'); setTimeout(() => document.getElementById('pinAdmin').focus(), 100); }
 
-  function muatMasterData(callback, forceRefresh) {
-    if (typeof callback === 'function') masterDataCallbacks.push(callback);
-
-    if (masterDataLoaded && !forceRefresh) {
-      jalankanMasterDataCallbacks();
-      return;
-    }
-
-    if (masterDataLoading) return;
-
-    masterDataLoading = true;
-    google.script.run.withSuccessHandler(function (data) {
-      masterDataLoading = false;
-      masterDataLoaded = true;
-      masterData = data || { pegawai: [], bmn: [] };
-      isiDatalistPegawai();
-      isiDatalistBMN();
+function resetPanelPinjam() {
+  ['panelPinjamRuangan','panelPinjamKendaraan','panelPinjamSarpras'].forEach(id => { const el = document.getElementById(id); if (el) el.classList.add('hidden'); });
+  document.querySelectorAll('.module-card[data-panel]').forEach(el => el.classList.remove('active'));
+  const guide = document.getElementById('guidePinjam'); if (guide) guide.classList.remove('hidden');
+}
+function bukaPanelPinjam(tipe, pushHistory) {
+  resetPanelPinjam();
+  const map = { ruangan: 'panelPinjamRuangan', kendaraan: 'panelPinjamKendaraan', sarpras: 'panelPinjamSarpras' };
+  const panelId = map[tipe];
+  const panel = document.getElementById(panelId);
+  const guide = document.getElementById('guidePinjam'); if (guide) guide.classList.add('hidden');
+  if (panel) panel.classList.remove('hidden');
+  const btn = document.querySelector(`.module-card[data-panel="${tipe}"]`);
+  if (btn) btn.classList.add('active');
+  if (tipe === 'ruangan') {
+    pastikanMasterData(function() {
       renderChecklistBMNPinjam();
-      jalankanMasterDataCallbacks();
-    }).withFailureHandler(function (err) {
-      masterDataLoading = false;
-      console.error(err);
-      jalankanMasterDataCallbacks();
-    }).getMasterDataOptimized(!!forceRefresh);
-  }
-
-  function pastikanMasterData(callback, forceRefresh) {
-    if (masterDataLoaded && !forceRefresh) {
-      if (typeof callback === 'function') callback();
-      return;
-    }
-    muatMasterData(callback, forceRefresh);
-  }
-
-  function jalankanMasterDataCallbacks() {
-    const callbacks = masterDataCallbacks.splice(0, masterDataCallbacks.length);
-    callbacks.forEach(function (fn) {
-      try { if (typeof fn === 'function') fn(); } catch (e) { console.error(e); }
+      muatJadwal();
     });
   }
+  if (tipe === 'kendaraan') { muatPinjamKendaraan(); muatKetersediaanKendaraan(); }
+  if (tipe === 'sarpras') muatPinjamSarpras();
+  setMinDateTimeLocal();
+  if (pushHistory !== false) pushHistoryState({ section: 'dashboardPinjamPakaiBMN', panelPinjam: tipe });
+  setTimeout(() => panel && panel.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+}
 
-  function isiDatalistPegawai() { const el = document.getElementById('listPegawai'); if (el) el.innerHTML = (masterData.pegawai || []).map(n => `<option value="${escapeHtml(n)}"></option>`).join(''); }
-  function labelBMN(item) { return [item.kodeBarang ? 'Kode: ' + item.kodeBarang : '', item.nup ? 'NUP: ' + item.nup : '', item.nama, item.merk, item.tahunPerolehan, item.lokasi].filter(Boolean).join(' | '); }
-  function isiDatalistBMN() { const el = document.getElementById('listBMN'); if (el) el.innerHTML = (masterData.bmn || []).map(item => `<option value="${escapeHtml(labelBMN(item))}"></option>`).join(''); }
-  function cariBMNDariInput(value) { const teks = normalizeText(value); return (masterData.bmn || []).find(item => normalizeText(labelBMN(item)) === teks) || null; }
+function tutupFormPemeliharaanUser() {
+  const form = document.getElementById('cardFormPemeliharaanUser');
+  const btn = document.getElementById('btnToggleFormPemeliharaanUser');
+  if (form) form.classList.add('hidden');
+  if (btn) btn.textContent = '➕ Buat Laporan Pemeliharaan';
+}
+function toggleFormPemeliharaanUser() {
+  const form = document.getElementById('cardFormPemeliharaanUser');
+  const btn = document.getElementById('btnToggleFormPemeliharaanUser');
+  if (!form) return;
+  const akanBuka = form.classList.contains('hidden');
+  form.classList.toggle('hidden', !akanBuka);
+  if (btn) btn.textContent = akanBuka ? 'Tutup Form' : '➕ Buat Laporan Pemeliharaan';
+  if (akanBuka) {
+    pastikanMasterData();
+    setTimeout(() => form.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+  }
+}
 
-  function renderChecklistBMNPinjam() {
-    const container = document.getElementById('bmnChecklistContainer');
-    if (!container) return;
-    const ruangan = document.getElementById('ruanganBooking').value;
-    document.getElementById('bmnDipinjam').value = '-';
-    if (!ruangan) { container.innerHTML = '<div class="muted">Pilih ruangan terlebih dahulu untuk menampilkan BMN yang ada di ruangan tersebut.</div>'; return; }
-    const data = (masterData.bmn || []).filter(item => normalizeRoom(item.lokasi) === normalizeRoom(ruangan));
-    if (!data.length) { container.innerHTML = '<div class="muted">Belum ada BMN tercatat pada ' + escapeHtml(ruangan) + '.</div>'; return; }
-    container.innerHTML = data.map((item, i) => `<label class="checkbox-item"><input type="checkbox" class="cekBmnPinjam" value="${escapeHtml(labelBMN(item))}" onchange="updateBMNPinjamTerpilih()"><div>${escapeHtml(item.nama || '-')}<span>${escapeHtml([item.kodeBarang ? 'Kode: ' + item.kodeBarang : '', item.nup ? 'NUP: ' + item.nup : '', item.merk, item.kondisi].filter(Boolean).join(' · '))}</span></div></label>`).join('');
-  }
-  function updateBMNPinjamTerpilih() { const values = Array.from(document.querySelectorAll('.cekBmnPinjam:checked')).map(el => el.value); document.getElementById('bmnDipinjam').value = values.length ? values.join('; ') : '-'; }
-  function normalizeRoom(value) { return normalizeText(value).replace(/ruang /g,'').replace(/ruangan /g,''); }
+function resetPanelAdminPinjam() {
+  ['panelAdminRuangan','panelAdminKendaraan','panelAdminSarpras'].forEach(id => { const el = document.getElementById(id); if (el) el.classList.add('hidden'); });
+  document.querySelectorAll('.module-card[data-admin-panel]').forEach(el => el.classList.remove('active'));
+  const guide = document.getElementById('guideAdminPinjam'); if (guide) guide.classList.remove('hidden');
+}
+function bukaPanelAdminPinjam(tipe, pushHistory) {
+  if (!pastikanAdminLogin()) return;
+  resetPanelAdminPinjam();
+  const map = { ruangan: 'panelAdminRuangan', kendaraan: 'panelAdminKendaraan', sarpras: 'panelAdminSarpras' };
+  const panelId = map[tipe];
+  const panel = document.getElementById(panelId);
+  const guide = document.getElementById('guideAdminPinjam'); if (guide) guide.classList.add('hidden');
+  if (panel) panel.classList.remove('hidden');
+  const btn = document.querySelector(`.module-card[data-admin-panel="${tipe}"]`);
+  if (btn) btn.classList.add('active');
+  if (tipe === 'ruangan') muatJadwalAdmin();
+  if (tipe === 'kendaraan') muatPinjamKendaraanAdmin();
+  if (tipe === 'sarpras') muatPinjamSarprasAdmin();
+  if (pushHistory !== false) pushHistoryState({ section: 'adminPinjamPakaiBMN', panelAdminPinjam: tipe });
+  setTimeout(() => panel && panel.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+}
 
-  function muatJadwal() {
-    ['tabelJadwalUtama','tabelJadwalPinjam'].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = '<tr><td colspan="8">Memuat data...</td></tr>'; });
-    google.script.run.withSuccessHandler(function (data) { daftarJadwal = data || []; renderTabelJadwal('tabelJadwalUtama', daftarJadwal, false); renderTabelJadwal('tabelJadwalPinjam', daftarJadwal, true); }).withFailureHandler(function (err) { renderError('tabelJadwalUtama', err.message, 7); }).getJadwalRingkas(LIMIT_USER);
-  }
-  function renderTabelJadwal(targetId, data, detail) {
-    const tbody = document.getElementById(targetId); if (!tbody) return;
-    const colspan = detail ? 8 : 7;
-    if (!data.length) { tbody.innerHTML = `<tr><td colspan="${colspan}">Belum ada jadwal ruangan hari ini.</td></tr>`; return; }
-    tbody.innerHTML = data.map(row => detail ? `<tr><td>${escapeHtml(row.tanggal)}</td><td>${escapeHtml(row.ruangan)}</td><td>${escapeHtml(row.mulai)} - ${escapeHtml(row.selesai)}</td><td>${escapeHtml(row.nama)}</td><td>${escapeHtml(row.namaKegiatan || '-')}</td><td>${escapeHtml(row.jumlahPeserta || '-')}<br><span class="muted">${escapeHtml(row.pesertaJabatan || '-')}</span></td><td>${escapeHtml(row.bmnPinjam || '-')}</td><td>${badgeStatus(row.status)}</td></tr>` : `<tr><td>${escapeHtml(row.tanggal)}</td><td>${escapeHtml(row.ruangan)}</td><td>${escapeHtml(row.mulai)} - ${escapeHtml(row.selesai)}</td><td>${escapeHtml(row.nama)}</td><td>${escapeHtml(row.namaKegiatan || '-')}</td><td>${escapeHtml(row.bmnPinjam || '-')}</td><td>${badgeStatus(row.status)}</td></tr>`).join('');
-  }
+function setTanggalHariIni() {
+  const today = formatDateInputLokal(new Date());
+  ['tanggalBooking','tanggalPemeliharaan','tanggalAdminPemeliharaan'].forEach(id => { const el = document.getElementById(id); if (el) { el.min = today; if (!el.value) el.value = today; } });
+}
+function setMinDateTimeLocal() {
+  const min = formatDateTimeLocal(new Date());
+  ['mulaiKendaraan','batasKembaliKendaraan','batasKembaliSarpras'].forEach(id => { const el = document.getElementById(id); if (el) el.min = min; });
+}
+function formatDateInputLokal(date) { return date.getFullYear() + '-' + String(date.getMonth()+1).padStart(2,'0') + '-' + String(date.getDate()).padStart(2,'0'); }
+function formatDateTimeLocal(date) { return formatDateInputLokal(date) + 'T' + String(date.getHours()).padStart(2,'0') + ':' + String(date.getMinutes()).padStart(2,'0'); }
 
-  function validasiBookingRealtime() {
-    const pesan = pesanValidasiWaktuBooking(document.getElementById('tanggalBooking').value, document.getElementById('jamMulaiBooking').value, document.getElementById('jamSelesaiBooking').value);
-    if (pesan) tampilAlert('alertPinjam', pesan, 'error');
-  }
-  function pesanValidasiWaktuBooking(tanggal, mulai, selesai) {
-    if (!tanggal || !mulai || !selesai) return '';
-    const start = new Date(tanggal + 'T' + mulai); const end = new Date(tanggal + 'T' + selesai);
-    if (end <= start) return 'Jam selesai harus lebih besar dari jam mulai.';
-    if (start < new Date()) return 'Tanggal dan jam mulai tidak boleh berada di masa lalu.';
-    return '';
-  }
-  function cariJadwalBentrokClient(form) {
-    const start = new Date(form.tanggal + 'T' + form.jamMulai); const end = new Date(form.tanggal + 'T' + form.jamSelesai);
-    return (daftarJadwal || []).find(row => !normalizeText(row.status).includes('tolak') && normalizeRoom(row.ruangan) === normalizeRoom(form.ruangan) && new Date(row.tanggal + 'T' + row.mulai) < end && new Date(row.tanggal + 'T' + row.selesai) > start);
-  }
+// --- IDENTITAS PEMINJAM BERBASIS NIP ---
+function configIdentitasPeminjam(tipe) {
+  const map = {
+    ruangan: { nip: 'nipPeminjamRuangan', nama: 'namaPeminjamRuangan', info: 'infoPegawaiRuangan', waBox: 'waBoxRuangan', waStored: 'waStoredRuangan', waMasked: 'waMaskedRuangan', waWrap: 'waInputWrapRuangan', waInput: 'waPeminjamRuangan' },
+    kendaraan: { nip: 'nipPeminjamKendaraan', nama: 'namaPeminjamKendaraan', info: 'infoPegawaiKendaraan', waBox: 'waBoxKendaraan', waStored: 'waStoredKendaraan', waMasked: 'waMaskedKendaraan', waWrap: 'waInputWrapKendaraan', waInput: 'waPeminjamKendaraan' },
+    sarpras: { nip: 'nipPeminjamSarpras', nama: 'namaPeminjamSarpras', info: 'infoPegawaiSarpras', waBox: 'waBoxSarpras', waStored: 'waStoredSarpras', waMasked: 'waMaskedSarpras', waWrap: 'waInputWrapSarpras', waInput: 'waPeminjamSarpras' }
+  };
+  return map[tipe] || null;
+}
 
-  function submitBooking(event) {
-    event.preventDefault(); updateBMNPinjamTerpilih();
-    const form = { tanggal: val('tanggalBooking'), ruangan: val('ruanganBooking'), jamMulai: val('jamMulaiBooking'), jamSelesai: val('jamSelesaiBooking'), nama: val('namaPeminjamRuangan'), bmnDipinjam: val('bmnDipinjam') || '-', namaKegiatan: val('namaKegiatanRuangan'), jumlahPeserta: val('jumlahPesertaRuangan'), pesertaJabatan: val('pesertaJabatanRuangan') };
-    const pesanWaktu = pesanValidasiWaktuBooking(form.tanggal, form.jamMulai, form.jamSelesai); if (pesanWaktu) return tampilAlert('alertPinjam', pesanWaktu, 'error');
-    const bentrok = cariJadwalBentrokClient(form); if (bentrok) return tampilAlert('alertPinjam', 'Jadwal bentrok dengan ' + bentrok.ruangan + ' pukul ' + bentrok.mulai + ' - ' + bentrok.selesai + ' oleh ' + bentrok.nama + '.', 'error');
-    runSubmit('btnSubmitBooking', 'Mengirim...', 'Kirim Pengajuan Pinjam Ruangan', 'alertPinjam', function(runner) { runner.simpanBooking(form); }, function() { document.getElementById('formBooking').reset(); setTanggalHariIni(); renderChecklistBMNPinjam(); muatJadwal(); });
-  }
+function resetIdentitasPeminjam(tipe, pertahankanNip) {
+  const cfg = configIdentitasPeminjam(tipe);
+  const state = identitasPeminjam[tipe];
+  if (!cfg || !state) return;
+  if (state.timer) clearTimeout(state.timer);
+  state.verifiedNip = '';
+  state.whatsappTerdaftar = false;
+  state.ubahWhatsapp = false;
+  state.requestId++;
+  const nipEl = document.getElementById(cfg.nip);
+  const namaEl = document.getElementById(cfg.nama);
+  const infoEl = document.getElementById(cfg.info);
+  const waBox = document.getElementById(cfg.waBox);
+  const stored = document.getElementById(cfg.waStored);
+  const masked = document.getElementById(cfg.waMasked);
+  const wrap = document.getElementById(cfg.waWrap);
+  const waInput = document.getElementById(cfg.waInput);
+  if (nipEl && !pertahankanNip) nipEl.value = '';
+  if (namaEl) namaEl.value = '';
+  if (infoEl) { infoEl.textContent = 'Masukkan NIP untuk memvalidasi nama pegawai.'; infoEl.className = 'identity-status muted'; }
+  if (waBox) waBox.classList.add('hidden');
+  if (stored) stored.classList.add('hidden');
+  if (masked) masked.textContent = '-';
+  if (wrap) wrap.classList.add('hidden');
+  if (waInput) { waInput.value = ''; waInput.required = false; }
+}
 
-  function submitPinjamKendaraan(event) {
-    event.preventDefault(); setMinDateTimeLocal();
-    const form = { nama: val('namaPeminjamKendaraan'), kegiatan: val('kegiatanKendaraan'), tujuan: val('tujuanKendaraan'), lama: val('lamaKendaraan'), batasKembali: val('batasKembaliKendaraan') };
-    if (new Date(form.batasKembali) < new Date()) return tampilAlert('alertPinjam', 'Batas kembali kendaraan tidak boleh berada di masa lalu.', 'error');
-    runSubmit('btnSubmitKendaraan', 'Mengirim...', 'Kirim Pengajuan Pinjam Kendaraan', 'alertPinjam', r => r.simpanPinjamKendaraan(form), function() { document.getElementById('formPinjamKendaraan').reset(); setMinDateTimeLocal(); muatPinjamKendaraan(); });
+function onNipInput(tipe) {
+  const cfg = configIdentitasPeminjam(tipe);
+  const state = identitasPeminjam[tipe];
+  if (!cfg || !state) return;
+  const nipEl = document.getElementById(cfg.nip);
+  if (!nipEl) return;
+  nipEl.value = String(nipEl.value || '').replace(/\D/g, '').slice(0, 18);
+  const nip = nipEl.value;
+  if (state.verifiedNip && state.verifiedNip !== nip) resetIdentitasPeminjam(tipe, true);
+  if (state.timer) clearTimeout(state.timer);
+  if (nip.length === 18 && state.verifiedNip !== nip) {
+    state.timer = setTimeout(function() {
+      if (val(cfg.nip) === nip) cekPegawaiNip(tipe);
+    }, 180);
   }
-  function submitPinjamSarpras(event) {
-    event.preventDefault(); setMinDateTimeLocal();
-    const form = { nama: val('namaPeminjamSarpras'), kegiatan: val('kegiatanSarpras'), tempat: val('tempatSarpras'), tujuan: val('tempatSarpras'), jenisBarang: val('jenisBarangSarpras'), lama: val('lamaSarpras'), batasKembali: val('batasKembaliSarpras') };
-    if (new Date(form.batasKembali) < new Date()) return tampilAlert('alertPinjam', 'Batas kembali sarpras tidak boleh berada di masa lalu.', 'error');
-    runSubmit('btnSubmitSarpras', 'Mengirim...', 'Kirim Pengajuan Pinjam Sarpras', 'alertPinjam', r => r.simpanPinjamSarpras(form), function() { document.getElementById('formPinjamSarpras').reset(); setMinDateTimeLocal(); muatPinjamSarpras(); });
-  }
+}
 
-  function muatPinjamKendaraan() { google.script.run.withSuccessHandler(function(data) { daftarKendaraan = data || []; renderPinjamKendaraan('tabelPinjamKendaraan', daftarKendaraan, false); }).withFailureHandler(err => renderError('tabelPinjamKendaraan', err.message, 8)).getPinjamKendaraanRingkas(LIMIT_USER); }
-  function muatPinjamSarpras() { google.script.run.withSuccessHandler(function(data) { daftarSarpras = data || []; renderPinjamSarpras('tabelPinjamSarpras', daftarSarpras, false); }).withFailureHandler(err => renderError('tabelPinjamSarpras', err.message, 8)).getPinjamSarprasRingkas(LIMIT_USER); }
-  function renderPinjamKendaraan(id, data, admin) {
-    const tbody = document.getElementById(id); if (!tbody) return;
-    const colspan = admin ? 10 : 8;
-    let rows = data || [];
-    if (admin && id === 'tabelAdminKendaraan') {
-      rows = filterAdminPinjamRows(rows, 'filterAdminKendaraan', 'filterStatusAdminKendaraan', row => [row.idPinjam,row.tanggalPengajuan,row.nama,row.kegiatan,row.tujuan,row.lama,row.batasKembali,row.status,statusDenganTerlambat(row),row.keteranganAdmin].join(' '));
-      setTextIfExists('summaryAdminKendaraan', rows.length + ' dari ' + (data || []).length + ' pengajuan kendaraan');
+function cekPegawaiNip(tipe) {
+  const cfg = configIdentitasPeminjam(tipe);
+  const state = identitasPeminjam[tipe];
+  if (!cfg || !state) return;
+  const nip = val(cfg.nip).replace(/\D/g, '');
+  const infoEl = document.getElementById(cfg.info);
+  if (!/^\d{18}$/.test(nip)) {
+    resetIdentitasPeminjam(tipe, true);
+    if (infoEl) { infoEl.textContent = 'NIP harus terdiri dari 18 digit.'; infoEl.className = 'identity-status is-error'; }
+    return;
+  }
+  if (state.verifiedNip === nip && val(cfg.nama)) return;
+
+  const requestId = ++state.requestId;
+  if (infoEl) { infoEl.textContent = 'Memeriksa NIP...'; infoEl.className = 'identity-status is-loading'; }
+
+  google.script.run.withSuccessHandler(function(result) {
+    if (requestId !== state.requestId || val(cfg.nip).replace(/\D/g, '') !== nip) return;
+    if (!result || result.found !== true) {
+      resetIdentitasPeminjam(tipe, true);
+      if (infoEl) { infoEl.textContent = (result && result.message) || 'NIP tidak ditemukan pada Master Pegawai.'; infoEl.className = 'identity-status is-error'; }
+      return;
     }
-    if (!rows.length) { tbody.innerHTML = `<tr><td colspan="${colspan}">Data pinjam kendaraan tidak ditemukan.</td></tr>`; return; }
-    tbody.innerHTML = rows.map(row => {
-      const ket = row.keteranganAdmin || '';
-      const idEncoded = encodeURIComponent(row.idPinjam || '');
-      const noteId = buatDomId('ketKendaraan_' + (row.idPinjam || ''));
-      const noteCell = admin
-        ? `<td class="admin-note-cell"><textarea class="admin-note-input" id="${noteId}" maxlength="500" placeholder="Catatan untuk peminjam kendaraan, opsional...">${escapeHtml(ket)}</textarea><div style="margin-top:6px;"><button class="btn-light btn-small" onclick="simpanKeteranganKendaraan('${idEncoded}', '${noteId}', this)">Simpan Catatan</button></div></td>`
-        : `<td><span class="admin-note-view">${escapeHtml(ket || '-')}</span></td>`;
-      return `<tr class="${isOverdue(row) ? 'return-warning' : ''}"><td>${escapeHtml(row.idPinjam)}</td>${admin ? `<td>${escapeHtml(row.tanggalPengajuan || '-')}</td>` : ''}<td>${escapeHtml(row.nama)}</td><td>${escapeHtml(row.kegiatan)}</td><td>${escapeHtml(row.tujuan)}</td><td>${escapeHtml(row.lama)}</td><td>${escapeHtml(row.batasKembali)}</td><td>${badgeStatus(statusDenganTerlambat(row))}</td>${noteCell}${admin ? `<td>${tombolAksiStatus('kendaraan', row.idPinjam, row.status, statusDenganTerlambat(row))}</td>` : ''}</tr>`;
+
+    state.verifiedNip = nip;
+    state.whatsappTerdaftar = !!result.whatsappTerdaftar;
+    state.ubahWhatsapp = false;
+    const namaEl = document.getElementById(cfg.nama);
+    if (namaEl) namaEl.value = result.nama || '';
+    if (infoEl) {
+      infoEl.textContent = '✓ ' + (result.nama || 'Pegawai ditemukan') + (result.jabatan ? ' · ' + result.jabatan : '');
+      infoEl.className = 'identity-status is-valid';
+    }
+
+    const waBox = document.getElementById(cfg.waBox);
+    const stored = document.getElementById(cfg.waStored);
+    const masked = document.getElementById(cfg.waMasked);
+    const wrap = document.getElementById(cfg.waWrap);
+    const waInput = document.getElementById(cfg.waInput);
+    if (waBox) waBox.classList.remove('hidden');
+    if (result.whatsappTerdaftar) {
+      if (stored) stored.classList.remove('hidden');
+      if (masked) masked.textContent = result.whatsappMasked || 'Nomor tersimpan';
+      if (wrap) wrap.classList.add('hidden');
+      if (waInput) { waInput.value = ''; waInput.required = false; }
+    } else {
+      if (stored) stored.classList.add('hidden');
+      if (wrap) wrap.classList.remove('hidden');
+      if (waInput) { waInput.required = true; setTimeout(() => waInput.focus(), 60); }
+    }
+  }).withFailureHandler(function(err) {
+    if (requestId !== state.requestId) return;
+    resetIdentitasPeminjam(tipe, true);
+    if (infoEl) { infoEl.textContent = 'Gagal memeriksa NIP: ' + ((err && err.message) || err || 'Kesalahan backend.'); infoEl.className = 'identity-status is-error'; }
+  }).getPegawaiByNip(nip);
+}
+
+function aktifkanUbahWhatsapp(tipe) {
+  const cfg = configIdentitasPeminjam(tipe);
+  const state = identitasPeminjam[tipe];
+  if (!cfg || !state || !state.verifiedNip) return;
+  state.ubahWhatsapp = true;
+  const wrap = document.getElementById(cfg.waWrap);
+  const waInput = document.getElementById(cfg.waInput);
+  if (wrap) wrap.classList.remove('hidden');
+  if (waInput) { waInput.required = true; waInput.value = ''; setTimeout(() => waInput.focus(), 60); }
+}
+
+function normalisasiWhatsappClient(value) {
+  let nomor = String(value || '').replace(/\D/g, '');
+  if (nomor.startsWith('0')) nomor = '62' + nomor.slice(1);
+  if (nomor.startsWith('8')) nomor = '62' + nomor;
+  return /^628\d{7,12}$/.test(nomor) ? nomor : '';
+}
+
+function identitasUntukSubmit(tipe) {
+  const cfg = configIdentitasPeminjam(tipe);
+  const state = identitasPeminjam[tipe];
+  if (!cfg || !state) throw new Error('Konfigurasi identitas peminjam tidak tersedia.');
+  const nip = val(cfg.nip).replace(/\D/g, '');
+  if (!/^\d{18}$/.test(nip) || state.verifiedNip !== nip || !val(cfg.nama)) {
+    throw new Error('Validasi NIP terlebih dahulu sampai nama pegawai muncul.');
+  }
+  let whatsapp = '';
+  if (!state.whatsappTerdaftar || state.ubahWhatsapp) {
+    whatsapp = normalisasiWhatsappClient(val(cfg.waInput));
+    if (!whatsapp) throw new Error('Nomor WhatsApp tidak valid. Gunakan nomor aktif, contoh 081234567890.');
+  }
+  return { nip: nip, nama: val(cfg.nama), whatsapp: whatsapp, ubahWhatsapp: !!state.ubahWhatsapp };
+}
+
+// --- KETERSEDIAAN KENDARAAN ---
+function resetKetersediaanKendaraan() {
+  daftarKetersediaanKendaraan = [];
+  requestKetersediaanKendaraanAktif++;
+  const select = document.getElementById('jenisMobilKendaraan');
+  const box = document.getElementById('ketersediaanKendaraan');
+  if (select) { select.disabled = true; select.innerHTML = '<option value="">Isi waktu penggunaan terlebih dahulu</option>'; }
+  if (box) box.innerHTML = '<span class="muted">Isi waktu mulai dan batas kembali untuk melihat ketersediaan kendaraan.</span>';
+}
+
+function muatKetersediaanKendaraan() {
+  const mulai = val('mulaiKendaraan');
+  const selesai = val('batasKembaliKendaraan');
+  const select = document.getElementById('jenisMobilKendaraan');
+  const box = document.getElementById('ketersediaanKendaraan');
+  if (!select || !box) return;
+
+  if (!mulai || !selesai) { resetKetersediaanKendaraan(); return; }
+  const start = new Date(mulai);
+  const end = new Date(selesai);
+  if (isNaN(start.getTime()) || isNaN(end.getTime()) || end <= start) {
+    resetKetersediaanKendaraan();
+    box.innerHTML = '<span class="vehicle-availability-error">Batas kembali harus setelah waktu mulai penggunaan.</span>';
+    return;
+  }
+  if (start < new Date()) {
+    resetKetersediaanKendaraan();
+    box.innerHTML = '<span class="vehicle-availability-error">Waktu mulai penggunaan tidak boleh berada di masa lalu.</span>';
+    return;
+  }
+
+  const requestId = ++requestKetersediaanKendaraanAktif;
+  const pilihanSebelumnya = select.value;
+  select.disabled = true;
+  select.innerHTML = '<option value="">Memeriksa kendaraan...</option>';
+  box.innerHTML = '<span class="muted">Memeriksa ketersediaan kendaraan...</span>';
+
+  google.script.run.withSuccessHandler(function(data) {
+    if (requestId !== requestKetersediaanKendaraanAktif) return;
+    daftarKetersediaanKendaraan = Array.isArray(data) ? data : [];
+    renderKetersediaanKendaraan(pilihanSebelumnya);
+  }).withFailureHandler(function(err) {
+    if (requestId !== requestKetersediaanKendaraanAktif) return;
+    daftarKetersediaanKendaraan = [];
+    select.disabled = true;
+    select.innerHTML = '<option value="">Ketersediaan gagal dimuat</option>';
+    box.innerHTML = '<span class="vehicle-availability-error">' + escapeHtml((err && err.message) || String(err || 'Gagal memuat ketersediaan.')) + '</span>';
+  }).getKetersediaanKendaraan(mulai, selesai);
+}
+
+function renderKetersediaanKendaraan(pilihanSebelumnya) {
+  const select = document.getElementById('jenisMobilKendaraan');
+  const box = document.getElementById('ketersediaanKendaraan');
+  if (!select || !box) return;
+
+  const data = Array.isArray(daftarKetersediaanKendaraan)
+    ? daftarKetersediaanKendaraan
+    : [];
+
+  if (!data.length) {
+    select.disabled = true;
+    select.innerHTML = '<option value="">Belum ada kendaraan aktif</option>';
+    box.innerHTML = '<span class="vehicle-availability-error">Master kendaraan belum memiliki unit aktif.</span>';
+    return;
+  }
+
+  const tersediaData = data.filter(function(item) {
+    return Number(item.tersedia || 0) > 0;
+  });
+
+  const pilihanMasihValid = !!pilihanSebelumnya && data.some(function(item) {
+    return item.jenisMobil === pilihanSebelumnya && Number(item.tersedia || 0) > 0;
+  });
+
+  select.innerHTML =
+    '<option value="">Pilih jenis mobil</option>' +
+    data.map(function(item) {
+      const tersedia = Number(item.tersedia || 0);
+      const total = Number(item.total || 0);
+      const penuh = tersedia < 1;
+
+      const label = penuh
+        ? item.jenisMobil + ' — PENUH / sudah terbooking'
+        : item.jenisMobil + ' — ' + tersedia + ' dari ' + total + ' tersedia';
+
+      return '<option value="' + escapeHtml(item.jenisMobil) + '"' +
+        (penuh ? ' disabled' : '') +
+        '>' + escapeHtml(label) + '</option>';
     }).join('');
-  }
-  function renderPinjamSarpras(id, data, admin) {
-    const tbody = document.getElementById(id); if (!tbody) return;
-    const colspan = admin ? 10 : 8;
-    let rows = data || [];
-    if (admin && id === 'tabelAdminSarpras') {
-      rows = filterAdminPinjamRows(rows, 'filterAdminSarpras', 'filterStatusAdminSarpras', row => [row.idPinjam,row.tanggalPengajuan,row.nama,row.kegiatan,row.tempat,row.jenisBarang,row.lama,row.batasKembali,row.status,statusDenganTerlambat(row)].join(' '));
-      setTextIfExists('summaryAdminSarpras', rows.length + ' dari ' + (data || []).length + ' pengajuan sarpras');
-    }
-    if (!rows.length) { tbody.innerHTML = `<tr><td colspan="${colspan}">Data pinjam sarpras tidak ditemukan.</td></tr>`; return; }
-    tbody.innerHTML = rows.map(row => `<tr class="${isOverdue(row) ? 'return-warning' : ''}"><td>${escapeHtml(row.idPinjam)}</td>${admin ? `<td>${escapeHtml(row.tanggalPengajuan || '-')}</td>` : ''}<td>${escapeHtml(row.nama)}</td><td>${escapeHtml(row.kegiatan)}</td><td>${escapeHtml(row.tempat)}</td><td>${escapeHtml(row.jenisBarang)}</td><td>${escapeHtml(row.lama)}</td><td>${escapeHtml(row.batasKembali)}</td><td>${badgeStatus(statusDenganTerlambat(row))}</td>${admin ? `<td>${tombolAksiStatus('sarpras', row.idPinjam, row.status, statusDenganTerlambat(row))}</td>` : ''}</tr>`).join('');
-  }
-  function isOverdue(row) { const st = normalizeText(row.status); if (st.includes('dikembalikan') || st.includes('tolak')) return false; const t = row.batasKembali ? new Date(row.batasKembali) : null; return t && !isNaN(t.getTime()) && t < new Date(); }
-  function statusDenganTerlambat(row) { return isOverdue(row) ? 'Terlambat' : row.status; }
 
-  function submitPemeliharaan(event) { event.preventDefault(); const item = cariBMNDariInput(val('bmnPemeliharaanInput')); if (!item) return tampilAlert('alertPemeliharaan', 'Silakan pilih BMN dari daftar pencarian.', 'error'); const form = { kodeBarang: item.kodeBarang, nup: item.nup, namaBmn: item.nama, tanggal: val('tanggalPemeliharaan'), deskripsi: val('deskripsiPemeliharaan'), sumber: 'User' }; kirimPemeliharaanDenganFoto(form, 'fotoPemeliharaan', 'btnSubmitPemeliharaan', 'Kirim Laporan Pemeliharaan', 'alertPemeliharaan', function() { document.getElementById('formPemeliharaan').reset(); setTanggalHariIni(); tutupFormPemeliharaanUser(); muatPemeliharaan(); }); }
-  function submitAdminPemeliharaan(event) { event.preventDefault(); const item = cariBMNDariInput(val('bmnAdminPemeliharaanInput')); if (!item) return tampilAlert('alertAdminPemeliharaan', 'Silakan pilih BMN dari daftar pencarian.', 'error'); const form = { kodeBarang: item.kodeBarang, nup: item.nup, namaBmn: item.nama, tanggal: val('tanggalAdminPemeliharaan'), deskripsi: val('deskripsiAdminPemeliharaan'), sumber: 'Administrator' }; kirimPemeliharaanDenganFoto(form, 'fotoAdminPemeliharaan', 'btnSubmitAdminPemeliharaan', 'Simpan Pemeliharaan Rutin', 'alertAdminPemeliharaan', function() { document.getElementById('formAdminPemeliharaan').reset(); setTanggalHariIni(); muatPemeliharaanAdmin(); muatPemeliharaan(); }); }
-  function kirimPemeliharaanDenganFoto(form, fileInputId, btnId, defaultText, alertId, successCallback) { const file = document.getElementById(fileInputId).files[0]; if (!file) return kirimPemeliharaan(form, btnId, defaultText, alertId, successCallback); const reader = new FileReader(); reader.onload = e => { form.fotoBase64 = e.target.result; form.namaFile = file.name; kirimPemeliharaan(form, btnId, defaultText, alertId, successCallback); }; reader.onerror = () => tampilAlert(alertId, 'Gagal membaca file foto.', 'error'); reader.readAsDataURL(file); }
-  function kirimPemeliharaan(form, btnId, defaultText, alertId, successCallback) { runSubmit(btnId, 'Menyimpan...', defaultText, alertId, r => r.simpanPemeliharaan(form), successCallback); }
-  function muatPemeliharaan() { google.script.run.withSuccessHandler(data => renderTabelPemeliharaan(data || [])).withFailureHandler(err => renderError('tabelPemeliharaan', err.message, 7)).getPemeliharaanRingkas(LIMIT_USER); }
-  function renderTabelPemeliharaan(data) { const tbody = document.getElementById('tabelPemeliharaan'); if (!tbody) return; if (!data.length) { tbody.innerHTML = '<tr><td colspan="7">Belum ada laporan pemeliharaan.</td></tr>'; return; } tbody.innerHTML = data.map(row => `<tr><td>${escapeHtml(row.kodeBarang || '-')}</td><td>${escapeHtml(row.nup || '-')}</td><td>${escapeHtml(row.nama || '-')}</td><td>${escapeHtml(row.tgl || '-')}</td><td>${escapeHtml(row.ket || '-')}</td><td>${row.foto && row.foto !== '-' ? `<a href="${escapeHtml(row.foto)}" target="_blank">Lihat Foto</a>` : '-'}</td><td>${badgeStatus(row.status)}</td></tr>`).join(''); }
+  select.disabled = tersediaData.length < 1;
 
-
-  function lokasiUtamaInventaris() { return ['Ruang Aula', 'Ruang Zona Integritas', 'Ruang Transit']; }
-  function namaLokasiBMN(item) { return String((item && item.lokasi) || '').trim() || 'Tanpa Lokasi'; }
-  function daftarLokasiInventaris() {
-    const set = new Set((masterData.bmn || []).map(namaLokasiBMN));
-    const utama = lokasiUtamaInventaris().filter(l => set.has(l));
-    const lain = Array.from(set).filter(l => !lokasiUtamaInventaris().includes(l)).sort((a,b) => a.localeCompare(b, 'id', { numeric:true, sensitivity:'base' }));
-    return utama.concat(lain);
-  }
-  function dataInventarisLokasi(lokasi) {
-    return (masterData.bmn || []).filter(item => namaLokasiBMN(item) === lokasi);
-  }
-  function badgeKondisiRingkas(label, jumlah) { return `<span>${escapeHtml(label)}: ${jumlah}</span>`; }
-  function hitungKondisi(data) {
-    const ringkas = { baik:0, ringan:0, berat:0, lain:0 };
-    data.forEach(item => {
-      const kondisi = normalizeText(item.kondisi || '');
-      if (kondisi.includes('baik')) ringkas.baik++;
-      else if (kondisi.includes('ringan')) ringkas.ringan++;
-      else if (kondisi.includes('berat')) ringkas.berat++;
-      else ringkas.lain++;
-    });
-    return ringkas;
-  }
-  function renderSelectInventarisLokasi(lokasiList) {
-    const select = document.getElementById('selectInventarisLokasi');
-    if (!select) return;
-    select.innerHTML = lokasiList.map(lokasi => `<option value="${escapeHtml(lokasi)}" ${lokasi === inventarisLokasiAktif ? 'selected' : ''}>${escapeHtml(lokasi)}</option>`).join('');
-  }
-  function renderKartuInventarisLokasi(lokasiList) {
-    const grid = document.getElementById('inventarisRoomGrid');
-    if (!grid) return;
-    if (!lokasiList.length) {
-      grid.innerHTML = '<div class="empty-guide" style="grid-column:1/-1;">Belum ada data lokasi BMN. Isi kolom Lokasi pada sheet Data_BMN terlebih dahulu.</div>';
-      return;
-    }
-    grid.innerHTML = lokasiList.map(lokasi => {
-      const data = dataInventarisLokasi(lokasi);
-      const k = hitungKondisi(data);
-      const aktif = lokasi === inventarisLokasiAktif ? 'active' : '';
-      return `<button class="inventory-room-card ${aktif}" onclick="pilihLokasiInventaris('${encodeURIComponent(lokasi)}')">
-        <h3>${escapeHtml(lokasi)}</h3>
-        <div class="count">${data.length}</div>
-        <p class="muted">item BMN tercatat</p>
-        <div class="inventory-meta">${badgeKondisiRingkas('Baik', k.baik)}${badgeKondisiRingkas('RR', k.ringan)}${badgeKondisiRingkas('RB', k.berat)}${k.lain ? badgeKondisiRingkas('Lain', k.lain) : ''}</div>
-      </button>`;
-    }).join('');
-  }
-  function pilihLokasiInventaris(encodedLokasi) {
-    inventarisLokasiAktif = decodeURIComponent(encodedLokasi || '');
-    renderInventarisRuangan(false);
-    pushHistoryState({ section: 'dashboardInventarisRuangan', inventarisLokasi: inventarisLokasiAktif });
-  }
-  function pilihLokasiInventarisSelect() {
-    inventarisLokasiAktif = val('selectInventarisLokasi');
-    renderInventarisRuangan(false);
-    pushHistoryState({ section: 'dashboardInventarisRuangan', inventarisLokasi: inventarisLokasiAktif });
-  }
-  function resetInventarisRuangan() {
-    const search = document.getElementById('searchInventarisRuangan');
-    if (search) search.value = '';
-    renderInventarisRuangan(false);
-  }
-  function renderInventarisRuangan(resetLokasi) {
-    if (!masterDataLoaded) return pastikanMasterData(function() { renderInventarisRuangan(resetLokasi); });
-    const tbody = document.getElementById('tabelInventarisRuangan');
-    if (!tbody) return;
-    const lokasiList = daftarLokasiInventaris();
-    if (resetLokasi || !inventarisLokasiAktif || !lokasiList.includes(inventarisLokasiAktif)) {
-      inventarisLokasiAktif = lokasiList[0] || '';
-    }
-    renderSelectInventarisLokasi(lokasiList);
-    renderKartuInventarisLokasi(lokasiList);
-
-    const judul = document.getElementById('judulInventarisRuangan');
-    const ringkasan = document.getElementById('ringkasanInventarisRuangan');
-
-    if (!inventarisLokasiAktif) {
-      if (judul) judul.textContent = 'Inventaris Ruangan';
-      if (ringkasan) ringkasan.textContent = 'Belum ada data lokasi BMN.';
-      tbody.innerHTML = '<tr><td colspan="8">Belum ada data lokasi BMN.</td></tr>';
-      return;
-    }
-
-    const keyword = normalizeText(val('searchInventarisRuangan'));
-    const keys = keyword.split(' ').filter(Boolean);
-    const semuaDiLokasi = dataInventarisLokasi(inventarisLokasiAktif);
-    const data = semuaDiLokasi.filter(item => {
-      const txt = normalizeText([item.kodeBarang, item.nup, item.nama, item.merk, item.tahunPerolehan, item.kondisi, item.pj].join(' '));
-      return keys.every(k => txt.includes(k));
-    }).sort((a,b) => String(a.nama || '').localeCompare(String(b.nama || ''), 'id', { numeric:true, sensitivity:'base' }));
-
-    if (judul) judul.textContent = 'Inventaris ' + inventarisLokasiAktif;
-    if (ringkasan) ringkasan.textContent = data.length + ' dari ' + semuaDiLokasi.length + ' BMN ditampilkan' + (keyword ? ' berdasarkan pencarian.' : '.');
-
-    if (!data.length) {
-      tbody.innerHTML = '<tr><td colspan="8">Tidak ada BMN yang cocok pada ruangan ini.</td></tr>';
-      return;
-    }
-    tbody.innerHTML = data.map((item, i) => `<tr><td>${i+1}</td><td>${escapeHtml(item.kodeBarang || '-')}</td><td>${escapeHtml(item.nup || '-')}</td><td>${escapeHtml(item.nama || '-')}</td><td>${escapeHtml(item.merk || '-')}</td><td>${escapeHtml(item.tahunPerolehan || '-')}</td><td>${escapeHtml(item.kondisi || '-')}</td><td>${escapeHtml(item.pj || '-')}</td></tr>`).join('');
+  if (pilihanMasihValid) {
+    select.value = pilihanSebelumnya;
+  } else {
+    select.value = '';
   }
 
-  function submitLoginAdmin(event) { event.preventDefault(); runSubmit('btnLoginAdmin', 'Memverifikasi...', 'Masuk Administrator', 'alertLoginAdmin', r => r.verifikasiPin(val('pinAdmin')), function(valid) { if (!valid) { tampilAlert('alertLoginAdmin', 'PIN salah. Silakan coba lagi.', 'error'); return false; } adminLogin = true; sessionStorage.setItem('adminLoginBMN','1'); document.getElementById('formLoginAdmin').reset(); tampilkanSection('dashboardAdmin'); }); }
-  function logoutAdmin() { adminLogin = false; sessionStorage.removeItem('adminLoginBMN'); kembaliKeUtama(); }
-  function pastikanAdminLogin() { if (adminLogin) return true; bukaLoginAdmin(); return false; }
-  function kembaliKeDashboardAdmin() { if (pastikanAdminLogin()) tampilkanSection('dashboardAdmin'); }
-  function bukaAdminFitur(id) {
-    if (!pastikanAdminLogin()) return;
-    tampilkanSection(id);
-    if (id === 'adminDataBMN') pastikanMasterData(renderAdminDataBMN);
-    if (id === 'adminLokasiBMN') pastikanMasterData(renderAdminLokasiBMN);
-    if (id === 'adminPemeliharaan') muatPemeliharaanAdmin();
-    if (id === 'adminPinjamPakaiBMN') resetPanelAdminPinjam();
+  const semuaPenuh = tersediaData.length < 1;
+
+  box.innerHTML =
+    (semuaPenuh
+      ? '<div class="vehicle-availability-error" style="margin-bottom:10px;">' +
+          'Semua kendaraan pada jadwal ini sudah terbooking/ACC. Silakan ubah waktu penggunaan.' +
+        '</div>'
+      : '') +
+    '<div class="vehicle-availability-grid">' +
+      data.map(function(item) {
+        const tersedia = Number(item.tersedia || 0);
+        const total = Number(item.total || 0);
+        const penuh = tersedia < 1;
+        const cls = penuh ? 'is-unavailable' : 'is-available';
+
+        const status = penuh
+          ? 'PENUH — tidak dapat dipilih'
+          : tersedia + ' dari ' + total + ' tersedia';
+
+        return '<div class="vehicle-availability-item ' + cls + '">' +
+          '<strong>' + escapeHtml(item.jenisMobil) + '</strong>' +
+          '<span>' + escapeHtml(status) + '</span>' +
+        '</div>';
+      }).join('') +
+    '</div>';
+
+  // Bila jadwal diubah dan jenis yang sebelumnya dipilih kini penuh,
+  // tampilkan peringatan seperti booking ruangan yang sudah terisi.
+  if (pilihanSebelumnya && !pilihanMasihValid) {
+    tampilAlert(
+      'alertPinjam',
+      'Jenis mobil yang sebelumnya dipilih sudah terbooking pada jadwal tersebut. Silakan pilih jenis mobil lain atau ubah waktu penggunaan.',
+      'error'
+    );
+  }
+}
+
+function formatDateTimeRingkas(value) {
+  const teks = String(value || '').trim();
+  if (!teks) return '-';
+  const m = teks.match(/^(\d{4})-(\d{2})-(\d{2})[T\s]+(\d{2}):(\d{2})(?::(\d{2}))?/);
+  if (!m) return teks;
+  const tahun = Number(m[1]);
+  const bulan = Number(m[2]) - 1;
+  const tanggal = Number(m[3]);
+  const jam = Number(m[4]);
+  const menit = Number(m[5]);
+  const detik = Number(m[6] || 0);
+  const hasil = new Date(tahun, bulan, tanggal, jam, menit, detik, 0);
+  if (
+    isNaN(hasil.getTime()) ||
+    hasil.getFullYear() !== tahun ||
+    hasil.getMonth() !== bulan ||
+    hasil.getDate() !== tanggal ||
+    hasil.getHours() !== jam ||
+    hasil.getMinutes() !== menit
+  ) {
+    return teks;
+  }
+  return m[3] + '/' + m[2] + '/' + m[1] + ' ' + m[4] + ':' + m[5] + ' WITA';
+}
+
+function muatMasterData(callback, forceRefresh) {
+  if (typeof callback === 'function') masterDataCallbacks.push(callback);
+
+  if (masterDataLoaded && !forceRefresh) {
+    jalankanMasterDataCallbacks();
+    return;
   }
 
-  function toggleFormInputBMN(show) { const card = document.getElementById('cardInputBMNBaru'); card.classList.toggle('hidden', !show); if (show) document.getElementById('inputKodeBarangBMN').focus(); }
-  function submitInputBMNBaru(event) { event.preventDefault(); const form = { kodeBarang: val('inputKodeBarangBMN'), nup: val('inputNupBMN'), namaBmn: val('inputNamaBMN'), merk: val('inputMerkBMN'), tahunPerolehan: val('inputTahunBMN'), kondisi: val('inputKondisiBMN'), lokasi: val('inputLokasiBMN'), pj: val('inputPjBMN') }; runSubmit('btnSimpanBMNBaru', 'Menyimpan...', 'Simpan Data BMN', 'alertInputBMN', r => r.simpanBMN(form), function() { document.getElementById('formInputBMNBaru').reset(); toggleFormInputBMN(false); muatMasterData(function() { renderAdminDataBMN(); renderAdminLokasiBMN(); }, true); }); }
-  function filterDataBMN(keyword) {
-    const keys = normalizeText(keyword).split(' ').filter(Boolean);
-    return (masterData.bmn || []).filter(item => {
-      const txt = normalizeText([item.kodeBarang,item.nup,item.id,item.nama,item.merk,item.tahunPerolehan,item.kondisi,item.lokasi,item.pj].join(' '));
-      return keys.every(k => txt.includes(k));
-    });
-  }
-  function nilaiSortBMN(item, key) {
-    const nilai = item && item[key] != null ? item[key] : '';
-    if (key === 'nup' || key === 'tahunPerolehan') {
-      const angka = Number(String(nilai).replace(/[^0-9.-]/g, ''));
-      return Number.isFinite(angka) ? angka : String(nilai || '').toLowerCase();
-    }
-    return normalizeText(nilai || '');
-  }
-  function sortRowsBMN(data, state) {
-    const hasil = [...(data || [])];
-    const key = state.key;
-    const dir = state.dir === 'desc' ? -1 : 1;
-    hasil.sort((a, b) => {
-      const va = nilaiSortBMN(a, key);
-      const vb = nilaiSortBMN(b, key);
-      if (typeof va === 'number' && typeof vb === 'number') return (va - vb) * dir;
-      return String(va).localeCompare(String(vb), 'id', { numeric: true, sensitivity: 'base' }) * dir;
-    });
-    return hasil;
-  }
-  function refreshSortChips(group, state) {
-    document.querySelectorAll(`[data-sort-group="${group}"]`).forEach(btn => {
-      const aktif = btn.dataset.sortKey === state.key;
-      btn.classList.toggle('active', aktif);
-      const labelAsli = btn.dataset.originalLabel || btn.textContent.replace(/\s*[↑↓]$/,'');
-      btn.dataset.originalLabel = labelAsli;
-      btn.textContent = aktif ? `${labelAsli} ${state.dir === 'asc' ? '↑' : '↓'}` : labelAsli;
-    });
-  }
-  function setSortDataBMN(key) {
-    if (sortDataBMN.key === key) sortDataBMN.dir = sortDataBMN.dir === 'asc' ? 'desc' : 'asc';
-    else sortDataBMN = { key, dir: 'asc' };
-    renderAdminDataBMN();
-  }
-  function setSortLokasiBMN(key) {
-    if (sortLokasiBMN.key === key) sortLokasiBMN.dir = sortLokasiBMN.dir === 'asc' ? 'desc' : 'asc';
-    else sortLokasiBMN = { key, dir: 'asc' };
-    renderAdminLokasiBMN();
-  }
-  function renderAdminDataBMN() {
-    if (!masterDataLoaded) return pastikanMasterData(renderAdminDataBMN);
-    const tbody = document.getElementById('tabelAdminDataBMN');
-    const semua = masterData.bmn || [];
-    const data = sortRowsBMN(filterDataBMN(val('filterAdminDataBMN')), sortDataBMN);
-    refreshSortChips('data-bmn', sortDataBMN);
-    document.getElementById('jumlahAdminDataBMN').textContent = data.length + ' dari ' + semua.length + ' data BMN';
-    if (!data.length) { tbody.innerHTML = '<tr><td colspan="7">Data BMN tidak ditemukan.</td></tr>'; return; }
-    tbody.innerHTML = data.map((item,i) => `<tr><td>${i+1}</td><td>${escapeHtml(item.kodeBarang || '-')}</td><td>${escapeHtml(item.nup || '-')}</td><td>${escapeHtml(item.nama || '-')}</td><td>${escapeHtml(item.merk || '-')}</td><td>${escapeHtml(item.tahunPerolehan || '-')}</td><td>${escapeHtml(item.kondisi || '-')}</td></tr>`).join('');
-  }
-  function renderAdminLokasiBMN() {
-    if (!masterDataLoaded) return pastikanMasterData(renderAdminLokasiBMN);
-    const tbody = document.getElementById('tabelAdminLokasiBMN');
-    const semua = masterData.bmn || [];
-    const data = sortRowsBMN(filterDataBMN(val('filterAdminLokasiBMN')), sortLokasiBMN);
-    refreshSortChips('lokasi-bmn', sortLokasiBMN);
-    const totalLokasi = new Set(semua.map(item => item.lokasi || 'Tanpa Lokasi')).size;
-    document.getElementById('jumlahAdminLokasiBMN').textContent = data.length + ' data BMN · ' + totalLokasi + ' lokasi terdeteksi';
-    if (!data.length) { tbody.innerHTML = '<tr><td colspan="9">Data lokasi BMN tidak ditemukan.</td></tr>'; return; }
-    tbody.innerHTML = data.map((item,i) => `<tr><td>${i+1}</td><td>${escapeHtml(item.lokasi || 'Tanpa Lokasi')}</td><td>${escapeHtml(item.pj || '-')}</td><td>${escapeHtml(item.kodeBarang || '-')}</td><td>${escapeHtml(item.nup || '-')}</td><td>${escapeHtml(item.nama || '-')}</td><td>${escapeHtml(item.merk || '-')}</td><td>${escapeHtml(item.tahunPerolehan || '-')}</td><td>${escapeHtml(item.kondisi || '-')}</td></tr>`).join('');
-  }
-  function kosongkanValue(ids) { ids.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; }); }
-  function resetAllAdminDataBMNSearch() { kosongkanValue(['filterAdminDataBMN']); renderAdminDataBMN(); }
-  function resetAllAdminLokasiBMNSearch() { kosongkanValue(['filterAdminLokasiBMN']); renderAdminLokasiBMN(); }
-  function resetFilterAdmin(inputId, callback) { const el = document.getElementById(inputId); if (el) el.value = ''; callback(); }
+  if (masterDataLoading) return;
 
-  function muatPemeliharaanAdmin() { google.script.run.withSuccessHandler(data => renderTabelPemeliharaanAdmin(data || [])).withFailureHandler(err => renderError('tabelAdminPemeliharaan', err.message, 10)).getPemeliharaanAdminRingkas(LIMIT_ADMIN); }
-  function renderTabelPemeliharaanAdmin(data) { const tbody = document.getElementById('tabelAdminPemeliharaan'); if (!data.length) { tbody.innerHTML = '<tr><td colspan="10">Belum ada data pemeliharaan.</td></tr>'; return; } tbody.innerHTML = data.map(row => `<tr><td>${escapeHtml(row.idPemeliharaan || '-')}</td><td>${escapeHtml(row.kodeBarang || '-')}</td><td>${escapeHtml(row.nup || '-')}</td><td>${escapeHtml(row.nama || '-')}</td><td>${escapeHtml(row.tgl || '-')}</td><td>${escapeHtml(row.ket || '-')}</td><td>${row.foto && row.foto !== '-' ? `<a href="${escapeHtml(row.foto)}" target="_blank">Lihat Foto</a>` : '-'}</td><td>${escapeHtml(row.sumber || 'User')}</td><td>${badgeStatus(row.status)}</td><td>${tombolAksiStatus('pemeliharaan', row.idPemeliharaan, row.status)}</td></tr>`).join(''); }
+  masterDataLoading = true;
+  google.script.run.withSuccessHandler(function (data) {
+    masterDataLoading = false;
+    masterDataLoaded = true;
+    masterData = data || { pegawai: [], bmn: [] };
+    isiDatalistPegawai();
+    isiDatalistBMN();
+    renderChecklistBMNPinjam();
+    jalankanMasterDataCallbacks();
+  }).withFailureHandler(function (err) {
+    masterDataLoading = false;
+    console.error(err);
+    jalankanMasterDataCallbacks();
+  }).getMasterDataOptimized(!!forceRefresh);
+}
 
-  function muatPinjamPakaiAdmin() { muatJadwalAdmin(); muatPinjamKendaraanAdmin(); muatPinjamSarprasAdmin(); }
-  function muatJadwalAdmin() { google.script.run.withSuccessHandler(data => { daftarJadwal = data || []; renderTabelJadwalAdmin(daftarJadwal); }).withFailureHandler(err => renderError('tabelAdminJadwal', err.message, 11)).getJadwalAdminRingkas(LIMIT_ADMIN); }
-  function muatPinjamKendaraanAdmin() { google.script.run.withSuccessHandler(data => { daftarKendaraan = data || []; renderPinjamKendaraan('tabelAdminKendaraan', daftarKendaraan, true); }).withFailureHandler(err => renderError('tabelAdminKendaraan', err.message, 10)).getPinjamKendaraanAdminRingkas(LIMIT_ADMIN); }
-  function muatPinjamSarprasAdmin() { google.script.run.withSuccessHandler(data => { daftarSarpras = data || []; renderPinjamSarpras('tabelAdminSarpras', daftarSarpras, true); }).withFailureHandler(err => renderError('tabelAdminSarpras', err.message, 10)).getPinjamSarprasAdminRingkas(LIMIT_ADMIN); }
-  function filterAdminPinjamRows(data, inputId, statusId, textFn) {
-    let hasil = data || [];
-    const keyword = normalizeText(val(inputId));
-    const status = normalizeText(val(statusId));
-    if (keyword) {
-      const keys = keyword.split(' ').filter(Boolean);
-      hasil = hasil.filter(row => { const teks = normalizeText(textFn(row)); return keys.every(k => teks.includes(k)); });
-    }
-    if (status && status !== 'semua') hasil = hasil.filter(row => normalizeText(statusDenganTerlambat(row)).includes(status) || normalizeText(row.status).includes(status));
-    return hasil;
+function pastikanMasterData(callback, forceRefresh) {
+  if (masterDataLoaded && !forceRefresh) {
+    if (typeof callback === 'function') callback();
+    return;
   }
-  function setTextIfExists(id, text) { const el = document.getElementById(id); if (el) el.textContent = text; }
-  function renderTabelJadwalAdmin(data) {
-    const tbody = document.getElementById('tabelAdminJadwal'); if (!tbody) return;
-    const filtered = filterAdminPinjamRows(data, 'filterAdminJadwal', 'filterStatusAdminJadwal', row => [row.idBooking,row.tanggal,row.ruangan,row.mulai,row.selesai,row.nama,row.namaKegiatan,row.jumlahPeserta,row.pesertaJabatan,row.bmnPinjam,row.status].join(' '));
-    setTextIfExists('summaryAdminJadwal', filtered.length + ' dari ' + (data || []).length + ' pengajuan ruangan');
-    if (!filtered.length) { tbody.innerHTML = '<tr><td colspan="11">Data pinjam ruangan tidak ditemukan.</td></tr>'; return; }
-    tbody.innerHTML = filtered.map(row => `<tr><td>${escapeHtml(row.idBooking || '-')}</td><td>${escapeHtml(row.tanggal)}</td><td>${escapeHtml(row.ruangan)}</td><td>${escapeHtml(row.mulai)} - ${escapeHtml(row.selesai)}</td><td>${escapeHtml(row.nama)}</td><td>${escapeHtml(row.namaKegiatan || '-')}</td><td>${escapeHtml(row.jumlahPeserta || '-')}</td><td>${escapeHtml(row.pesertaJabatan || '-')}</td><td>${escapeHtml(row.bmnPinjam || '-')}</td><td>${badgeStatus(row.status)}</td><td>${tombolAksiStatus('booking', row.idBooking, row.status)}</td></tr>`).join('');
+  muatMasterData(callback, forceRefresh);
+}
+
+function jalankanMasterDataCallbacks() {
+  const callbacks = masterDataCallbacks.splice(0, masterDataCallbacks.length);
+  callbacks.forEach(function (fn) {
+    try { if (typeof fn === 'function') fn(); } catch (e) { console.error(e); }
+  });
+}
+
+function isiDatalistPegawai() { const el = document.getElementById('listPegawai'); if (el) el.innerHTML = (masterData.pegawai || []).map(n => `<option value="${escapeHtml(n)}"></option>`).join(''); }
+function labelBMN(item) { return [item.kodeBarang ? 'Kode: ' + item.kodeBarang : '', item.nup ? 'NUP: ' + item.nup : '', item.nama, item.merk, item.tahunPerolehan, item.lokasi].filter(Boolean).join(' | '); }
+function isiDatalistBMN() { const el = document.getElementById('listBMN'); if (el) el.innerHTML = (masterData.bmn || []).map(item => `<option value="${escapeHtml(labelBMN(item))}"></option>`).join(''); }
+function cariBMNDariInput(value) { const teks = normalizeText(value); return (masterData.bmn || []).find(item => normalizeText(labelBMN(item)) === teks) || null; }
+
+function renderChecklistBMNPinjam() {
+  const container = document.getElementById('bmnChecklistContainer');
+  if (!container) return;
+  const ruangan = document.getElementById('ruanganBooking').value;
+  document.getElementById('bmnDipinjam').value = '-';
+  if (!ruangan) { container.innerHTML = '<div class="muted">Pilih ruangan terlebih dahulu untuk menampilkan BMN yang ada di ruangan tersebut.</div>'; return; }
+  const data = (masterData.bmn || []).filter(item => normalizeRoom(item.lokasi) === normalizeRoom(ruangan));
+  if (!data.length) { container.innerHTML = '<div class="muted">Belum ada BMN tercatat pada ' + escapeHtml(ruangan) + '.</div>'; return; }
+  container.innerHTML = data.map((item, i) => `<label class="checkbox-item"><input type="checkbox" class="cekBmnPinjam" value="${escapeHtml(labelBMN(item))}" onchange="updateBMNPinjamTerpilih()"><div>${escapeHtml(item.nama || '-')}<span>${escapeHtml([item.kodeBarang ? 'Kode: ' + item.kodeBarang : '', item.nup ? 'NUP: ' + item.nup : '', item.merk, item.kondisi].filter(Boolean).join(' · '))}</span></div></label>`).join('');
+}
+function updateBMNPinjamTerpilih() { const values = Array.from(document.querySelectorAll('.cekBmnPinjam:checked')).map(el => el.value); document.getElementById('bmnDipinjam').value = values.length ? values.join('; ') : '-'; }
+function normalizeRoom(value) { return normalizeText(value).replace(/ruang /g,'').replace(/ruangan /g,''); }
+
+function muatJadwal() {
+  if (!tanggalJadwalAktif) tanggalJadwalAktif = tanggalHariIniWita();
+  const tanggalRequest = tanggalJadwalAktif;
+  const requestId = ++requestJadwalUserAktif;
+  const tbody = document.getElementById('tabelJadwalPinjam');
+  const ringkasan = document.getElementById('ringkasanTanggalJadwal');
+
+  if (tbody) tbody.innerHTML = '<tr><td colspan="8">Memuat jadwal...</td></tr>';
+  if (ringkasan) ringkasan.textContent = 'Memuat · ' + formatTanggalJadwal(tanggalRequest);
+
+  google.script.run
+    .withSuccessHandler(function (data) {
+      if (requestId !== requestJadwalUserAktif || tanggalRequest !== tanggalJadwalAktif) return;
+      daftarJadwalUser = Array.isArray(data) ? data : [];
+      renderTabelJadwal('tabelJadwalPinjam', daftarJadwalUser, true);
+      perbaruiLabelTanggalJadwal(daftarJadwalUser.length);
+    })
+    .withFailureHandler(function (err) {
+      if (requestId !== requestJadwalUserAktif || tanggalRequest !== tanggalJadwalAktif) return;
+      daftarJadwalUser = [];
+      renderError('tabelJadwalPinjam', err && err.message ? err.message : String(err || 'Gagal memuat jadwal.'), 8);
+      if (ringkasan) ringkasan.textContent = 'Gagal memuat · ' + formatTanggalJadwal(tanggalRequest);
+    })
+    .getJadwalRingkas(tanggalRequest, LIMIT_USER);
+}
+function renderTabelJadwal(targetId, data, detail) {
+  const tbody = document.getElementById(targetId); if (!tbody) return;
+  const colspan = detail ? 8 : 7;
+  if (!data.length) {
+    const tanggal = formatTanggalJadwal(tanggalJadwalAktif || tanggalHariIniWita());
+    tbody.innerHTML = `<tr class="schedule-empty-row"><td colspan="${colspan}">Belum ada jadwal ruangan pada ${escapeHtml(tanggal)}.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = data.map(row => detail ? `<tr><td>${escapeHtml(row.tanggal)}</td><td>${escapeHtml(row.ruangan)}</td><td>${escapeHtml(row.mulai)} - ${escapeHtml(row.selesai)}</td><td>${escapeHtml(row.nama)}</td><td>${escapeHtml(row.namaKegiatan || '-')}</td><td>${escapeHtml(row.jumlahPeserta || '-')}<br><span class="muted">${escapeHtml(row.pesertaJabatan || '-')}</span></td><td>${escapeHtml(row.bmnPinjam || '-')}</td><td>${badgeStatus(row.status)}</td></tr>` : `<tr><td>${escapeHtml(row.tanggal)}</td><td>${escapeHtml(row.ruangan)}</td><td>${escapeHtml(row.mulai)} - ${escapeHtml(row.selesai)}</td><td>${escapeHtml(row.nama)}</td><td>${escapeHtml(row.namaKegiatan || '-')}</td><td>${escapeHtml(row.bmnPinjam || '-')}</td><td>${badgeStatus(row.status)}</td></tr>`).join('');
+}
+
+function validasiBookingRealtime() {
+  const pesan = pesanValidasiWaktuBooking(document.getElementById('tanggalBooking').value, document.getElementById('jamMulaiBooking').value, document.getElementById('jamSelesaiBooking').value);
+  if (pesan) tampilAlert('alertPinjam', pesan, 'error');
+}
+function pesanValidasiWaktuBooking(tanggal, mulai, selesai) {
+  if (!tanggal || !mulai || !selesai) return '';
+  const start = new Date(tanggal + 'T' + mulai); const end = new Date(tanggal + 'T' + selesai);
+  if (end <= start) return 'Jam selesai harus lebih besar dari jam mulai.';
+  if (start < new Date()) return 'Tanggal dan jam mulai tidak boleh berada di masa lalu.';
+  return '';
+}
+function parseJamClientKeMenit(value) {
+  const match = String(value || '').trim().match(/^(\d{1,2})[:.](\d{2})/);
+  if (!match) return null;
+  const jam = Number(match[1]);
+  const menit = Number(match[2]);
+  if (jam < 0 || jam > 23 || menit < 0 || menit > 59) return null;
+  return jam * 60 + menit;
+}
+
+function cariJadwalBentrokClient(form) {
+  // Pengecekan client hanya digunakan sebagai peringatan cepat jika tanggal form
+  // sama dengan tanggal jadwal yang sedang dimuat. Backend tetap menjadi otoritas final.
+  if (!form || form.tanggal !== tanggalJadwalAktif) return null;
+  const mulaiBaru = parseJamClientKeMenit(form.jamMulai);
+  const selesaiBaru = parseJamClientKeMenit(form.jamSelesai);
+  if (mulaiBaru === null || selesaiBaru === null) return null;
+
+  return (daftarJadwalUser || []).find(function(row) {
+    if (normalizeText(row.status).includes('tolak')) return false;
+    if (normalizeRoom(row.ruangan) !== normalizeRoom(form.ruangan)) return false;
+    const mulaiLama = parseJamClientKeMenit(row.mulai);
+    const selesaiLama = parseJamClientKeMenit(row.selesai);
+    if (mulaiLama === null || selesaiLama === null) return false;
+    return mulaiBaru < selesaiLama && selesaiBaru > mulaiLama;
+  }) || null;
+}
+
+function submitBooking(event) {
+  event.preventDefault();
+  updateBMNPinjamTerpilih();
+  let identitas;
+  try { identitas = identitasUntukSubmit('ruangan'); }
+  catch (e) { return tampilAlert('alertPinjam', e.message || String(e), 'error'); }
+
+  const form = {
+    nip: identitas.nip, nama: identitas.nama, whatsapp: identitas.whatsapp, ubahWhatsapp: identitas.ubahWhatsapp,
+    tanggal: val('tanggalBooking'), ruangan: val('ruanganBooking'), jamMulai: val('jamMulaiBooking'), jamSelesai: val('jamSelesaiBooking'),
+    bmnDipinjam: val('bmnDipinjam') || '-', namaKegiatan: val('namaKegiatanRuangan'), jumlahPeserta: val('jumlahPesertaRuangan'), pesertaJabatan: val('pesertaJabatanRuangan')
+  };
+  const pesanWaktu = pesanValidasiWaktuBooking(form.tanggal, form.jamMulai, form.jamSelesai);
+  if (pesanWaktu) return tampilAlert('alertPinjam', pesanWaktu, 'error');
+  const bentrok = cariJadwalBentrokClient(form);
+  if (bentrok) return tampilAlert('alertPinjam', 'Jadwal bentrok dengan ' + bentrok.ruangan + ' pukul ' + bentrok.mulai + ' - ' + bentrok.selesai + ' oleh ' + bentrok.nama + '.', 'error');
+
+  runSubmit('btnSubmitBooking', 'Mengirim...', 'Kirim Pengajuan Pinjam Ruangan', 'alertPinjam', function(runner) {
+    runner.simpanBooking(form);
+  }, function() {
+    document.getElementById('formBooking').reset();
+    resetIdentitasPeminjam('ruangan');
+    setTanggalHariIni();
+    renderChecklistBMNPinjam();
+    pilihTanggalJadwal(form.tanggal);
+  });
+}
+
+function submitPinjamKendaraan(event) {
+  event.preventDefault();
+  setMinDateTimeLocal();
+
+  let identitas;
+  try {
+    identitas = identitasUntukSubmit('kendaraan');
+  } catch (e) {
+    return tampilAlert('alertPinjam', e.message || String(e), 'error');
   }
 
-  function simpanKeteranganKendaraan(idEncoded, textareaId, tombol) {
-    if (!pastikanAdminLogin()) return;
+  const mulai = val('mulaiKendaraan');
+  const batasKembali = val('batasKembaliKendaraan');
+  const jenisMobil = val('jenisMobilKendaraan');
+  const start = new Date(mulai);
+  const end = new Date(batasKembali);
 
-    const id = decodeURIComponent(idEncoded || '');
-    const textarea = document.getElementById(textareaId);
-    const keterangan = textarea ? String(textarea.value || '').trim() : '';
+  if (!mulai || !batasKembali || isNaN(start.getTime()) || isNaN(end.getTime()) || end <= start) {
+    return tampilAlert('alertPinjam', 'Waktu penggunaan kendaraan belum valid.', 'error');
+  }
 
-    if (keterangan.length > 500) {
-      return tampilAlert('alertAdminPinjam', 'Keterangan admin maksimal 500 karakter.', 'error');
-    }
+  if (start < new Date()) {
+    return tampilAlert('alertPinjam', 'Waktu mulai penggunaan kendaraan tidak boleh berada di masa lalu.', 'error');
+  }
 
-    const teksAwal = tombol ? tombol.textContent : '';
-    if (tombol) {
-      tombol.disabled = true;
-      tombol.textContent = 'Menyimpan...';
-    }
+  if (!jenisMobil) {
+    return tampilAlert(
+      'alertPinjam',
+      'Pilih jenis mobil yang masih tersedia. Kendaraan yang sudah terbooking/ACC tidak dapat dipilih.',
+      'error'
+    );
+  }
 
-    google.script.run.withSuccessHandler(function(pesan) {
-      if (tombol) {
-        tombol.disabled = false;
-        tombol.textContent = teksAwal || 'Simpan Catatan';
-      }
-      tampilAlert('alertAdminPinjam', pesan, 'success');
-      muatPinjamKendaraanAdmin();
+  const infoJenis = (daftarKetersediaanKendaraan || []).find(function(item) {
+    return item.jenisMobil === jenisMobil;
+  });
+
+  if (!infoJenis || Number(infoJenis.tersedia || 0) < 1) {
+    const select = document.getElementById('jenisMobilKendaraan');
+    if (select) select.value = '';
+
+    return tampilAlert(
+      'alertPinjam',
+      'Jenis mobil tersebut sudah penuh/terbooking pada jadwal ini. Silakan pilih jenis mobil lain atau ubah waktu penggunaan.',
+      'error'
+    );
+  }
+
+  const form = {
+    nip: identitas.nip,
+    nama: identitas.nama,
+    whatsapp: identitas.whatsapp,
+    ubahWhatsapp: identitas.ubahWhatsapp,
+    kegiatan: val('kegiatanKendaraan'),
+    tujuan: val('tujuanKendaraan'),
+    jenisMobil: jenisMobil,
+    mulaiPenggunaan: mulai,
+    batasKembali: batasKembali
+  };
+
+  runSubmit(
+    'btnSubmitKendaraan',
+    'Mengirim...',
+    'Kirim Pengajuan Pinjam Kendaraan',
+    'alertPinjam',
+    function(runner) {
+      runner.simpanPinjamKendaraan(form);
+    },
+    function() {
+      document.getElementById('formPinjamKendaraan').reset();
+      resetIdentitasPeminjam('kendaraan');
+      resetKetersediaanKendaraan();
+      setMinDateTimeLocal();
       muatPinjamKendaraan();
-    }).withFailureHandler(function(err) {
-      if (tombol) {
-        tombol.disabled = false;
-        tombol.textContent = teksAwal || 'Simpan Catatan';
+    }
+  );
+}
+
+function submitPinjamSarpras(event) {
+  event.preventDefault();
+  setMinDateTimeLocal();
+  let identitas;
+  try { identitas = identitasUntukSubmit('sarpras'); }
+  catch (e) { return tampilAlert('alertPinjam', e.message || String(e), 'error'); }
+
+  const form = {
+    nip: identitas.nip, nama: identitas.nama, whatsapp: identitas.whatsapp, ubahWhatsapp: identitas.ubahWhatsapp,
+    kegiatan: val('kegiatanSarpras'), tempat: val('tempatSarpras'), tujuan: val('tempatSarpras'),
+    jenisBarang: val('jenisBarangSarpras'), lama: val('lamaSarpras'), batasKembali: val('batasKembaliSarpras')
+  };
+  if (new Date(form.batasKembali) < new Date()) return tampilAlert('alertPinjam', 'Batas kembali sarpras tidak boleh berada di masa lalu.', 'error');
+  runSubmit('btnSubmitSarpras', 'Mengirim...', 'Kirim Pengajuan Pinjam Sarpras', 'alertPinjam', r => r.simpanPinjamSarpras(form), function() {
+    document.getElementById('formPinjamSarpras').reset();
+    resetIdentitasPeminjam('sarpras');
+    setMinDateTimeLocal();
+    muatPinjamSarpras();
+  });
+}
+
+function muatPinjamKendaraan() {
+  google.script.run.withSuccessHandler(function(data) {
+    daftarKendaraan = data || [];
+    renderPinjamKendaraan('tabelPinjamKendaraan', daftarKendaraan, false);
+  }).withFailureHandler(err => renderError('tabelPinjamKendaraan', err.message, 10)).getPinjamKendaraanRingkas(LIMIT_USER);
+}
+function muatPinjamSarpras() { google.script.run.withSuccessHandler(function(data) { daftarSarpras = data || []; renderPinjamSarpras('tabelPinjamSarpras', daftarSarpras, false); }).withFailureHandler(err => renderError('tabelPinjamSarpras', err.message, 8)).getPinjamSarprasRingkas(LIMIT_USER); }
+
+function renderUnitKendaraanAdmin(row) {
+  const assigned = String(row.mobilDitugaskan || '').trim();
+  if (assigned) return '<span class="assigned-vehicle">' + escapeHtml(assigned) + '</span>';
+  const modern = !!(row.jenisMobil && row.mulaiPenggunaan && row.batasKembali);
+  const pending = normalizeText(row.status).includes('pending') || !normalizeText(row.status);
+  if (!modern || !pending) return '<span class="muted">-</span>';
+  const options = Array.isArray(row.opsiMobilDitugaskan) ? row.opsiMobilDitugaskan : [];
+  const selectId = buatDomId('unitKendaraan_' + (row.idPinjam || ''));
+  if (!options.length) return '<select id="' + selectId + '" class="unit-vehicle-select" data-requires-assignment="1" disabled><option value="">Tidak ada unit tersedia</option></select>';
+  return '<select id="' + selectId + '" class="unit-vehicle-select" data-requires-assignment="1"><option value="">Pilih unit...</option>' + options.map(unit => '<option value="' + escapeHtml(unit) + '">' + escapeHtml(unit) + '</option>').join('') + '</select>';
+}
+
+function renderPinjamKendaraan(id, data, admin) {
+  const tbody = document.getElementById(id); if (!tbody) return;
+  const colspan = admin ? 12 : 10;
+  let rows = data || [];
+  if (admin && id === 'tabelAdminKendaraan') {
+    rows = filterAdminPinjamRows(rows, 'filterAdminKendaraan', 'filterStatusAdminKendaraan', row => [row.idPinjam,row.tanggalPengajuan,row.nama,row.kegiatan,row.tujuan,row.jenisMobil,row.mulaiPenggunaan,row.batasKembali,row.mobilDitugaskan,row.status,statusDenganTerlambat(row),row.keteranganAdmin].join(' '));
+    setTextIfExists('summaryAdminKendaraan', rows.length + ' dari ' + (data || []).length + ' pengajuan kendaraan');
+  }
+  if (!rows.length) { tbody.innerHTML = `<tr><td colspan="${colspan}">Data pinjam kendaraan tidak ditemukan.</td></tr>`; return; }
+
+  tbody.innerHTML = rows.map(row => {
+    const ket = row.keteranganAdmin || '';
+    const idEncoded = encodeURIComponent(row.idPinjam || '');
+    const noteId = buatDomId('ketKendaraan_' + (row.idPinjam || ''));
+    const noteCell = admin
+      ? `<td class="admin-note-cell"><textarea class="admin-note-input" id="${noteId}" maxlength="500" placeholder="Catatan untuk peminjam kendaraan, opsional...">${escapeHtml(ket)}</textarea><div style="margin-top:6px;"><button class="btn-light btn-small" onclick="simpanKeteranganKendaraan('${idEncoded}', '${noteId}', this)">Simpan Catatan</button></div></td>`
+      : `<td><span class="admin-note-view">${escapeHtml(ket || '-')}</span></td>`;
+    const jenis = escapeHtml(row.jenisMobil || '-');
+    const mulai = escapeHtml(formatDateTimeRingkas(row.mulaiPenggunaan));
+    const kembali = escapeHtml(formatDateTimeRingkas(row.batasKembali));
+    const unit = admin ? renderUnitKendaraanAdmin(row) : escapeHtml(row.mobilDitugaskan || 'Menunggu penetapan admin');
+    const status = badgeStatus(statusDenganTerlambat(row));
+    const cls = isOverdue(row) ? 'return-warning' : '';
+
+    if (admin) {
+      return `<tr class="${cls}"><td>${escapeHtml(row.idPinjam)}</td><td>${escapeHtml(row.tanggalPengajuan || '-')}</td><td>${escapeHtml(row.nama)}</td><td>${escapeHtml(row.kegiatan)}</td><td>${escapeHtml(row.tujuan)}</td><td>${jenis}</td><td>${mulai}</td><td>${kembali}</td><td>${unit}</td><td>${status}</td>${noteCell}<td>${tombolAksiStatus('kendaraan', row.idPinjam, row.status, statusDenganTerlambat(row))}</td></tr>`;
+    }
+    return `<tr class="${cls}"><td>${escapeHtml(row.idPinjam)}</td><td>${escapeHtml(row.nama)}</td><td>${escapeHtml(row.kegiatan)}</td><td>${escapeHtml(row.tujuan)}</td><td>${jenis}</td><td>${mulai}</td><td>${kembali}</td><td>${unit}</td><td>${status}</td>${noteCell}</tr>`;
+  }).join('');
+}
+
+function renderPinjamSarpras(id, data, admin) {
+  const tbody = document.getElementById(id); if (!tbody) return;
+  const colspan = admin ? 10 : 8;
+  let rows = data || [];
+  if (admin && id === 'tabelAdminSarpras') {
+    rows = filterAdminPinjamRows(rows, 'filterAdminSarpras', 'filterStatusAdminSarpras', row => [row.idPinjam,row.tanggalPengajuan,row.nama,row.kegiatan,row.tempat,row.jenisBarang,row.lama,row.batasKembali,row.status,statusDenganTerlambat(row)].join(' '));
+    setTextIfExists('summaryAdminSarpras', rows.length + ' dari ' + (data || []).length + ' pengajuan sarpras');
+  }
+  if (!rows.length) { tbody.innerHTML = `<tr><td colspan="${colspan}">Data pinjam sarpras tidak ditemukan.</td></tr>`; return; }
+  tbody.innerHTML = rows.map(row => `<tr class="${isOverdue(row) ? 'return-warning' : ''}"><td>${escapeHtml(row.idPinjam)}</td>${admin ? `<td>${escapeHtml(row.tanggalPengajuan || '-')}</td>` : ''}<td>${escapeHtml(row.nama)}</td><td>${escapeHtml(row.kegiatan)}</td><td>${escapeHtml(row.tempat)}</td><td>${escapeHtml(row.jenisBarang)}</td><td>${escapeHtml(row.lama)}</td><td>${escapeHtml(formatDateTimeRingkas(row.batasKembali))}</td><td>${badgeStatus(statusDenganTerlambat(row))}</td>${admin ? `<td>${tombolAksiStatus('sarpras', row.idPinjam, row.status, statusDenganTerlambat(row))}</td>` : ''}</tr>`).join('');
+}
+function isOverdue(row) { const st = normalizeText(row.status); if (st.includes('dikembalikan') || st.includes('tolak')) return false; const t = row.batasKembali ? new Date(row.batasKembali) : null; return t && !isNaN(t.getTime()) && t < new Date(); }
+function statusDenganTerlambat(row) { return isOverdue(row) ? 'Terlambat' : row.status; }
+
+function submitPemeliharaan(event) { event.preventDefault(); const item = cariBMNDariInput(val('bmnPemeliharaanInput')); if (!item) return tampilAlert('alertPemeliharaan', 'Silakan pilih BMN dari daftar pencarian.', 'error'); const form = { kodeBarang: item.kodeBarang, nup: item.nup, namaBmn: item.nama, tanggal: val('tanggalPemeliharaan'), deskripsi: val('deskripsiPemeliharaan'), sumber: 'User' }; kirimPemeliharaanDenganFoto(form, 'fotoPemeliharaan', 'btnSubmitPemeliharaan', 'Kirim Laporan Pemeliharaan', 'alertPemeliharaan', function() { document.getElementById('formPemeliharaan').reset(); setTanggalHariIni(); tutupFormPemeliharaanUser(); muatPemeliharaan(); }); }
+function submitAdminPemeliharaan(event) { event.preventDefault(); const item = cariBMNDariInput(val('bmnAdminPemeliharaanInput')); if (!item) return tampilAlert('alertAdminPemeliharaan', 'Silakan pilih BMN dari daftar pencarian.', 'error'); const form = { kodeBarang: item.kodeBarang, nup: item.nup, namaBmn: item.nama, tanggal: val('tanggalAdminPemeliharaan'), deskripsi: val('deskripsiAdminPemeliharaan'), sumber: 'Administrator' }; kirimPemeliharaanDenganFoto(form, 'fotoAdminPemeliharaan', 'btnSubmitAdminPemeliharaan', 'Simpan Pemeliharaan Rutin', 'alertAdminPemeliharaan', function() { document.getElementById('formAdminPemeliharaan').reset(); setTanggalHariIni(); muatPemeliharaanAdmin(); muatPemeliharaan(); }); }
+function kirimPemeliharaanDenganFoto(form, fileInputId, btnId, defaultText, alertId, successCallback) { const file = document.getElementById(fileInputId).files[0]; if (!file) return kirimPemeliharaan(form, btnId, defaultText, alertId, successCallback); const reader = new FileReader(); reader.onload = e => { form.fotoBase64 = e.target.result; form.namaFile = file.name; kirimPemeliharaan(form, btnId, defaultText, alertId, successCallback); }; reader.onerror = () => tampilAlert(alertId, 'Gagal membaca file foto.', 'error'); reader.readAsDataURL(file); }
+function kirimPemeliharaan(form, btnId, defaultText, alertId, successCallback) { runSubmit(btnId, 'Menyimpan...', defaultText, alertId, r => r.simpanPemeliharaan(form), successCallback); }
+function muatPemeliharaan() { google.script.run.withSuccessHandler(data => renderTabelPemeliharaan(data || [])).withFailureHandler(err => renderError('tabelPemeliharaan', err.message, 7)).getPemeliharaanRingkas(LIMIT_USER); }
+function renderTabelPemeliharaan(data) { const tbody = document.getElementById('tabelPemeliharaan'); if (!tbody) return; if (!data.length) { tbody.innerHTML = '<tr><td colspan="7">Belum ada laporan pemeliharaan.</td></tr>'; return; } tbody.innerHTML = data.map(row => `<tr><td>${escapeHtml(row.kodeBarang || '-')}</td><td>${escapeHtml(row.nup || '-')}</td><td>${escapeHtml(row.nama || '-')}</td><td>${escapeHtml(row.tgl || '-')}</td><td>${escapeHtml(row.ket || '-')}</td><td>${row.foto && row.foto !== '-' ? `<a href="${escapeHtml(row.foto)}" target="_blank">Lihat Foto</a>` : '-'}</td><td>${badgeStatus(row.status)}</td></tr>`).join(''); }
+
+
+function lokasiUtamaInventaris() { return ['Ruang Aula', 'Ruang Zona Integritas', 'Ruang Transit']; }
+function namaLokasiBMN(item) { return String((item && item.lokasi) || '').trim() || 'Tanpa Lokasi'; }
+function daftarLokasiInventaris() {
+  const set = new Set((masterData.bmn || []).map(namaLokasiBMN));
+  const utama = lokasiUtamaInventaris().filter(l => set.has(l));
+  const lain = Array.from(set).filter(l => !lokasiUtamaInventaris().includes(l)).sort((a,b) => a.localeCompare(b, 'id', { numeric:true, sensitivity:'base' }));
+  return utama.concat(lain);
+}
+function dataInventarisLokasi(lokasi) {
+  return (masterData.bmn || []).filter(item => namaLokasiBMN(item) === lokasi);
+}
+function badgeKondisiRingkas(label, jumlah) { return `<span>${escapeHtml(label)}: ${jumlah}</span>`; }
+function hitungKondisi(data) {
+  const ringkas = { baik:0, ringan:0, berat:0, lain:0 };
+  data.forEach(item => {
+    const kondisi = normalizeText(item.kondisi || '');
+    if (kondisi.includes('baik')) ringkas.baik++;
+    else if (kondisi.includes('ringan')) ringkas.ringan++;
+    else if (kondisi.includes('berat')) ringkas.berat++;
+    else ringkas.lain++;
+  });
+  return ringkas;
+}
+function renderSelectInventarisLokasi(lokasiList) {
+  const select = document.getElementById('selectInventarisLokasi');
+  if (!select) return;
+  select.innerHTML = lokasiList.map(lokasi => `<option value="${escapeHtml(lokasi)}" ${lokasi === inventarisLokasiAktif ? 'selected' : ''}>${escapeHtml(lokasi)}</option>`).join('');
+}
+function renderKartuInventarisLokasi(lokasiList) {
+  const grid = document.getElementById('inventarisRoomGrid');
+  if (!grid) return;
+  if (!lokasiList.length) {
+    grid.innerHTML = '<div class="empty-guide" style="grid-column:1/-1;">Belum ada data lokasi BMN. Isi kolom Lokasi pada sheet Data_BMN terlebih dahulu.</div>';
+    return;
+  }
+  grid.innerHTML = lokasiList.map(lokasi => {
+    const data = dataInventarisLokasi(lokasi);
+    const k = hitungKondisi(data);
+    const aktif = lokasi === inventarisLokasiAktif ? 'active' : '';
+    return `<button class="inventory-room-card ${aktif}" onclick="pilihLokasiInventaris('${encodeURIComponent(lokasi)}')">
+      <h3>${escapeHtml(lokasi)}</h3>
+      <div class="count">${data.length}</div>
+      <p class="muted">item BMN tercatat</p>
+      <div class="inventory-meta">${badgeKondisiRingkas('Baik', k.baik)}${badgeKondisiRingkas('RR', k.ringan)}${badgeKondisiRingkas('RB', k.berat)}${k.lain ? badgeKondisiRingkas('Lain', k.lain) : ''}</div>
+    </button>`;
+  }).join('');
+}
+function pilihLokasiInventaris(encodedLokasi) {
+  inventarisLokasiAktif = decodeURIComponent(encodedLokasi || '');
+  renderInventarisRuangan(false);
+  pushHistoryState({ section: 'dashboardInventarisRuangan', inventarisLokasi: inventarisLokasiAktif });
+}
+function pilihLokasiInventarisSelect() {
+  inventarisLokasiAktif = val('selectInventarisLokasi');
+  renderInventarisRuangan(false);
+  pushHistoryState({ section: 'dashboardInventarisRuangan', inventarisLokasi: inventarisLokasiAktif });
+}
+function resetInventarisRuangan() {
+  const search = document.getElementById('searchInventarisRuangan');
+  if (search) search.value = '';
+  renderInventarisRuangan(false);
+}
+function renderInventarisRuangan(resetLokasi) {
+  if (!masterDataLoaded) return pastikanMasterData(function() { renderInventarisRuangan(resetLokasi); });
+  const tbody = document.getElementById('tabelInventarisRuangan');
+  if (!tbody) return;
+  const lokasiList = daftarLokasiInventaris();
+  if (resetLokasi || !inventarisLokasiAktif || !lokasiList.includes(inventarisLokasiAktif)) {
+    inventarisLokasiAktif = lokasiList[0] || '';
+  }
+  renderSelectInventarisLokasi(lokasiList);
+  renderKartuInventarisLokasi(lokasiList);
+
+  const judul = document.getElementById('judulInventarisRuangan');
+  const ringkasan = document.getElementById('ringkasanInventarisRuangan');
+
+  if (!inventarisLokasiAktif) {
+    if (judul) judul.textContent = 'Inventaris Ruangan';
+    if (ringkasan) ringkasan.textContent = 'Belum ada data lokasi BMN.';
+    tbody.innerHTML = '<tr><td colspan="8">Belum ada data lokasi BMN.</td></tr>';
+    return;
+  }
+
+  const keyword = normalizeText(val('searchInventarisRuangan'));
+  const keys = keyword.split(' ').filter(Boolean);
+  const semuaDiLokasi = dataInventarisLokasi(inventarisLokasiAktif);
+  const data = semuaDiLokasi.filter(item => {
+    const txt = normalizeText([item.kodeBarang, item.nup, item.nama, item.merk, item.tahunPerolehan, item.kondisi, item.pj].join(' '));
+    return keys.every(k => txt.includes(k));
+  }).sort((a,b) => String(a.nama || '').localeCompare(String(b.nama || ''), 'id', { numeric:true, sensitivity:'base' }));
+
+  if (judul) judul.textContent = 'Inventaris ' + inventarisLokasiAktif;
+  if (ringkasan) ringkasan.textContent = data.length + ' dari ' + semuaDiLokasi.length + ' BMN ditampilkan' + (keyword ? ' berdasarkan pencarian.' : '.');
+
+  if (!data.length) {
+    tbody.innerHTML = '<tr><td colspan="8">Tidak ada BMN yang cocok pada ruangan ini.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.map((item, i) => `<tr><td>${i+1}</td><td>${escapeHtml(item.kodeBarang || '-')}</td><td>${escapeHtml(item.nup || '-')}</td><td>${escapeHtml(item.nama || '-')}</td><td>${escapeHtml(item.merk || '-')}</td><td>${escapeHtml(item.tahunPerolehan || '-')}</td><td>${escapeHtml(item.kondisi || '-')}</td><td>${escapeHtml(item.pj || '-')}</td></tr>`).join('');
+}
+
+function submitLoginAdmin(event) { event.preventDefault(); runSubmit('btnLoginAdmin', 'Memverifikasi...', 'Masuk Administrator', 'alertLoginAdmin', r => r.verifikasiPin(val('pinAdmin')), function(valid) { if (!valid) { tampilAlert('alertLoginAdmin', 'PIN salah. Silakan coba lagi.', 'error'); return false; } adminLogin = true; sessionStorage.setItem('adminLoginBMN','1'); document.getElementById('formLoginAdmin').reset(); tampilkanSection('dashboardAdmin'); }); }
+function logoutAdmin() { fetch('/api/logout', { method:'POST', credentials:'same-origin' }).catch(() => {}); adminLogin = false; sessionStorage.removeItem('adminLoginBMN'); kembaliKeUtama(); }
+function pastikanAdminLogin() { if (adminLogin) return true; bukaLoginAdmin(); return false; }
+function kembaliKeDashboardAdmin() { if (pastikanAdminLogin()) tampilkanSection('dashboardAdmin'); }
+function bukaAdminFitur(id) {
+  if (!pastikanAdminLogin()) return;
+  tampilkanSection(id);
+  if (id === 'adminDataBMN') pastikanMasterData(renderAdminDataBMN);
+  if (id === 'adminLokasiBMN') pastikanMasterData(renderAdminLokasiBMN);
+  if (id === 'adminPemeliharaan') muatPemeliharaanAdmin();
+  if (id === 'adminPinjamPakaiBMN') resetPanelAdminPinjam();
+}
+
+function toggleFormInputBMN(show) { const card = document.getElementById('cardInputBMNBaru'); card.classList.toggle('hidden', !show); if (show) document.getElementById('inputKodeBarangBMN').focus(); }
+function submitInputBMNBaru(event) { event.preventDefault(); const form = { kodeBarang: val('inputKodeBarangBMN'), nup: val('inputNupBMN'), namaBmn: val('inputNamaBMN'), merk: val('inputMerkBMN'), tahunPerolehan: val('inputTahunBMN'), kondisi: val('inputKondisiBMN'), lokasi: val('inputLokasiBMN'), pj: val('inputPjBMN') }; runSubmit('btnSimpanBMNBaru', 'Menyimpan...', 'Simpan Data BMN', 'alertInputBMN', r => r.simpanBMN(form), function() { document.getElementById('formInputBMNBaru').reset(); toggleFormInputBMN(false); muatMasterData(function() { renderAdminDataBMN(); renderAdminLokasiBMN(); }, true); }); }
+function filterDataBMN(keyword) {
+  const keys = normalizeText(keyword).split(' ').filter(Boolean);
+  return (masterData.bmn || []).filter(item => {
+    const txt = normalizeText([item.kodeBarang,item.nup,item.id,item.nama,item.merk,item.tahunPerolehan,item.kondisi,item.lokasi,item.pj].join(' '));
+    return keys.every(k => txt.includes(k));
+  });
+}
+function nilaiSortBMN(item, key) {
+  const nilai = item && item[key] != null ? item[key] : '';
+  if (key === 'nup' || key === 'tahunPerolehan') {
+    const angka = Number(String(nilai).replace(/[^0-9.-]/g, ''));
+    return Number.isFinite(angka) ? angka : String(nilai || '').toLowerCase();
+  }
+  return normalizeText(nilai || '');
+}
+function sortRowsBMN(data, state) {
+  const hasil = [...(data || [])];
+  const key = state.key;
+  const dir = state.dir === 'desc' ? -1 : 1;
+  hasil.sort((a, b) => {
+    const va = nilaiSortBMN(a, key);
+    const vb = nilaiSortBMN(b, key);
+    if (typeof va === 'number' && typeof vb === 'number') return (va - vb) * dir;
+    return String(va).localeCompare(String(vb), 'id', { numeric: true, sensitivity: 'base' }) * dir;
+  });
+  return hasil;
+}
+function refreshSortChips(group, state) {
+  document.querySelectorAll(`[data-sort-group="${group}"]`).forEach(btn => {
+    const aktif = btn.dataset.sortKey === state.key;
+    btn.classList.toggle('active', aktif);
+    const labelAsli = btn.dataset.originalLabel || btn.textContent.replace(/\s*[↑↓]$/,'');
+    btn.dataset.originalLabel = labelAsli;
+    btn.textContent = aktif ? `${labelAsli} ${state.dir === 'asc' ? '↑' : '↓'}` : labelAsli;
+  });
+}
+function setSortDataBMN(key) {
+  if (sortDataBMN.key === key) sortDataBMN.dir = sortDataBMN.dir === 'asc' ? 'desc' : 'asc';
+  else sortDataBMN = { key, dir: 'asc' };
+  renderAdminDataBMN();
+}
+function setSortLokasiBMN(key) {
+  if (sortLokasiBMN.key === key) sortLokasiBMN.dir = sortLokasiBMN.dir === 'asc' ? 'desc' : 'asc';
+  else sortLokasiBMN = { key, dir: 'asc' };
+  renderAdminLokasiBMN();
+}
+function renderAdminDataBMN() {
+  if (!masterDataLoaded) return pastikanMasterData(renderAdminDataBMN);
+  const tbody = document.getElementById('tabelAdminDataBMN');
+  const semua = masterData.bmn || [];
+  const data = sortRowsBMN(filterDataBMN(val('filterAdminDataBMN')), sortDataBMN);
+  refreshSortChips('data-bmn', sortDataBMN);
+  document.getElementById('jumlahAdminDataBMN').textContent = data.length + ' dari ' + semua.length + ' data BMN';
+  if (!data.length) { tbody.innerHTML = '<tr><td colspan="7">Data BMN tidak ditemukan.</td></tr>'; return; }
+  tbody.innerHTML = data.map((item,i) => `<tr><td>${i+1}</td><td>${escapeHtml(item.kodeBarang || '-')}</td><td>${escapeHtml(item.nup || '-')}</td><td>${escapeHtml(item.nama || '-')}</td><td>${escapeHtml(item.merk || '-')}</td><td>${escapeHtml(item.tahunPerolehan || '-')}</td><td>${escapeHtml(item.kondisi || '-')}</td></tr>`).join('');
+}
+function renderAdminLokasiBMN() {
+  if (!masterDataLoaded) return pastikanMasterData(renderAdminLokasiBMN);
+  const tbody = document.getElementById('tabelAdminLokasiBMN');
+  const semua = masterData.bmn || [];
+  const data = sortRowsBMN(filterDataBMN(val('filterAdminLokasiBMN')), sortLokasiBMN);
+  refreshSortChips('lokasi-bmn', sortLokasiBMN);
+  const totalLokasi = new Set(semua.map(item => item.lokasi || 'Tanpa Lokasi')).size;
+  document.getElementById('jumlahAdminLokasiBMN').textContent = data.length + ' data BMN · ' + totalLokasi + ' lokasi terdeteksi';
+  if (!data.length) { tbody.innerHTML = '<tr><td colspan="9">Data lokasi BMN tidak ditemukan.</td></tr>'; return; }
+  tbody.innerHTML = data.map((item,i) => `<tr><td>${i+1}</td><td>${escapeHtml(item.lokasi || 'Tanpa Lokasi')}</td><td>${escapeHtml(item.pj || '-')}</td><td>${escapeHtml(item.kodeBarang || '-')}</td><td>${escapeHtml(item.nup || '-')}</td><td>${escapeHtml(item.nama || '-')}</td><td>${escapeHtml(item.merk || '-')}</td><td>${escapeHtml(item.tahunPerolehan || '-')}</td><td>${escapeHtml(item.kondisi || '-')}</td></tr>`).join('');
+}
+function kosongkanValue(ids) { ids.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; }); }
+function resetAllAdminDataBMNSearch() { kosongkanValue(['filterAdminDataBMN']); renderAdminDataBMN(); }
+function resetAllAdminLokasiBMNSearch() { kosongkanValue(['filterAdminLokasiBMN']); renderAdminLokasiBMN(); }
+function resetFilterAdmin(inputId, callback) { const el = document.getElementById(inputId); if (el) el.value = ''; callback(); }
+
+function muatPemeliharaanAdmin() { google.script.run.withSuccessHandler(data => renderTabelPemeliharaanAdmin(data || [])).withFailureHandler(err => renderError('tabelAdminPemeliharaan', err.message, 10)).getPemeliharaanAdminRingkas(LIMIT_ADMIN); }
+function renderTabelPemeliharaanAdmin(data) { const tbody = document.getElementById('tabelAdminPemeliharaan'); if (!data.length) { tbody.innerHTML = '<tr><td colspan="10">Belum ada data pemeliharaan.</td></tr>'; return; } tbody.innerHTML = data.map(row => `<tr><td>${escapeHtml(row.idPemeliharaan || '-')}</td><td>${escapeHtml(row.kodeBarang || '-')}</td><td>${escapeHtml(row.nup || '-')}</td><td>${escapeHtml(row.nama || '-')}</td><td>${escapeHtml(row.tgl || '-')}</td><td>${escapeHtml(row.ket || '-')}</td><td>${row.foto && row.foto !== '-' ? `<a href="${escapeHtml(row.foto)}" target="_blank">Lihat Foto</a>` : '-'}</td><td>${escapeHtml(row.sumber || 'User')}</td><td>${badgeStatus(row.status)}</td><td>${tombolAksiStatus('pemeliharaan', row.idPemeliharaan, row.status)}</td></tr>`).join(''); }
+
+function muatPinjamPakaiAdmin() { muatJadwalAdmin(); muatPinjamKendaraanAdmin(); muatPinjamSarprasAdmin(); }
+function muatJadwalAdmin() { google.script.run.withSuccessHandler(data => { daftarJadwal = data || []; renderTabelJadwalAdmin(daftarJadwal); }).withFailureHandler(err => renderError('tabelAdminJadwal', err.message, 11)).getJadwalAdminRingkas(LIMIT_ADMIN); }
+function muatPinjamKendaraanAdmin() { google.script.run.withSuccessHandler(data => { daftarKendaraan = data || []; renderPinjamKendaraan('tabelAdminKendaraan', daftarKendaraan, true); }).withFailureHandler(err => renderError('tabelAdminKendaraan', err.message, 12)).getPinjamKendaraanAdminRingkas(LIMIT_ADMIN); }
+function muatPinjamSarprasAdmin() { google.script.run.withSuccessHandler(data => { daftarSarpras = data || []; renderPinjamSarpras('tabelAdminSarpras', daftarSarpras, true); }).withFailureHandler(err => renderError('tabelAdminSarpras', err.message, 10)).getPinjamSarprasAdminRingkas(LIMIT_ADMIN); }
+function filterAdminPinjamRows(data, inputId, statusId, textFn) {
+  let hasil = data || [];
+  const keyword = normalizeText(val(inputId));
+  const status = normalizeText(val(statusId));
+  if (keyword) {
+    const keys = keyword.split(' ').filter(Boolean);
+    hasil = hasil.filter(row => { const teks = normalizeText(textFn(row)); return keys.every(k => teks.includes(k)); });
+  }
+  if (status && status !== 'semua') hasil = hasil.filter(row => normalizeText(statusDenganTerlambat(row)).includes(status) || normalizeText(row.status).includes(status));
+  return hasil;
+}
+function setTextIfExists(id, text) { const el = document.getElementById(id); if (el) el.textContent = text; }
+function renderTabelJadwalAdmin(data) {
+  const tbody = document.getElementById('tabelAdminJadwal'); if (!tbody) return;
+  const filtered = filterAdminPinjamRows(data, 'filterAdminJadwal', 'filterStatusAdminJadwal', row => [row.idBooking,row.tanggal,row.ruangan,row.mulai,row.selesai,row.nama,row.namaKegiatan,row.jumlahPeserta,row.pesertaJabatan,row.bmnPinjam,row.status].join(' '));
+  setTextIfExists('summaryAdminJadwal', filtered.length + ' dari ' + (data || []).length + ' pengajuan ruangan');
+  if (!filtered.length) { tbody.innerHTML = '<tr><td colspan="11">Data pinjam ruangan tidak ditemukan.</td></tr>'; return; }
+  tbody.innerHTML = filtered.map(row => `<tr><td>${escapeHtml(row.idBooking || '-')}</td><td>${escapeHtml(row.tanggal)}</td><td>${escapeHtml(row.ruangan)}</td><td>${escapeHtml(row.mulai)} - ${escapeHtml(row.selesai)}</td><td>${escapeHtml(row.nama)}</td><td>${escapeHtml(row.namaKegiatan || '-')}</td><td>${escapeHtml(row.jumlahPeserta || '-')}</td><td>${escapeHtml(row.pesertaJabatan || '-')}</td><td>${escapeHtml(row.bmnPinjam || '-')}</td><td>${badgeStatus(row.status)}</td><td>${tombolAksiStatus('booking', row.idBooking, row.status)}</td></tr>`).join('');
+}
+
+function simpanKeteranganKendaraan(idEncoded, textareaId, tombol) {
+  if (!pastikanAdminLogin()) return;
+
+  const id = decodeURIComponent(idEncoded || '');
+  const textarea = document.getElementById(textareaId);
+  const keterangan = textarea ? String(textarea.value || '').trim() : '';
+
+  if (keterangan.length > 500) {
+    return tampilAlert('alertAdminPinjam', 'Keterangan admin maksimal 500 karakter.', 'error');
+  }
+
+  const teksAwal = tombol ? tombol.textContent : '';
+  if (tombol) {
+    tombol.disabled = true;
+    tombol.textContent = 'Menyimpan...';
+  }
+
+  google.script.run.withSuccessHandler(function(pesan) {
+    if (tombol) {
+      tombol.disabled = false;
+      tombol.textContent = teksAwal || 'Simpan Catatan';
+    }
+    tampilAlert('alertAdminPinjam', pesan, 'success');
+    muatPinjamKendaraanAdmin();
+    muatPinjamKendaraan();
+  }).withFailureHandler(function(err) {
+    if (tombol) {
+      tombol.disabled = false;
+      tombol.textContent = teksAwal || 'Simpan Catatan';
+    }
+    tampilAlert('alertAdminPinjam', 'Gagal menyimpan keterangan admin: ' + (err.message || err), 'error');
+  }).updateKeteranganKendaraan(id, keterangan);
+}
+
+function tombolAksiStatus(tipe, idData, statusSekarang, statusTampil) {
+  if (!idData) return '<span class="muted">ID belum tersedia</span>';
+
+  const statusRaw = normalizeText(statusSekarang);
+  const statusView = normalizeText(statusTampil || statusSekarang);
+  const id = encodeURIComponent(idData);
+  const isPending = !statusRaw || statusRaw.includes('pending');
+  const isDitolak = statusRaw.includes('tolak') || statusView.includes('tolak');
+  const isDikembalikan = statusRaw.includes('dikembalikan') || statusView.includes('dikembalikan');
+  const isDisetujui = statusRaw.includes('acc') || statusRaw.includes('setuju') || statusRaw.includes('dipakai') || statusView.includes('terlambat');
+
+  if (isPending) {
+    return `<div class="action-group"><button class="btn-green btn-small" onclick="ubahStatusAdmin('${tipe}','${id}','ACC', this)">ACC</button><button class="btn-danger btn-small" onclick="ubahStatusAdmin('${tipe}','${id}','Ditolak', this)">Tolak</button></div>`;
+  }
+
+  if ((tipe === 'kendaraan' || tipe === 'sarpras') && isDisetujui && !isDitolak && !isDikembalikan) {
+    return `<div class="action-group"><button class="btn-light btn-small" onclick="ubahStatusAdmin('${tipe}','${id}','Dikembalikan', this)">Dikembalikan</button></div>`;
+  }
+
+  return '<span class="muted">Tidak ada aksi</span>';
+}
+function ubahStatusAdmin(tipe, idEncoded, statusBaru, tombol) {
+  if (!pastikanAdminLogin()) return;
+  const id = decodeURIComponent(idEncoded || '');
+  let keteranganAdmin = '';
+  let mobilDitugaskan = '';
+
+  if (tipe === 'kendaraan') {
+    const noteEl = document.getElementById(buatDomId('ketKendaraan_' + id));
+    keteranganAdmin = noteEl ? String(noteEl.value || '').trim() : '';
+    if (statusBaru === 'ACC') {
+      const unitEl = document.getElementById(buatDomId('unitKendaraan_' + id));
+      if (unitEl) {
+        mobilDitugaskan = String(unitEl.value || '').trim();
+        if (unitEl.dataset.requiresAssignment === '1' && !mobilDitugaskan) {
+          return tampilAlert('alertAdminPinjam', 'Pilih mobil yang ditugaskan sebelum ACC.', 'error');
+        }
       }
-      tampilAlert('alertAdminPinjam', 'Gagal menyimpan keterangan admin: ' + (err.message || err), 'error');
-    }).updateKeteranganKendaraan(id, keterangan);
+    }
   }
 
-  function tombolAksiStatus(tipe, idData, statusSekarang, statusTampil) {
-    if (!idData) return '<span class="muted">ID belum tersedia</span>';
-
-    const statusRaw = normalizeText(statusSekarang);
-    const statusView = normalizeText(statusTampil || statusSekarang);
-    const id = encodeURIComponent(idData);
-    const isPending = !statusRaw || statusRaw.includes('pending');
-    const isDitolak = statusRaw.includes('tolak') || statusView.includes('tolak');
-    const isDikembalikan = statusRaw.includes('dikembalikan') || statusView.includes('dikembalikan');
-    const isDisetujui = statusRaw.includes('acc') || statusRaw.includes('setuju') || statusRaw.includes('dipakai') || statusView.includes('terlambat');
-
-    if (isPending) {
-      return `<div class="action-group"><button class="btn-green btn-small" onclick="ubahStatusAdmin('${tipe}','${id}','ACC', this)">ACC</button><button class="btn-danger btn-small" onclick="ubahStatusAdmin('${tipe}','${id}','Ditolak', this)">Tolak</button></div>`;
-    }
-
-    if ((tipe === 'kendaraan' || tipe === 'sarpras') && isDisetujui && !isDitolak && !isDikembalikan) {
-      return `<div class="action-group"><button class="btn-light btn-small" onclick="ubahStatusAdmin('${tipe}','${id}','Dikembalikan', this)">Dikembalikan</button></div>`;
-    }
-
-    return '<span class="muted">Tidak ada aksi</span>';
+  if (statusBaru === 'Ditolak' && !keteranganAdmin) {
+    const alasan = window.prompt('Keterangan/alasan penolakan untuk peminjam (opsional):', '');
+    if (alasan === null) return;
+    keteranganAdmin = String(alasan || '').trim();
   }
-  function ubahStatusAdmin(tipe, idEncoded, statusBaru, tombol) {
-    if (!pastikanAdminLogin()) return;
-    const id = decodeURIComponent(idEncoded || '');
-    if (!confirm('Ubah status data ' + id + ' menjadi ' + statusBaru + '?')) return;
+  if (keteranganAdmin.length > 500) return tampilAlert('alertAdminPinjam', 'Keterangan admin maksimal 500 karakter.', 'error');
 
-    const wrapperAksi = tombol ? tombol.closest('.action-group') : null;
+  const detailKonfirmasi = tipe === 'kendaraan' && statusBaru === 'ACC' && mobilDitugaskan ? ' dengan unit ' + mobilDitugaskan : '';
+  if (!confirm('Ubah status data ' + id + ' menjadi ' + statusBaru + detailKonfirmasi + '?')) return;
+
+  const wrapperAksi = tombol ? tombol.closest('.action-group') : null;
+  if (wrapperAksi) {
+    wrapperAksi.querySelectorAll('button').forEach(btn => btn.disabled = true);
+    wrapperAksi.insertAdjacentHTML('beforeend', '<span class="muted"> Memproses...</span>');
+  }
+
+  const runner = google.script.run.withSuccessHandler(function(pesan) {
+    tampilAlert(tipe === 'pemeliharaan' ? 'alertAdminPemeliharaan' : 'alertAdminPinjam', pesan, 'success');
+    if (tipe === 'pemeliharaan') {
+      muatPemeliharaanAdmin();
+      if (isVisible('dashboardPemeliharaan')) muatPemeliharaan();
+    } else if (tipe === 'booking') {
+      muatJadwalAdmin();
+      if (isVisible('panelPinjamRuangan')) muatJadwal();
+    } else if (tipe === 'kendaraan') {
+      muatPinjamKendaraanAdmin();
+      if (isVisible('panelPinjamKendaraan')) { muatPinjamKendaraan(); muatKetersediaanKendaraan(); }
+    } else if (tipe === 'sarpras') {
+      muatPinjamSarprasAdmin();
+      if (isVisible('panelPinjamSarpras')) muatPinjamSarpras();
+    }
+  }).withFailureHandler(function(err) {
     if (wrapperAksi) {
-      wrapperAksi.querySelectorAll('button').forEach(btn => btn.disabled = true);
-      wrapperAksi.insertAdjacentHTML('beforeend', '<span class="muted"> Memproses...</span>');
+      wrapperAksi.querySelectorAll('button').forEach(btn => btn.disabled = false);
+      const proses = wrapperAksi.querySelector('.muted');
+      if (proses) proses.remove();
     }
+    tampilAlert(tipe === 'pemeliharaan' ? 'alertAdminPemeliharaan' : 'alertAdminPinjam', 'Gagal mengubah status: ' + (err.message || err), 'error');
+  });
 
-    const runner = google.script.run.withSuccessHandler(function(pesan) {
-      tampilAlert(tipe === 'pemeliharaan' ? 'alertAdminPemeliharaan' : 'alertAdminPinjam', pesan, 'success');
-      if (tipe === 'pemeliharaan') {
-        muatPemeliharaanAdmin();
-        if (isVisible('dashboardPemeliharaan')) muatPemeliharaan();
-      } else if (tipe === 'booking') {
-        muatJadwalAdmin();
-        if (isVisible('panelPinjamRuangan')) muatJadwal();
-      } else if (tipe === 'kendaraan') {
-        muatPinjamKendaraanAdmin();
-        if (isVisible('panelPinjamKendaraan')) muatPinjamKendaraan();
-      } else if (tipe === 'sarpras') {
-        muatPinjamSarprasAdmin();
-        if (isVisible('panelPinjamSarpras')) muatPinjamSarpras();
-      }
-    }).withFailureHandler(function(err) {
-      if (wrapperAksi) {
-        wrapperAksi.querySelectorAll('button').forEach(btn => btn.disabled = false);
-        const proses = wrapperAksi.querySelector('.muted');
-        if (proses) proses.remove();
-      }
-      tampilAlert(tipe === 'pemeliharaan' ? 'alertAdminPemeliharaan' : 'alertAdminPinjam', 'Gagal mengubah status: ' + (err.message || err), 'error');
-    });
+  if (tipe === 'pemeliharaan') return runner.ubahStatusPemeliharaan(id, statusBaru);
+  if (tipe === 'booking') return runner.ubahStatusBooking(id, statusBaru, keteranganAdmin);
+  if (tipe === 'kendaraan') return runner.ubahStatusKendaraan(id, statusBaru, mobilDitugaskan, keteranganAdmin);
+  if (tipe === 'sarpras') return runner.ubahStatusSarpras(id, statusBaru, keteranganAdmin);
+}
 
-    if (tipe === 'pemeliharaan') return runner.ubahStatusPemeliharaan(id, statusBaru);
-    if (tipe === 'booking') return runner.ubahStatusBooking(id, statusBaru);
-    if (tipe === 'kendaraan') return runner.ubahStatusKendaraan(id, statusBaru);
-    if (tipe === 'sarpras') return runner.ubahStatusSarpras(id, statusBaru);
-  }
+function buatDomId(value) { return String(value || '').replace(/[^a-zA-Z0-9_-]/g, '_'); }
+function runSubmit(btnId, loadingText, defaultText, alertId, callFn, successCallback) { const btn = document.getElementById(btnId); btn.disabled = true; btn.textContent = loadingText; const runner = google.script.run.withSuccessHandler(function(result) { btn.disabled = false; btn.textContent = defaultText; if (successCallback) { const cont = successCallback(result); if (cont === false) return; } tampilAlert(alertId, typeof result === 'string' ? result : 'Berhasil.', 'success'); }).withFailureHandler(function(err) { btn.disabled = false; btn.textContent = defaultText; tampilAlert(alertId, err.message || 'Terjadi kesalahan.', 'error'); }); callFn(runner); }
+function badgeStatus(status) { const n = normalizeText(status); let c = 'status-default'; if (n.includes('pending')) c = 'status-pending'; if (n.includes('acc') || n.includes('setuju')) c = 'status-acc'; if (n.includes('tolak')) c = 'status-ditolak'; if (n.includes('dikembalikan')) c = 'status-dikembalikan'; if (n.includes('dipakai')) c = 'status-dipakai'; if (n.includes('terlambat')) c = 'status-terlambat'; return `<span class="status ${c}">${escapeHtml(status || '-')}</span>`; }
+function tampilAlert(id, pesan, tipe) { const el = document.getElementById(id); if (!el) return; el.className = 'alert show ' + (tipe === 'success' ? 'alert-success' : tipe === 'info' ? 'alert-info' : 'alert-error'); el.textContent = pesan; }
+function renderError(id, pesan, colspan) { const el = document.getElementById(id); if (el) el.innerHTML = `<tr><td colspan="${colspan}">Gagal memuat data: ${escapeHtml(pesan || '')}</td></tr>`; }
+function val(id) { const el = document.getElementById(id); return el ? String(el.value || '').trim() : ''; }
+function normalizeText(value) { return String(value || '').toLowerCase().trim().replace(/\s+/g,' '); }
+function isVisible(id) { const el = document.getElementById(id); return !!(el && !el.classList.contains('hidden')); }
+function escapeHtml(value) { return String(value == null ? '' : value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); }
 
-  function buatDomId(value) { return String(value || '').replace(/[^a-zA-Z0-9_-]/g, '_'); }
-  function runSubmit(btnId, loadingText, defaultText, alertId, callFn, successCallback) { const btn = document.getElementById(btnId); btn.disabled = true; btn.textContent = loadingText; const runner = google.script.run.withSuccessHandler(function(result) { btn.disabled = false; btn.textContent = defaultText; if (successCallback) { const cont = successCallback(result); if (cont === false) return; } tampilAlert(alertId, typeof result === 'string' ? result : 'Berhasil.', 'success'); }).withFailureHandler(function(err) { btn.disabled = false; btn.textContent = defaultText; tampilAlert(alertId, err.message || 'Terjadi kesalahan.', 'error'); }); callFn(runner); }
-  function badgeStatus(status) { const n = normalizeText(status); let c = 'status-default'; if (n.includes('pending')) c = 'status-pending'; if (n.includes('acc') || n.includes('setuju')) c = 'status-acc'; if (n.includes('tolak')) c = 'status-ditolak'; if (n.includes('dikembalikan')) c = 'status-dikembalikan'; if (n.includes('dipakai')) c = 'status-dipakai'; if (n.includes('terlambat')) c = 'status-terlambat'; return `<span class="status ${c}">${escapeHtml(status || '-')}</span>`; }
-  function tampilAlert(id, pesan, tipe) { const el = document.getElementById(id); if (!el) return; el.className = 'alert show ' + (tipe === 'success' ? 'alert-success' : tipe === 'info' ? 'alert-info' : 'alert-error'); el.textContent = pesan; }
-  function renderError(id, pesan, colspan) { const el = document.getElementById(id); if (el) el.innerHTML = `<tr><td colspan="${colspan}">Gagal memuat data: ${escapeHtml(pesan || '')}</td></tr>`; }
-  function val(id) { const el = document.getElementById(id); return el ? String(el.value || '').trim() : ''; }
-  function normalizeText(value) { return String(value || '').toLowerCase().trim().replace(/\s+/g,' '); }
-  function isVisible(id) { const el = document.getElementById(id); return !!(el && !el.classList.contains('hidden')); }
-  function escapeHtml(value) { return String(value == null ? '' : value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); }
-</script>
+  </script>
 </body>
 </html>
